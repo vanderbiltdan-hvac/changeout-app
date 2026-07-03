@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v01.18 | Local Logos, Column Persistence & Voice Stacking -->
+<!-- Changeout Lookup v01.17 | UI Cleanup, Real Logos & Voice Command Engine -->
 <!DOCTYPE html>
 <html lang="en" style="overscroll-behavior: none;">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Changeout Lookup v01.18</title>
+  <title>Changeout Lookup v01.17</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -46,7 +46,7 @@
       </div>
       
       <!-- Drawer Toggle Button -->
-      <button onclick="toggleDrawer()" class="flex items-center space-x-1 bg-slate-800 hover:bg-slate-750 transition border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-355 hover:text-white">
+      <button onclick="toggleDrawer()" class="flex items-center space-x-1 bg-slate-800 hover:bg-slate-755 transition border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-355 hover:text-white">
         <span>⚡ Quick Actions</span>
         <svg id="drawer-chevron" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
       </button>
@@ -399,7 +399,7 @@
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
           <span>Lookup</span>
-          <span class="text-[8px] font-normal text-blue-400">v01.18</span>
+          <span class="text-[8px] font-normal text-blue-400">v01.17</span>
         </span>
       </button>
 
@@ -506,7 +506,6 @@
     // Window load triggers
     window.addEventListener('DOMContentLoaded', () => {
       loadCartData();
-      loadColumnSettings();
     });
     window.addEventListener('load', loadData);
 
@@ -706,28 +705,8 @@
       const checkbox = document.getElementById(`toggle-col-${colKey}`);
       if (checkbox) {
         columnVisibility[colKey] = checkbox.checked;
-        saveColumnSettings();
         applyColumnVisibility();
       }
-    }
-
-    function saveColumnSettings() {
-        localStorage.setItem('changeout_columns_v1', JSON.stringify(columnVisibility));
-    }
-
-    function loadColumnSettings() {
-        const saved = localStorage.getItem('changeout_columns_v1');
-        if (saved) {
-            try {
-                Object.assign(columnVisibility, JSON.parse(saved));
-                Object.keys(columnVisibility).forEach(key => {
-                    const checkbox = document.getElementById(`toggle-col-${key}`);
-                    if (checkbox) checkbox.checked = columnVisibility[key];
-                });
-            } catch (e) {
-                console.error("Error loading column settings: ", e);
-            }
-        }
     }
 
     function applyColumnVisibility() {
@@ -875,9 +854,9 @@
         const brandVal = String(row[3] || "").trim().toUpperCase();
         let brandHtml = row[3] || "";
         if (brandVal === "CARRIER") {
-            brandHtml = `<img src="./Carrier-Logo-history.png" alt="Carrier" class="h-5 object-contain">`;
+            brandHtml = `<img src="https://www.carrier.com/residential/en/us/assets/carrier-logo-blue.svg" alt="Carrier" class="h-4 object-contain brightness-150">`;
         } else if (brandVal === "COMFORTMAKER") {
-            brandHtml = `<img src="./comfortmaker-air-conditioning-heating-logo-png_seeklogo-338392.png" alt="Comfortmaker" class="h-5 object-contain">`;
+            brandHtml = `<img src="https://www.comfortmaker.com/en/us/assets/cm_logo_white.svg" alt="Comfortmaker" class="h-4 object-contain">`;
         } else {
             brandHtml = `<span class="font-bold text-white">${row[3] || ""}</span>`;
         }
@@ -1192,7 +1171,7 @@
           </div>
           <div>
             <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Investment Price</span>
-            <span class="text-emerald-400 font-bold font-mono text-sm">${priceVal || "N/A"}</span>
+            <span class="text-emerald-455 font-bold font-mono text-sm">${priceVal || "N/A"}</span>
           </div>
         </div>
       `;
@@ -1386,6 +1365,9 @@
             const speechResult = event.results[0][0].transcript.toUpperCase();
             voiceBtn.classList.remove('bg-red-600', 'animate-pulse');
             
+            // Reset filters for fresh search
+            resetMobileFilters();
+
             // Parsing Engine
             if (speechResult.includes("1.5 TON") || speechResult.includes("ONE AND A HALF TON")) selectMobilePill('capacity', '1.5 Ton', 1);
             else if (speechResult.includes("2.5 TON") || speechResult.includes("TWO AND A HALF TON")) selectMobilePill('capacity', '2.5 Ton', 1);
