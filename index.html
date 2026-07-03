@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v01.19 | Logo File Path Fix -->
+<!-- Changeout Lookup v01.20 | Floating UI & Logo Sizing Studio -->
 <!DOCTYPE html>
 <html lang="en" style="overscroll-behavior: none;">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Changeout Lookup v01.19</title>
+  <title>Changeout Lookup v01.20</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -159,6 +159,14 @@
       <!-- Generated dynamically in JS -->
     </div>
   </div>
+
+  <!-- FLOATING LEFT CONTROLS -->
+  <button onclick="activateVoiceCommand()" id="floating-voice-btn" class="fixed bottom-20 left-4 z-50 bg-red-600 hover:bg-red-500 transition-all text-white p-4 rounded-full shadow-2xl flex items-center justify-center border border-red-400/30">
+      <span class="text-xl">🎙️</span>
+  </button>
+  <button onclick="resetMobileFilters()" class="fixed bottom-36 left-4 z-50 bg-slate-700 hover:bg-slate-600 transition-all text-white p-4 rounded-full shadow-2xl flex items-center justify-center border border-slate-500/30" title="Reset All Filters">
+      <span class="text-xl">🔄</span>
+  </button>
 
   <!-- FLOATING HUB BUTTON (THE CART) -->
   <button onclick="openCartModal()" class="fixed bottom-20 right-4 z-50 bg-blue-600 hover:bg-blue-500 active:scale-95 transition-all text-white font-bold px-5 py-3 rounded-full flex items-center space-x-2 shadow-2xl group border border-blue-400/30">
@@ -357,6 +365,30 @@
           </label>
         </div>
       </div>
+
+      <!-- Logo Scalers -->
+      <div class="space-y-4 border-t border-slate-700 pt-4 mt-4">
+          <h4 class="text-xs font-bold text-white tracking-wide">Brand Logo Sizing</h4>
+          <div class="grid grid-cols-2 gap-4">
+              <div>
+                  <div class="flex justify-between"><label class="text-[10px] text-slate-400">Carrier Height</label><span id="val-car-h" class="text-[10px] text-blue-400">20px</span></div>
+                  <input type="range" min="10" max="60" value="20" oninput="updateLogoSize('car-h', this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500">
+              </div>
+              <div>
+                  <div class="flex justify-between"><label class="text-[10px] text-slate-400">Carrier Width</label><span id="val-car-w" class="text-[10px] text-blue-400">auto</span></div>
+                  <input type="range" min="0" max="150" value="0" oninput="updateLogoSize('car-w', this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500">
+              </div>
+              <div>
+                  <div class="flex justify-between"><label class="text-[10px] text-slate-400">C-Maker Height</label><span id="val-cm-h" class="text-[10px] text-blue-400">20px</span></div>
+                  <input type="range" min="10" max="60" value="20" oninput="updateLogoSize('cm-h', this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500">
+              </div>
+              <div>
+                  <div class="flex justify-between"><label class="text-[10px] text-slate-400">C-Maker Width</label><span id="val-cm-w" class="text-[10px] text-blue-400">auto</span></div>
+                  <input type="range" min="0" max="150" value="0" oninput="updateLogoSize('cm-w', this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500">
+              </div>
+          </div>
+      </div>
+
     </div>
   </div>
 
@@ -399,7 +431,7 @@
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
           <span>Lookup</span>
-          <span class="text-[8px] font-normal text-blue-400">v01.19</span>
+          <span class="text-[8px] font-normal text-blue-400">v01.20</span>
         </span>
       </button>
 
@@ -735,6 +767,11 @@
         }
     }
 
+    function updateLogoSize(prop, val) {
+        document.getElementById('val-' + prop).innerText = val == 0 ? 'auto' : val + 'px';
+        document.documentElement.style.setProperty('--' + prop, val == 0 ? 'auto' : val + 'px');
+    }
+
     function applyColumnVisibility() {
       const table = document.getElementById('results-table');
       if (!table) return;
@@ -880,9 +917,9 @@
         const brandVal = String(row[3] || "").trim().toUpperCase();
         let brandHtml = row[3] || "";
         if (brandVal === "CARRIER") {
-            brandHtml = `<img src="./carrier.png" alt="Carrier" class="h-5 object-contain">`;
+            brandHtml = `<img src="./carrier.png" alt="Carrier" style="height: var(--car-h, 20px); width: var(--car-w, auto); object-fit: contain;">`;
         } else if (brandVal === "COMFORTMAKER") {
-            brandHtml = `<img src="./comfortmaker.png" alt="Comfortmaker" class="h-5 object-contain">`;
+            brandHtml = `<img src="./comfortmaker.png" alt="Comfortmaker" style="height: var(--cm-h, 20px); width: var(--cm-w, auto); object-fit: contain;">`;
         } else {
             brandHtml = `<span class="font-bold text-white">${row[3] || ""}</span>`;
         }
@@ -1383,13 +1420,17 @@
         recognition.maxAlternatives = 1;
 
         const voiceBtn = document.getElementById('voice-btn');
-        voiceBtn.classList.add('bg-red-600', 'animate-pulse');
+        const floatVoiceBtn = document.getElementById('floating-voice-btn');
+
+        if (voiceBtn) voiceBtn.classList.add('bg-red-600', 'animate-pulse');
+        if (floatVoiceBtn) floatVoiceBtn.classList.add('bg-red-600', 'animate-pulse');
 
         recognition.start();
 
         recognition.onresult = function(event) {
             const speechResult = event.results[0][0].transcript.toUpperCase();
-            voiceBtn.classList.remove('bg-red-600', 'animate-pulse');
+            if (voiceBtn) voiceBtn.classList.remove('bg-red-600', 'animate-pulse');
+            if (floatVoiceBtn) floatVoiceBtn.classList.remove('bg-red-600', 'animate-pulse');
             
             // Parsing Engine
             if (speechResult.includes("1.5 TON") || speechResult.includes("ONE AND A HALF TON")) selectMobilePill('capacity', '1.5 Ton', 1);
@@ -1419,12 +1460,14 @@
         };
 
         recognition.onerror = function(event) {
-            voiceBtn.classList.remove('bg-red-600', 'animate-pulse');
+            if (voiceBtn) voiceBtn.classList.remove('bg-red-600', 'animate-pulse');
+            if (floatVoiceBtn) floatVoiceBtn.classList.remove('bg-red-600', 'animate-pulse');
             console.error("Speech recognition error", event.error);
         };
         
         recognition.onend = function() {
-            voiceBtn.classList.remove('bg-red-600', 'animate-pulse');
+            if (voiceBtn) voiceBtn.classList.remove('bg-red-600', 'animate-pulse');
+            if (floatVoiceBtn) floatVoiceBtn.classList.remove('bg-red-600', 'animate-pulse');
         };
     }
 
