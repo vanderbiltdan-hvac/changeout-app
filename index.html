@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v01.18 | Restored Mobile Filter Hub Function -->
+<!-- Changeout Lookup v01.19 | Logo File Path Fix -->
 <!DOCTYPE html>
 <html lang="en" style="overscroll-behavior: none;">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Changeout Lookup v01.18</title>
+  <title>Changeout Lookup v01.19</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -399,7 +399,7 @@
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
           <span>Lookup</span>
-          <span class="text-[8px] font-normal text-blue-400">v01.18</span>
+          <span class="text-[8px] font-normal text-blue-400">v01.19</span>
         </span>
       </button>
 
@@ -880,9 +880,9 @@
         const brandVal = String(row[3] || "").trim().toUpperCase();
         let brandHtml = row[3] || "";
         if (brandVal === "CARRIER") {
-            brandHtml = `<img src="./Carrier-Logo-history.png" alt="Carrier" class="h-5 object-contain">`;
+            brandHtml = `<img src="./carrier.png" alt="Carrier" class="h-5 object-contain">`;
         } else if (brandVal === "COMFORTMAKER") {
-            brandHtml = `<img src="./comfortmaker-air-conditioning-heating-logo-png_seeklogo-338392.png" alt="Comfortmaker" class="h-5 object-contain">`;
+            brandHtml = `<img src="./comfortmaker.png" alt="Comfortmaker" class="h-5 object-contain">`;
         } else {
             brandHtml = `<span class="font-bold text-white">${row[3] || ""}</span>`;
         }
