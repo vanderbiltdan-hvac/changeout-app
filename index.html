@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v01.15 | Proposal Boilerplate & Conditional Warranties -->
+<!-- Changeout Lookup v01.18 | Restored Mobile Filter Hub Function -->
 <!DOCTYPE html>
 <html lang="en" style="overscroll-behavior: none;">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Changeout Lookup v01.15</title>
+  <title>Changeout Lookup v01.18</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -63,7 +63,7 @@
           <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">📁</span>
           <span class="text-[10px] font-medium text-slate-400">Drive</span>
         </button>
-        <button class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900 hover:bg-slate-855 border border-slate-800 hover:border-slate-700 transition group">
+        <button class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-805 hover:border-slate-700 transition group">
           <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">📸</span>
           <span class="text-[10px] font-medium text-slate-400">Album</span>
         </button>
@@ -75,9 +75,9 @@
           <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">⚙️</span>
           <span class="text-[10px] font-medium text-slate-400">Settings</span>
         </button>
-        <button class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900 hover:bg-slate-855 border border-slate-800 hover:border-slate-700 transition group">
-          <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">🎤</span>
-          <span class="text-[10px] font-medium text-slate-400">Mic</span>
+        <button onclick="openMobileFilterHubAll()" class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900 hover:bg-slate-805 border border-slate-800 hover:border-slate-700 transition group">
+          <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">🔍</span>
+          <span class="text-[10px] font-medium text-slate-400">Filters</span>
         </button>
         <button onclick="clearAllSelections()" class="flex flex-col items-center justify-center p-3 rounded-xl bg-red-955/20 hover:bg-red-955/40 border border-red-900/30 hover:border-red-700/55 transition group col-span-4 md:col-span-1">
           <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">🧹</span>
@@ -89,15 +89,6 @@
 
   <!-- MAIN CONTAINER -->
   <main class="w-full px-2 md:px-4 py-6 flex-grow flex flex-col space-y-6">
-    
-    <!-- Mobile Filter Hub Trigger -->
-    <div class="block md:hidden w-full">
-      <button onclick="openMobileFilterHubAll()" class="w-full bg-blue-600 hover:bg-blue-500 active:scale-98 transition text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center space-x-2 shadow-lg border border-blue-500/30">
-        <span>🔍</span>
-        <span>Filter Equipment Options</span>
-        <span id="mobile-filter-badge" class="bg-white text-blue-600 font-extrabold text-xs px-2 py-0.5 rounded-full hidden">0</span>
-      </button>
-    </div>
 
     <!-- THE LIVE RESULTS CANVAS -->
     <section class="bg-slate-800 border border-slate-700 rounded-2xl flex-grow overflow-hidden flex flex-col shadow-xl">
@@ -106,6 +97,7 @@
         <div class="flex items-center space-x-4">
           <span class="text-xl select-none">📊</span>
           <h2 class="text-base font-bold font-outfit text-white tracking-wide">Live Matches</h2>
+          <button onclick="openMobileFilterHubAll()" class="md:hidden ml-2 bg-blue-600 text-white p-1.5 rounded-lg shadow-sm border border-blue-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg></button>
         </div>
         <p class="text-xs text-slate-400"><span class="text-blue-400 font-semibold">Tip:</span> Click column headers to filter. Click Series to view details.</p>
       </div>
@@ -128,7 +120,7 @@
               <th id="th-eer2" onclick="openFilterFor('eer2')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">EER2</th>
               <th id="th-hspf2" onclick="openFilterFor('hspf2')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">HSPF2</th>
               <th id="th-ahri" onclick="openFilterFor('ahri')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">AHRI</th>
-              <th id="th-coolbtu" onclick="openFilterFor('coolbtu')" class="py-3 px-4 cursor-pointer hover:bg-slate-805 transition whitespace-nowrap">Cooling BTU</th>
+              <th id="th-coolbtu" onclick="openFilterFor('coolbtu')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Cooling BTU</th>
               <th id="th-heatbtu" onclick="openFilterFor('heatbtu')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Heating BTU</th>
               <th id="th-page" onclick="openFilterFor('page')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">PAGE</th>
               <th id="th-width" onclick="openFilterFor('width')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Width</th>
@@ -157,6 +149,7 @@
       <div class="flex items-center space-x-2">
         <span class="text-xl">🔍</span>
         <h2 class="text-base font-bold font-outfit text-white">Filter Catalog Options</h2>
+        <button onclick="activateVoiceCommand()" id="voice-btn" class="ml-2 bg-slate-700 hover:bg-red-600 text-white p-2 rounded-full shadow border border-slate-600 transition-colors flex items-center justify-center animate-none"><span class="text-lg">🎙️</span></button>
       </div>
       <button onclick="closeMobileFilterHub()" class="text-slate-400 hover:text-white bg-slate-805 border border-slate-700/50 rounded-full p-2 w-9 h-9 flex items-center justify-center">✕</button>
     </div>
@@ -406,7 +399,7 @@
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
           <span>Lookup</span>
-          <span class="text-[8px] font-normal text-blue-400">v01.15</span>
+          <span class="text-[8px] font-normal text-blue-400">v01.18</span>
         </span>
       </button>
 
@@ -513,25 +506,25 @@
     // Window load triggers
     window.addEventListener('DOMContentLoaded', () => {
       loadCartData();
+      loadColumnSettings();
     });
     window.addEventListener('load', loadData);
 
     function loadData() {
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run
-          .withSuccessHandler(onDataLoaded)
-          .withFailureHandler(onDataFetchError)
-          .getEquipmentData();
-      } else {
-        console.warn("Apps Script environment not detected. Rendering mock database.");
-        // Simulated mock data for offline browser testing
-        const mockCatalog = [
-          ["Row 12", "3 Ton", "AC", "Carrier", "INFINITY", "SINGLE STAGE", "STANDARD", "18", "13", "", "20894812", "36000", "", "180", "35", "44", 6250, "TAX"],
-          ["Row 13", "2.5 Ton", "HP", "Comfortmaker", "MAIN LINE", "2 STAGE", "STANDARD", "16", "12.5", "9.0", "20912403", "30000", "29000", "182", "31", "38", 5120, ""],
-          ["Row 14", "4 Ton", "AC", "Ruud", "BUILDER", "VARIABLE SPEED", "STANDARD", "14.3", "11.7", "", "20784910", "48000", "", "185", "35", "34", 4850, ""]
-        ];
-        setTimeout(() => onDataLoaded(mockCatalog), 600);
-      }
+        const API_URL = "https://script.google.com/macros/s/AKfycbwkwzMONqF8Rv9CLqSvcfPuMjBnfiP23i4CzedrZY0-ybNXDnY67FinGyS2RUHd56tI/exec";
+        
+        fetch(API_URL)
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === "success") {
+                    onDataLoaded(result.data);
+                } else {
+                    onDataFetchError("API returned a status error.");
+                }
+            })
+            .catch(error => {
+                onDataFetchError(error);
+            });
     }
 
     function onDataLoaded(data) {
@@ -718,8 +711,28 @@
       const checkbox = document.getElementById(`toggle-col-${colKey}`);
       if (checkbox) {
         columnVisibility[colKey] = checkbox.checked;
+        saveColumnSettings();
         applyColumnVisibility();
       }
+    }
+
+    function saveColumnSettings() {
+        localStorage.setItem('changeout_columns_v1', JSON.stringify(columnVisibility));
+    }
+
+    function loadColumnSettings() {
+        const saved = localStorage.getItem('changeout_columns_v1');
+        if (saved) {
+            try {
+                Object.assign(columnVisibility, JSON.parse(saved));
+                Object.keys(columnVisibility).forEach(key => {
+                    const checkbox = document.getElementById(`toggle-col-${key}`);
+                    if (checkbox) checkbox.checked = columnVisibility[key];
+                });
+            } catch (e) {
+                console.error("Error loading column settings: ", e);
+            }
+        }
     }
 
     function applyColumnVisibility() {
@@ -867,9 +880,11 @@
         const brandVal = String(row[3] || "").trim().toUpperCase();
         let brandHtml = row[3] || "";
         if (brandVal === "CARRIER") {
-          brandHtml = `<span class="font-black text-blue-500 tracking-widest italic text-lg drop-shadow-sm">Carrier</span>`;
+            brandHtml = `<img src="./Carrier-Logo-history.png" alt="Carrier" class="h-5 object-contain">`;
         } else if (brandVal === "COMFORTMAKER") {
-          brandHtml = `<span class="font-black text-slate-300 tracking-tighter text-lg drop-shadow-sm flex items-center gap-1"><svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Comfortmaker</span>`;
+            brandHtml = `<img src="./comfortmaker-air-conditioning-heating-logo-png_seeklogo-338392.png" alt="Comfortmaker" class="h-5 object-contain">`;
+        } else {
+            brandHtml = `<span class="font-bold text-white">${row[3] || ""}</span>`;
         }
         tdCells.push('<td class="py-3 px-4 font-semibold text-white whitespace-nowrap">' + brandHtml + '</td>');
         
@@ -1353,6 +1368,64 @@
       }
 
       terminal.value = text;
+    }
+
+    function activateVoiceCommand() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("Voice command is not supported in this browser. Please use Chrome.");
+            return;
+        }
+        
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        const voiceBtn = document.getElementById('voice-btn');
+        voiceBtn.classList.add('bg-red-600', 'animate-pulse');
+
+        recognition.start();
+
+        recognition.onresult = function(event) {
+            const speechResult = event.results[0][0].transcript.toUpperCase();
+            voiceBtn.classList.remove('bg-red-600', 'animate-pulse');
+            
+            // Parsing Engine
+            if (speechResult.includes("1.5 TON") || speechResult.includes("ONE AND A HALF TON")) selectMobilePill('capacity', '1.5 Ton', 1);
+            else if (speechResult.includes("2.5 TON") || speechResult.includes("TWO AND A HALF TON")) selectMobilePill('capacity', '2.5 Ton', 1);
+            else if (speechResult.includes("3.5 TON") || speechResult.includes("THREE AND A HALF TON")) selectMobilePill('capacity', '3.5 Ton', 1);
+            else if (speechResult.includes("4.5 TON") || speechResult.includes("FOUR AND A HALF TON") || speechResult.includes("4 TO 5 TON")) selectMobilePill('capacity', '4-5 Ton', 1);
+            else if (speechResult.includes("2 TON") || speechResult.includes("TWO TON")) selectMobilePill('capacity', '2 Ton', 1);
+            else if (speechResult.includes("3 TON") || speechResult.includes("THREE TON")) selectMobilePill('capacity', '3 Ton', 1);
+            else if (speechResult.includes("4 TON") || speechResult.includes("FOUR TON")) selectMobilePill('capacity', '4 Ton', 1);
+            else if (speechResult.includes("5 TON") || speechResult.includes("FIVE TON")) selectMobilePill('capacity', '5 Ton', 1);
+
+            if (speechResult.includes("STRAIGHT COOL") || speechResult.includes("AC") || speechResult.includes("A/C")) selectMobilePill('type', 'STRAIGHT COOL', 2);
+            if (speechResult.includes("HEAT PUMP")) selectMobilePill('type', 'HEAT PUMP', 2);
+            if (speechResult.includes("FURNACE") || speechResult.includes("GAS")) selectMobilePill('type', 'Gas Furnace', 2);
+
+            if (speechResult.includes("SINGLE STAGE") || speechResult.includes("ONE STAGE") || speechResult.includes("1 STAGE")) selectMobilePill('stage', 'SINGLE STAGE', 5);
+            if (speechResult.includes("TWO STAGE") || speechResult.includes("2 STAGE")) selectMobilePill('stage', '2 STAGE', 5);
+            if (speechResult.includes("VARIABLE")) selectMobilePill('stage', 'VARIABLE SPEED', 5);
+
+            if (speechResult.includes("STANDARD")) selectMobilePill('style', 'STANDARD', 6);
+            if (speechResult.includes("COASTAL")) selectMobilePill('style', 'COASTAL', 6);
+            if (speechResult.includes("APARTMENT")) selectMobilePill('style', 'APARTMENT', 6);
+            if (speechResult.includes("CROSSOVER")) selectMobilePill('style', 'CROSSOVER', 6);
+
+            filterData();
+            alert('Heard: "' + speechResult + '"\nFilters applied!');
+        };
+
+        recognition.onerror = function(event) {
+            voiceBtn.classList.remove('bg-red-600', 'animate-pulse');
+            console.error("Speech recognition error", event.error);
+        };
+        
+        recognition.onend = function() {
+            voiceBtn.classList.remove('bg-red-600', 'animate-pulse');
+        };
     }
 
     // Toggle Text Format
