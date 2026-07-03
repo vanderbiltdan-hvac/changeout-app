@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v01.16 | GitHub Migration & JSON API Integration -->
+<!-- Changeout Lookup v01.15 | Proposal Boilerplate & Conditional Warranties -->
 <!DOCTYPE html>
 <html lang="en" style="overscroll-behavior: none;">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Changeout Lookup v01.16</title>
+  <title>Changeout Lookup v01.15</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -63,7 +63,7 @@
           <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">📁</span>
           <span class="text-[10px] font-medium text-slate-400">Drive</span>
         </button>
-        <button class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-805 hover:border-slate-700 transition group">
+        <button class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900 hover:bg-slate-855 border border-slate-800 hover:border-slate-700 transition group">
           <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">📸</span>
           <span class="text-[10px] font-medium text-slate-400">Album</span>
         </button>
@@ -128,7 +128,7 @@
               <th id="th-eer2" onclick="openFilterFor('eer2')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">EER2</th>
               <th id="th-hspf2" onclick="openFilterFor('hspf2')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">HSPF2</th>
               <th id="th-ahri" onclick="openFilterFor('ahri')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">AHRI</th>
-              <th id="th-coolbtu" onclick="openFilterFor('coolbtu')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Cooling BTU</th>
+              <th id="th-coolbtu" onclick="openFilterFor('coolbtu')" class="py-3 px-4 cursor-pointer hover:bg-slate-805 transition whitespace-nowrap">Cooling BTU</th>
               <th id="th-heatbtu" onclick="openFilterFor('heatbtu')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Heating BTU</th>
               <th id="th-page" onclick="openFilterFor('page')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">PAGE</th>
               <th id="th-width" onclick="openFilterFor('width')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Width</th>
@@ -406,7 +406,7 @@
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
           <span>Lookup</span>
-          <span class="text-[8px] font-normal text-blue-400">v01.16</span>
+          <span class="text-[8px] font-normal text-blue-400">v01.15</span>
         </span>
       </button>
 
@@ -517,20 +517,21 @@
     window.addEventListener('load', loadData);
 
     function loadData() {
-        const API_URL = "https://script.google.com/macros/s/AKfycbwkwzMONqF8Rv9CLqSvcfPuMjBnfiP23i4CzedrZY0-ybNXDnY67FinGyS2RUHd56tI/exec";
-        
-        fetch(API_URL)
-            .then(response => response.json())
-            .then(result => {
-                if (result.status === "success") {
-                    onDataLoaded(result.data);
-                } else {
-                    onDataFetchError("API returned a status error.");
-                }
-            })
-            .catch(error => {
-                onDataFetchError(error);
-            });
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(onDataLoaded)
+          .withFailureHandler(onDataFetchError)
+          .getEquipmentData();
+      } else {
+        console.warn("Apps Script environment not detected. Rendering mock database.");
+        // Simulated mock data for offline browser testing
+        const mockCatalog = [
+          ["Row 12", "3 Ton", "AC", "Carrier", "INFINITY", "SINGLE STAGE", "STANDARD", "18", "13", "", "20894812", "36000", "", "180", "35", "44", 6250, "TAX"],
+          ["Row 13", "2.5 Ton", "HP", "Comfortmaker", "MAIN LINE", "2 STAGE", "STANDARD", "16", "12.5", "9.0", "20912403", "30000", "29000", "182", "31", "38", 5120, ""],
+          ["Row 14", "4 Ton", "AC", "Ruud", "BUILDER", "VARIABLE SPEED", "STANDARD", "14.3", "11.7", "", "20784910", "48000", "", "185", "35", "34", 4850, ""]
+        ];
+        setTimeout(() => onDataLoaded(mockCatalog), 600);
+      }
     }
 
     function onDataLoaded(data) {
@@ -671,6 +672,11 @@
           badge.classList.add('hidden');
         }
       }
+    }
+
+    function openMobileFilterHub() {
+      document.getElementById('mobile-filter-hub').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
     }
 
     // Close mobile filter hub
@@ -1197,7 +1203,7 @@
 
       if (warrantyText) {
         container.innerHTML += `
-          <div class="mt-4 p-3.5 bg-amber-500/10 border border-amber-500/30 text-amber-455 rounded-xl font-medium flex items-start space-x-2.5">
+          <div class="mt-4 p-3.5 bg-amber-500/10 border border-amber-500/30 text-amber-450 rounded-xl font-medium flex items-start space-x-2.5">
             <span class="text-base leading-none select-none">🛡️</span>
             <div>
               <span class="font-bold text-amber-300 block mb-0.5">Manufacturer Warranty Highlight</span>
