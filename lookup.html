@@ -1,0 +1,1386 @@
+<!-- Changeout Lookup v01.16 | GitHub Migration & JSON API Integration -->
+<!DOCTYPE html>
+<html lang="en" style="overscroll-behavior: none;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Changeout Lookup v01.16</title>
+  <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    h1, h2, h3, .font-outfit {
+      font-family: 'Outfit', sans-serif;
+    }
+    /* Hide scrollbar but keep functionality */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    summary::-webkit-details-marker {
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col no-scrollbar selection:bg-blue-500 selection:text-white pb-32" style="overscroll-behavior: none;">
+
+  <!-- TOP STATUS BAR & DRAWER (STICKY) -->
+  <header class="sticky top-0 z-50 bg-slate-900 border-b border-slate-800 shadow-md">
+    <div class="w-full px-2 md:px-4 py-3 flex items-center justify-between">
+      <!-- Active Job Ticket -->
+      <div id="active-job-ticket" class="flex items-center space-x-3 bg-slate-850 border border-slate-700 rounded-full px-4 py-1.5 shadow-inner">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-xs font-semibold tracking-wider text-slate-300">JOB #24908: SMITH RESIDENCE</span>
+      </div>
+      
+      <!-- Drawer Toggle Button -->
+      <button onclick="toggleDrawer()" class="flex items-center space-x-1 bg-slate-800 hover:bg-slate-750 transition border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-355 hover:text-white">
+        <span>⚡ Quick Actions</span>
+        <svg id="drawer-chevron" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+      </button>
+    </div>
+
+    <!-- Collapsible Quick Action Drawer -->
+    <div id="top-ribbon-drawer" class="max-h-0 overflow-hidden bg-slate-955 border-t border-slate-855 transition-all duration-350 ease-in-out">
+      <div class="w-full px-2 md:px-4 py-4 grid grid-cols-4 md:grid-cols-7 gap-3 text-center">
+        <button class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900 hover:bg-slate-805 border border-slate-800 hover:border-slate-700 transition group">
+          <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">🆕</span>
+          <span class="text-[10px] font-medium text-slate-400">New Job</span>
+        </button>
+        <button class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900 hover:bg-slate-805 border border-slate-800 hover:border-slate-700 transition group">
+          <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">📁</span>
+          <span class="text-[10px] font-medium text-slate-400">Drive</span>
+        </button>
+        <button class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-800 hover:border-slate-700 transition group">
+          <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">📸</span>
+          <span class="text-[10px] font-medium text-slate-400">Album</span>
+        </button>
+        <button class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-905 hover:bg-slate-805 border border-slate-800 hover:border-slate-700 transition group">
+          <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">📚</span>
+          <span class="text-[10px] font-medium text-slate-400">Manuals</span>
+        </button>
+        <button onclick="openSettingsModal()" class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900 hover:bg-slate-805 border border-slate-800 hover:border-slate-700 transition group">
+          <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">⚙️</span>
+          <span class="text-[10px] font-medium text-slate-400">Settings</span>
+        </button>
+        <button class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-900 hover:bg-slate-855 border border-slate-800 hover:border-slate-700 transition group">
+          <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">🎤</span>
+          <span class="text-[10px] font-medium text-slate-400">Mic</span>
+        </button>
+        <button onclick="clearAllSelections()" class="flex flex-col items-center justify-center p-3 rounded-xl bg-red-955/20 hover:bg-red-955/40 border border-red-900/30 hover:border-red-700/55 transition group col-span-4 md:col-span-1">
+          <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">🧹</span>
+          <span class="text-[10px] font-medium text-red-400">Clear All</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="w-full px-2 md:px-4 py-6 flex-grow flex flex-col space-y-6">
+    
+    <!-- Mobile Filter Hub Trigger -->
+    <div class="block md:hidden w-full">
+      <button onclick="openMobileFilterHubAll()" class="w-full bg-blue-600 hover:bg-blue-500 active:scale-98 transition text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center space-x-2 shadow-lg border border-blue-500/30">
+        <span>🔍</span>
+        <span>Filter Equipment Options</span>
+        <span id="mobile-filter-badge" class="bg-white text-blue-600 font-extrabold text-xs px-2 py-0.5 rounded-full hidden">0</span>
+      </button>
+    </div>
+
+    <!-- THE LIVE RESULTS CANVAS -->
+    <section class="bg-slate-800 border border-slate-700 rounded-2xl flex-grow overflow-hidden flex flex-col shadow-xl">
+      <!-- Live Results Header -->
+      <div class="px-6 py-4 border-b border-slate-700 flex flex-wrap justify-between items-center bg-slate-800/80 sticky top-0 z-10 gap-3">
+        <div class="flex items-center space-x-4">
+          <span class="text-xl select-none">📊</span>
+          <h2 class="text-base font-bold font-outfit text-white tracking-wide">Live Matches</h2>
+        </div>
+        <p class="text-xs text-slate-400"><span class="text-blue-400 font-semibold">Tip:</span> Click column headers to filter. Click Series to view details.</p>
+      </div>
+
+      <!-- Scrollable Canvas -->
+      <div id="results-canvas" class="overflow-x-auto">
+        <!-- Desktop Table View (18 Columns Expansion) -->
+        <table id="results-table" class="w-full text-left border-collapse transition-all duration-200">
+          <thead>
+            <tr class="bg-slate-900 text-slate-400 text-[10px] uppercase font-bold tracking-wider border-b border-slate-700 select-none">
+              <th id="th-add" class="py-3 px-4 text-center w-16 whitespace-nowrap">Add</th>
+              <th id="th-source" onclick="openFilterFor('source')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Source Row</th>
+              <th id="th-capacity" onclick="openFilterFor('capacity')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Capacity</th>
+              <th id="th-type" onclick="openFilterFor('type')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">System Type</th>
+              <th id="th-brand" onclick="openFilterFor('brand')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Brand</th>
+              <th id="th-series" onclick="openFilterFor('series')" class="py-3 px-4 cursor-pointer hover:bg-slate-805 transition whitespace-nowrap">Series / Tier</th>
+              <th id="th-stage" onclick="openFilterFor('stage')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Mechanical Stage</th>
+              <th id="th-style" onclick="openFilterFor('style')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Application / Style</th>
+              <th id="th-seer2" onclick="openFilterFor('seer2')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">SEER2</th>
+              <th id="th-eer2" onclick="openFilterFor('eer2')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">EER2</th>
+              <th id="th-hspf2" onclick="openFilterFor('hspf2')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">HSPF2</th>
+              <th id="th-ahri" onclick="openFilterFor('ahri')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">AHRI</th>
+              <th id="th-coolbtu" onclick="openFilterFor('coolbtu')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Cooling BTU</th>
+              <th id="th-heatbtu" onclick="openFilterFor('heatbtu')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Heating BTU</th>
+              <th id="th-page" onclick="openFilterFor('page')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">PAGE</th>
+              <th id="th-width" onclick="openFilterFor('width')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Width</th>
+              <th id="th-height" onclick="openFilterFor('height')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Height</th>
+              <th id="th-price" onclick="openFilterFor('price')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition text-right whitespace-nowrap">Price</th>
+              <th id="th-tax" onclick="openFilterFor('tax')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Tax Creditable</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-750 text-sm text-slate-200">
+            <!-- Loading Indicator by default -->
+            <tr id="loading-row">
+              <td colspan="19" class="py-12 text-center text-xs text-slate-500 font-medium whitespace-nowrap">
+                <span class="inline-block animate-spin mr-2">⏳</span> Loading catalog from Google Sheets...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- FULL-SCREEN MOBILE FILTER HUB MODAL -->
+  <div id="mobile-filter-hub" class="hidden fixed inset-0 z-50 bg-slate-900 flex flex-col p-4 overflow-y-auto no-scrollbar">
+    <!-- Header -->
+    <div class="flex justify-between items-center pb-4 border-b border-slate-800">
+      <div class="flex items-center space-x-2">
+        <span class="text-xl">🔍</span>
+        <h2 class="text-base font-bold font-outfit text-white">Filter Catalog Options</h2>
+      </div>
+      <button onclick="closeMobileFilterHub()" class="text-slate-400 hover:text-white bg-slate-805 border border-slate-700/50 rounded-full p-2 w-9 h-9 flex items-center justify-center">✕</button>
+    </div>
+    
+    <!-- Content: Accordions with Large Option Buttons (Dynamically generated) -->
+    <div id="mobile-filter-accordions" class="flex-grow py-6 space-y-4">
+      <!-- Generated dynamically in JS -->
+    </div>
+  </div>
+
+  <!-- FLOATING HUB BUTTON (THE CART) -->
+  <button onclick="openCartModal()" class="fixed bottom-20 right-4 z-50 bg-blue-600 hover:bg-blue-500 active:scale-95 transition-all text-white font-bold px-5 py-3 rounded-full flex items-center space-x-2 shadow-2xl group border border-blue-400/30">
+    <span class="text-lg">🛒</span>
+    <span class="text-xs font-bold uppercase tracking-wider">CART</span>
+    <span id="cart-counter" class="bg-white text-blue-600 font-extrabold text-xs w-5 h-5 flex items-center justify-center rounded-full shadow-inner transform group-hover:scale-110 transition-transform">0</span>
+  </button>
+
+  <!-- HIDDEN CART MODAL (THE "F2" PROPOSAL HUD) -->
+  <div id="cart-modal" class="hidden fixed inset-0 z-50 bg-slate-900/95 flex flex-col items-center justify-center p-4">
+    <!-- Expanded Cart Layout to 95vw -->
+    <div class="bg-slate-800 border border-slate-700 w-[95vw] max-w-[1600px] rounded-2xl flex flex-col max-h-[90vh] shadow-2xl relative">
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-slate-700 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <span class="text-2xl">📋</span>
+          <div>
+            <h3 class="text-lg font-bold font-outfit text-white tracking-wide">F2 Proposal HUD</h3>
+            <p class="text-[10px] text-slate-400 uppercase tracking-wide">Manage selected systems & copy compiled output</p>
+          </div>
+        </div>
+        <button onclick="closeCartModal()" class="text-slate-400 hover:text-white transition bg-slate-900/50 hover:bg-slate-900 border border-slate-700/55 rounded-full p-2.5 shadow w-9 h-9 flex items-center justify-center">✕</button>
+      </div>
+
+      <!-- Modal Body (Vertically Stacked Layout) -->
+      <div class="flex-grow overflow-y-auto p-6 flex flex-col space-y-6">
+        <!-- Collapsible Selected Systems Area -->
+        <details open class="group bg-slate-900/30 border border-slate-750/50 rounded-xl p-4 flex flex-col w-full">
+          <summary class="flex justify-between items-center cursor-pointer list-none select-none">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center">
+              <span>🛒 Selected Systems</span>
+              <span id="cart-collapsed-badge" class="ml-2 bg-blue-600/35 text-blue-400 text-[10px] px-1.5 py-0.5 rounded-full group-open:hidden">0</span>
+            </h4>
+            <span class="text-slate-400 transition-transform group-open:rotate-180">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </span>
+          </summary>
+          <div class="mt-4 flex flex-col space-y-4 w-full">
+            <div class="flex justify-end">
+              <button onclick="clearCart()" class="text-[10px] font-semibold text-red-400 hover:underline">Clear All</button>
+            </div>
+            <div id="cart-items" class="space-y-3 no-scrollbar max-h-[220px] overflow-y-auto w-full">
+              <!-- Empty state -->
+              <div id="cart-empty-state" class="border border-dashed border-slate-700 rounded-xl p-8 text-center text-slate-500 text-xs">
+                No equipment selected. Add items from the lookup canvas.
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- Terminal Output Area (Stretches 100% horizontally) -->
+        <div class="flex flex-col space-y-4 w-full">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Terminal Output</h4>
+          <textarea id="terminal-box" readonly class="bg-slate-955 border border-slate-855 rounded-xl p-4 flex-grow font-mono text-[18px] text-blue-400 focus:outline-none resize-none no-scrollbar h-64 select-text leading-relaxed w-full">SYSTEM OPTIONS SELECTED:
+-------------------------
+(No systems in proposal cart)</textarea>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-6 py-4 border-t border-slate-700 bg-slate-855 flex flex-col md:flex-row justify-between items-center gap-4">
+        <!-- Plain / Rich Text Toggle -->
+        <div class="flex items-center space-x-3">
+          <span class="text-xs text-slate-355 font-medium">Plain Text</span>
+          <label class="relative inline-flex items-center cursor-pointer select-none">
+            <input type="checkbox" id="text-type-toggle" class="sr-only peer" onchange="toggleTextType()">
+            <div class="w-9 h-5 bg-slate-900 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-blue-500 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-slate-700"></div>
+          </label>
+          <span class="text-xs text-slate-355 font-medium">Rich Text</span>
+        </div>
+
+        <!-- Copy / Action Row -->
+        <div class="flex items-center space-x-3">
+          <button onclick="copyTerminalToClipboard()" class="bg-blue-600 hover:bg-blue-500 active:scale-95 transition text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-lg flex items-center space-x-2 shadow-lg">
+            <span>📋</span>
+            <span>Copy to Clipboard</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING SYSTEM DETAILS CARD MODAL -->
+  <div id="system-details-modal" class="hidden fixed inset-0 z-50 bg-slate-955/90 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 w-full max-w-lg rounded-2xl flex flex-col max-h-[90vh] shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/80">
+        <div class="flex items-center space-x-2.5">
+          <span class="text-xl">📋</span>
+          <h3 class="text-base font-bold font-outfit text-white">System Specification Details</h3>
+        </div>
+        <button onclick="closeSystemDetails()" class="text-slate-405 hover:text-white transition bg-slate-900 border border-slate-700 rounded-full w-8 h-8 flex items-center justify-center">✕</button>
+      </div>
+      
+      <!-- Modal Body (Grid of Specs) -->
+      <div id="system-details-content" class="flex-grow overflow-y-auto p-6 space-y-4 text-xs">
+        <!-- Filled dynamically by JavaScript -->
+      </div>
+      
+      <!-- Modal Footer -->
+      <div class="px-6 py-4 border-t border-slate-700 bg-slate-855 flex flex-col gap-3">
+        <div id="system-details-action-btn-container">
+          <!-- Dyn Button: Add to Cart / Remove from Cart -->
+        </div>
+        <button onclick="closeSystemDetails()" class="w-full bg-slate-800 hover:bg-slate-755 text-slate-355 font-bold py-3 rounded-lg border border-slate-700/50 transition text-xs">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALIBRATION DOCK (SETTINGS MODAL) -->
+  <div id="settings-modal" class="hidden fixed inset-0 z-50 bg-slate-955/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 w-full max-w-2xl rounded-2xl flex flex-col p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+        <div class="flex items-center space-x-2.5">
+          <span class="text-xl">⚙️</span>
+          <h3 class="text-base font-bold font-outfit text-white">Calibration Dock</h3>
+        </div>
+        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white transition bg-slate-900 border border-slate-700 rounded-full w-8 h-8 flex items-center justify-center">✕</button>
+      </div>
+
+      <!-- Column Visibility Checklist (18 Columns Expanded) -->
+      <div class="space-y-3">
+        <h4 class="text-xs font-bold text-white uppercase tracking-wider">Visible Table Columns</h4>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-[10px]">
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-source" checked onchange="toggleColumnVisibility('source')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>Source Row</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-capacity" checked onchange="toggleColumnVisibility('capacity')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>Capacity</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-type" checked onchange="toggleColumnVisibility('type')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>System Type</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-brand" checked onchange="toggleColumnVisibility('brand')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>Brand</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-series" checked onchange="toggleColumnVisibility('series')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>Series / Tier</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-stage" checked onchange="toggleColumnVisibility('stage')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>Mechanical Stage</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-style" checked onchange="toggleColumnVisibility('style')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>Style</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-seer2" checked onchange="toggleColumnVisibility('seer2')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>SEER2</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-eer2" checked onchange="toggleColumnVisibility('eer2')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>EER2</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-hspf2" checked onchange="toggleColumnVisibility('hspf2')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>HSPF2</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-ahri" checked onchange="toggleColumnVisibility('ahri')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>AHRI</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-coolbtu" checked onchange="toggleColumnVisibility('coolbtu')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>Cooling BTU</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-heatbtu" checked onchange="toggleColumnVisibility('heatbtu')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>Heating BTU</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-page" checked onchange="toggleColumnVisibility('page')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>PAGE</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-width" checked onchange="toggleColumnVisibility('width')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>Width</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-height" checked onchange="toggleColumnVisibility('height')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>Height</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-price" checked onchange="toggleColumnVisibility('price')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>Price</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-tax" checked onchange="toggleColumnVisibility('tax')" class="rounded border-slate-755 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>Tax Creditable</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM APP NAVIGATION RIBBON (STICKY) -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900 border-t border-slate-800 shadow-2xl">
+    <div class="w-full px-2 md:px-4 flex items-center justify-between overflow-x-auto no-scrollbar py-2 space-x-2">
+      <!-- Notes -->
+      <button class="flex flex-col items-center justify-center px-3 py-1 rounded-lg text-slate-400 hover:text-white transition min-w-[60px]">
+        <span class="text-sm">📝</span>
+        <span class="text-[9px] font-medium tracking-tight mt-0.5">Notes</span>
+      </button>
+      <!-- Mirror -->
+      <button class="flex flex-col items-center justify-center px-3 py-1 rounded-lg text-slate-400 hover:text-white transition min-w-[60px]">
+        <span class="text-sm">🪞</span>
+        <span class="text-[9px] font-medium tracking-tight mt-0.5">Mirror</span>
+      </button>
+      <!-- Specs -->
+      <button class="flex flex-col items-center justify-center px-3 py-1 rounded-lg text-slate-400 hover:text-white transition min-w-[60px]">
+        <span class="text-sm">📐</span>
+        <span class="text-[9px] font-medium tracking-tight mt-0.5">Specs</span>
+      </button>
+      <!-- PMI -->
+      <button class="flex flex-col items-center justify-center px-3 py-1 rounded-lg text-slate-400 hover:text-white transition min-w-[60px]">
+        <span class="text-sm">📈</span>
+        <span class="text-[9px] font-medium tracking-tight mt-0.5">PMI</span>
+      </button>
+      <!-- Diag -->
+      <button class="flex flex-col items-center justify-center px-3 py-1 rounded-lg text-slate-400 hover:text-white transition min-w-[60px]">
+        <span class="text-sm">🛠️</span>
+        <span class="text-[9px] font-medium tracking-tight mt-0.5">Diag</span>
+      </button>
+      <!-- Startup -->
+      <button class="flex flex-col items-center justify-center px-3 py-1 rounded-lg text-slate-400 hover:text-white transition min-w-[60px]">
+        <span class="text-sm">🚀</span>
+        <span class="text-[9px] font-medium tracking-tight mt-0.5">Startup</span>
+      </button>
+
+      <!-- Active: Lookup Button -->
+      <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
+        <span class="text-base select-none">🔍</span>
+        <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
+          <span>Lookup</span>
+          <span class="text-[8px] font-normal text-blue-400">v01.16</span>
+        </span>
+      </button>
+
+      <!-- Compiler -->
+      <button class="flex flex-col items-center justify-center px-3 py-1 rounded-lg text-slate-400 hover:text-white transition min-w-[60px]">
+        <span class="text-sm">💻</span>
+        <span class="text-[9px] font-medium tracking-tight mt-0.5">Compiler</span>
+      </button>
+      <!-- Templates -->
+      <button class="flex flex-col items-center justify-center px-3 py-1 rounded-lg text-slate-400 hover:text-white transition min-w-[60px]">
+        <span class="text-sm">📄</span>
+        <span class="text-[9px] font-medium tracking-tight mt-0.5">Templates</span>
+      </button>
+      <!-- Reports -->
+      <button class="flex flex-col items-center justify-center px-3 py-1 rounded-lg text-slate-400 hover:text-white transition min-w-[60px]">
+        <span class="text-sm">📊</span>
+        <span class="text-[9px] font-medium tracking-tight mt-0.5">Reports</span>
+      </button>
+      <!-- Data Block -->
+      <button class="flex flex-col items-center justify-center px-3 py-1 rounded-lg text-slate-400 hover:text-white transition min-w-[60px]">
+        <span class="text-sm">💾</span>
+        <span class="text-[9px] font-medium tracking-tight mt-0.5">Data Block</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- INTERACTIVE LOGIC (VANILLA JS) -->
+  <script>
+    // Global State for Equipment Data
+    let equipmentData = [];
+    const cart = [];
+    let draggedCartIndex = null;
+    let currentOpenAccordion = null;
+
+    // Filter Config definitions mapping categories
+    const filterConfigs = [
+      { key: 'source', name: 'Source Row', index: 0 },
+      { key: 'capacity', name: 'Capacity', index: 1 },
+      { key: 'type', name: 'System Type', index: 2 },
+      { key: 'brand', name: 'Brand', index: 3 },
+      { key: 'series', name: 'Series / Tier', index: 4 },
+      { key: 'stage', name: 'Mechanical Stage', index: 5 },
+      { key: 'style', name: 'Application / Style', index: 6 },
+      { key: 'seer2', name: 'SEER2', index: 7 },
+      { key: 'eer2', name: 'EER2', index: 8 },
+      { key: 'hspf2', name: 'HSPF2', index: 9 },
+      { key: 'ahri', name: 'AHRI', index: 10 },
+      { key: 'coolbtu', name: 'Cooling BTU', index: 11 },
+      { key: 'heatbtu', name: 'Heating BTU', index: 12 },
+      { key: 'page', name: 'PAGE', index: 13 },
+      { key: 'width', name: 'Width', index: 14 },
+      { key: 'height', name: 'Height', index: 15 },
+      { key: 'price', name: 'Price', index: 16 },
+      { key: 'tax', name: 'Tax Creditable', index: 17 }
+    ];
+
+    // Column Visibility State (All 18 tracked)
+    const columnVisibility = {
+      source: true,
+      capacity: true,
+      type: true,
+      brand: true,
+      series: true,
+      stage: true,
+      style: true,
+      seer2: true,
+      eer2: true,
+      hspf2: true,
+      ahri: true,
+      coolbtu: true,
+      heatbtu: true,
+      page: true,
+      width: true,
+      height: true,
+      price: true,
+      tax: true
+    };
+
+    // Mobile Filters State (All 18 tracked as arrays for multi-select)
+    const mobileFilterState = {
+      source: [],
+      capacity: [],
+      type: [],
+      brand: [],
+      series: [],
+      stage: [],
+      style: [],
+      seer2: [],
+      eer2: [],
+      hspf2: [],
+      ahri: [],
+      coolbtu: [],
+      heatbtu: [],
+      page: [],
+      width: [],
+      height: [],
+      price: [],
+      tax: []
+    };
+
+    // Settings State
+    const settings = {};
+
+    // Window load triggers
+    window.addEventListener('DOMContentLoaded', () => {
+      loadCartData();
+    });
+    window.addEventListener('load', loadData);
+
+    function loadData() {
+        const API_URL = "https://script.google.com/macros/s/AKfycbwkwzMONqF8Rv9CLqSvcfPuMjBnfiP23i4CzedrZY0-ybNXDnY67FinGyS2RUHd56tI/exec";
+        
+        fetch(API_URL)
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === "success") {
+                    onDataLoaded(result.data);
+                } else {
+                    onDataFetchError("API returned a status error.");
+                }
+            })
+            .catch(error => {
+                onDataFetchError(error);
+            });
+    }
+
+    function onDataLoaded(data) {
+      equipmentData = data;
+      buildAllMobileFilters();
+      renderTable(equipmentData);
+    }
+
+    function onDataFetchError(error) {
+      console.error("Failed to load catalog data: ", error);
+      const tbody = document.querySelector('#results-table tbody');
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="19" class="py-12 text-center text-xs text-red-400 font-medium opacity-70">⚠️ Error loading catalog data from server. Please refresh or check connection.</td></tr>`;
+      }
+    }
+
+    // Build Mobile Filter accordions as a clean, true vertical list menu with multi-select active styling
+    function buildAllMobileFilters() {
+      const container = document.getElementById('mobile-filter-accordions');
+      if (!container) return;
+      container.innerHTML = '';
+      
+      filterConfigs.forEach(cfg => {
+        // Find unique, non-empty, sorted values for this index
+        const uniqueValues = [...new Set(equipmentData.map(row => String(row[cfg.index] || "").trim()))]
+          .filter(val => val !== "");
+          
+        if (cfg.index === 5 || cfg.key === 'stage') {
+          uniqueValues.sort((a, b) => {
+            const order = ['SINGLE STAGE', '2 STAGE', 'VARIABLE SPEED'];
+            const idxA = order.indexOf(a.toUpperCase().trim());
+            const idxB = order.indexOf(b.toUpperCase().trim());
+            if (idxA === -1 && idxB === -1) return a.localeCompare(b);
+            if (idxA === -1) return 1;
+            if (idxB === -1) return -1;
+            return idxA - idxB;
+          });
+        } else {
+          uniqueValues.sort((a, b) => {
+            const numA = parseFloat(a);
+            const numB = parseFloat(b);
+            if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+            return a.localeCompare(b);
+          });
+        }
+          
+        if (uniqueValues.length === 0) return; // Skip building if column has no values
+
+        const details = document.createElement('details');
+        details.id = `mobile-accordion-${cfg.key}`;
+        details.className = "mobile-filter-group bg-slate-805 border border-slate-750 rounded-xl overflow-hidden group";
+        
+        // Header trigger
+        const summary = document.createElement('summary');
+        summary.className = "flex justify-between items-center p-4 cursor-pointer list-none select-none font-semibold text-xs text-white uppercase tracking-wider";
+        summary.innerHTML = `
+          <span>${cfg.name}</span>
+          <svg class="w-4 h-4 transform group-open:rotate-180 transition-transform text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        `;
+        details.appendChild(summary);
+        
+        // Option vertical stack container
+        const pillsDiv = document.createElement('div');
+        pillsDiv.className = "p-4 bg-slate-955/45 border-t border-slate-800 flex flex-col gap-2 w-full";
+        
+        // Add "All" Pill
+        const allPill = document.createElement('button');
+        const isAllSelected = mobileFilterState[cfg.key].length === 0;
+        allPill.className = `w-full text-left px-4 py-3 rounded-lg text-sm font-semibold transition border ${
+          isAllSelected 
+            ? 'bg-blue-600 text-white border-blue-500 shadow-md animate-pulse' 
+            : 'bg-slate-900 hover:bg-slate-805 text-slate-400 border-slate-750'
+        }`;
+        allPill.textContent = 'All';
+        allPill.onclick = () => selectMobilePill(cfg.key, '', cfg.index);
+        pillsDiv.appendChild(allPill);
+        
+        // Unique option values pills
+        uniqueValues.forEach(val => {
+          const pill = document.createElement('button');
+          const isSelected = mobileFilterState[cfg.key].includes(val);
+          pill.className = `w-full text-left px-4 py-3 rounded-lg text-sm font-semibold transition border ${
+            isSelected 
+              ? 'bg-blue-600 text-white border-blue-500 shadow-md' 
+              : 'bg-slate-900 hover:bg-slate-850 text-slate-355 border-slate-750'
+          }`;
+          pill.textContent = val;
+          pill.onclick = () => selectMobilePill(cfg.key, val, cfg.index);
+          pillsDiv.appendChild(pill);
+        });
+        
+        details.appendChild(pillsDiv);
+        container.appendChild(details);
+      });
+
+      // Memory check for open accordion (Filter Amnesia fix)
+      if (currentOpenAccordion !== null) {
+        const accordions = container.querySelectorAll('.mobile-filter-group');
+        accordions.forEach(acc => {
+          if (acc.id === `mobile-accordion-${currentOpenAccordion}`) {
+            acc.classList.remove('hidden');
+            acc.open = true;
+          } else {
+            acc.classList.add('hidden');
+            acc.open = false;
+          }
+        });
+      }
+    }
+
+    // selectMobilePill for Multi-Select support with Auto-Close behaviour
+    function selectMobilePill(filterKey, val, dataIndex) {
+      if (val === '') {
+        mobileFilterState[filterKey] = [];
+      } else {
+        const arr = mobileFilterState[filterKey];
+        const idx = arr.indexOf(val);
+        if (idx !== -1) {
+          arr.splice(idx, 1);
+        } else {
+          arr.push(val);
+        }
+      }
+      buildAllMobileFilters();
+      updateMobileFilterCounter();
+      filterData();
+      closeMobileFilterHub();
+    }
+
+    function updateMobileFilterCounter() {
+      const activeFilters = Object.values(mobileFilterState).filter(arr => arr.length > 0).length;
+      const badge = document.getElementById('mobile-filter-badge');
+      if (badge) {
+        if (activeFilters > 0) {
+          badge.textContent = activeFilters;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
+    }
+
+    function openMobileFilterHub() {
+      document.getElementById('mobile-filter-hub').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Close mobile filter hub
+    function closeMobileFilterHub() {
+      document.getElementById('mobile-filter-hub').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function openMobileFilterHubAll() {
+      currentOpenAccordion = null;
+      openMobileFilterHub();
+      buildAllMobileFilters();
+      const accordions = document.querySelectorAll('.mobile-filter-group');
+      accordions.forEach(acc => {
+        acc.classList.remove('hidden');
+        acc.open = false; // Collapse them all initially
+      });
+    }
+
+    function resetMobileFilters() {
+      Object.keys(mobileFilterState).forEach(key => {
+        mobileFilterState[key] = [];
+      });
+      buildAllMobileFilters();
+      updateMobileFilterCounter();
+      filterData();
+      updateHeaderIndicators();
+    }
+
+    // Opens filter hub and isolates only the clicked category (Filter Amnesia Fix)
+    function openFilterFor(categoryKey) {
+      currentOpenAccordion = categoryKey;
+      openMobileFilterHub();
+      buildAllMobileFilters();
+    }
+
+    // Column Visibility controls
+    function toggleColumnVisibility(colKey) {
+      const checkbox = document.getElementById(`toggle-col-${colKey}`);
+      if (checkbox) {
+        columnVisibility[colKey] = checkbox.checked;
+        applyColumnVisibility();
+      }
+    }
+
+    function applyColumnVisibility() {
+      const table = document.getElementById('results-table');
+      if (!table) return;
+
+      const colMapping = {
+        source: 'th-source',
+        capacity: 'th-capacity',
+        type: 'th-type',
+        brand: 'th-brand',
+        series: 'th-series',
+        stage: 'th-stage',
+        style: 'th-style',
+        seer2: 'th-seer2',
+        eer2: 'th-eer2',
+        hspf2: 'th-hspf2',
+        ahri: 'th-ahri',
+        coolbtu: 'th-coolbtu',
+        heatbtu: 'th-heatbtu',
+        page: 'th-page',
+        width: 'th-width',
+        height: 'th-height',
+        price: 'th-price',
+        tax: 'th-tax'
+      };
+
+      const keys = Object.keys(colMapping);
+
+      // Mask headers
+      keys.forEach(key => {
+        const headerId = colMapping[key];
+        const th = document.getElementById(headerId);
+        if (th) {
+          if (columnVisibility[key]) {
+            th.classList.remove('hidden');
+          } else {
+            th.classList.add('hidden');
+          }
+        }
+      });
+
+      // Mask cells in tbody
+      const rows = table.querySelectorAll('tbody tr');
+      rows.forEach(row => {
+        if (row.cells.length < 19) return; // Skip loading or empty rows
+        
+        keys.forEach((key, colIndex) => {
+          const isVisible = columnVisibility[key];
+          const td = row.cells[colIndex + 1]; // Offset by 1 for Add button td
+          if (td) {
+            if (isVisible) {
+              td.classList.remove('hidden');
+            } else {
+              td.classList.add('hidden');
+            }
+          }
+        });
+      });
+    }
+
+    // Smart Headers: Update header styles if filters are active (displays selected filters length)
+    function updateHeaderIndicators() {
+      const colMapping = [
+        { key: 'source', id: 'th-source', name: 'Source Row' },
+        { key: 'capacity', id: 'th-capacity', name: 'Capacity' },
+        { key: 'type', id: 'th-type', name: 'System Type' },
+        { key: 'brand', id: 'th-brand', name: 'Brand' },
+        { key: 'series', id: 'th-series', name: 'Series / Tier' },
+        { key: 'stage', id: 'th-stage', name: 'Mechanical Stage' },
+        { key: 'style', id: 'th-style', name: 'Application / Style' },
+        { key: 'seer2', id: 'th-seer2', name: 'SEER2' },
+        { key: 'eer2', id: 'th-eer2', name: 'EER2' },
+        { key: 'hspf2', id: 'th-hspf2', name: 'HSPF2' },
+        { key: 'ahri', id: 'th-ahri', name: 'AHRI' },
+        { key: 'coolbtu', id: 'th-coolbtu', name: 'Cooling BTU' },
+        { key: 'heatbtu', id: 'th-heatbtu', name: 'Heating BTU' },
+        { key: 'page', id: 'th-page', name: 'PAGE' },
+        { key: 'width', id: 'th-width', name: 'Width' },
+        { key: 'height', id: 'th-height', name: 'Height' },
+        { key: 'price', id: 'th-price', name: 'Price' },
+        { key: 'tax', id: 'th-tax', name: 'Tax Creditable' }
+      ];
+
+      colMapping.forEach(cfg => {
+        const th = document.getElementById(cfg.id);
+        if (th) {
+          const selectedArr = mobileFilterState[cfg.key];
+          if (selectedArr && selectedArr.length > 0) {
+            th.classList.remove('text-slate-400');
+            th.classList.add('text-blue-400');
+            th.innerHTML = `${cfg.name} <span class="text-[10px] ml-1">(${selectedArr.length})</span>`;
+          } else {
+            th.classList.remove('text-blue-400');
+            th.classList.add('text-slate-400');
+            th.innerHTML = cfg.name;
+          }
+        }
+      });
+    }
+
+    // Render Table logic dynamically generating cells for all 18 database indexes
+    function renderTable(dataToRender) {
+      const tbody = document.querySelector('#results-table tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (dataToRender.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="19" class="py-12 text-center text-xs text-slate-500 font-medium whitespace-nowrap">No matches found matching the filter criteria.</td></tr>`;
+        return;
+      }
+
+      dataToRender.forEach(row => {
+        const isInCart = cart.some(item => String(item[0] || "").trim() === String(row[0] || "").trim());
+        const tr = document.createElement('tr');
+        tr.className = isInCart 
+          ? "bg-blue-900/30 hover:bg-blue-850/50 transition border-b border-blue-500/30 text-xs" 
+          : "hover:bg-slate-750/50 transition border-b border-slate-750/40 text-xs";
+
+        const tdCells = [];
+        
+        // Add / Undo Button
+        if (isInCart) {
+          tdCells.push(`
+            <td class="py-3 px-4 text-center whitespace-nowrap">
+              <button onclick='removeFromCartBySource(${JSON.stringify(row)})' class="bg-red-600/35 hover:bg-red-600 hover:text-white transition text-red-400 w-7 h-7 rounded-full font-bold text-sm shadow">✕</button>
+            </td>
+          `);
+        } else {
+          tdCells.push(`
+            <td class="py-3 px-4 text-center whitespace-nowrap">
+              <button onclick='addToCart(${JSON.stringify(row)})' class="bg-blue-600/35 hover:bg-blue-600 hover:text-white transition text-blue-400 w-7 h-7 rounded-full font-bold text-sm shadow">＋</button>
+            </td>
+          `);
+        }
+
+        // Index 0: Source Row
+        tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${row[0] || ""}</td>`);
+        // Index 1: Capacity
+        tdCells.push(`<td class="py-3 px-4 font-medium text-slate-355 whitespace-nowrap">${row[1] || ""}</td>`);
+        // Index 2: System Type
+        tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${row[2] || ""}</td>`);
+        
+        // Index 3: Brand (Embedded SVG/Typography logos)
+        const brandVal = String(row[3] || "").trim().toUpperCase();
+        let brandHtml = row[3] || "";
+        if (brandVal === "CARRIER") {
+          brandHtml = `<span class="font-black text-blue-500 tracking-widest italic text-lg drop-shadow-sm">Carrier</span>`;
+        } else if (brandVal === "COMFORTMAKER") {
+          brandHtml = `<span class="font-black text-slate-300 tracking-tighter text-lg drop-shadow-sm flex items-center gap-1"><svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Comfortmaker</span>`;
+        }
+        tdCells.push('<td class="py-3 px-4 font-semibold text-white whitespace-nowrap">' + brandHtml + '</td>');
+        
+        // Index 4: Series / Tier (Badge button markup)
+        const series = String(row[4] || "").toUpperCase();
+        let badgeClass = "bg-slate-900/40 text-slate-355 border-slate-800/40";
+        if (series === "INFINITY" || series === "MAIN LINE") {
+          badgeClass = "bg-blue-900/40 text-blue-300 border-blue-800/40";
+        } else if (series === "PERFORMANCE" || series === "PERFORMER") {
+          badgeClass = "bg-green-900/40 text-green-300 border-green-800/40";
+        } else if (series === "COMFORT" || series === "BUILDER") {
+          badgeClass = "bg-amber-900/40 text-amber-300 border-amber-800/40";
+        } else if (series === "⚠️ UNRECOGNIZED COLOR") {
+          badgeClass = "bg-red-955/40 text-red-400 border-red-900/40";
+        }
+        tdCells.push(`<td class="py-3 px-4 whitespace-nowrap"><button onclick='openSystemDetails(${JSON.stringify(row)})' class="px-2.5 py-0.5 rounded text-xs font-semibold border ${badgeClass} hover:scale-105 transition-transform shadow-sm">${row[4] || ""}</button></td>`);
+        
+        // Index 5: Mechanical Stage
+        tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${row[5] || ""}</td>`);
+        // Index 6: Application / Style
+        tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${row[6] || ""}</td>`);
+        // Index 7: SEER2
+        tdCells.push(`<td class="py-3 px-4 font-mono font-medium whitespace-nowrap">${row[7] || ""}</td>`);
+        // Index 8: EER2
+        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[8] || ""}</td>`);
+        // Index 9: HSPF2
+        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[9] || ""}</td>`);
+        // Index 10: AHRI
+        tdCells.push(`<td class="py-3 px-4 font-mono text-xs text-slate-400 whitespace-nowrap">${row[10] || "N/A"}</td>`);
+        // Index 11: Cooling BTU
+        tdCells.push(`<td class="py-3 px-4 font-mono whitespace-nowrap">${row[11] || ""}</td>`);
+        // Index 12: Heating BTU
+        tdCells.push(`<td class="py-3 px-4 font-mono whitespace-nowrap">${row[12] || ""}</td>`);
+        // Index 13: PAGE
+        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-400 whitespace-nowrap">${row[13] || ""}</td>`);
+        // Index 14: Width (with double quote format)
+        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[14] ? row[14] + '"' : ""}</td>`);
+        // Index 15: Height (with double quote format)
+        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[15] ? row[15] + '"' : ""}</td>`);
+        
+        // Index 16: Price (Currency format)
+        let priceVal = row[16] || "";
+        if (typeof priceVal === "number") {
+          priceVal = "$" + priceVal.toLocaleString();
+        } else if (priceVal !== "" && !isNaN(Number(priceVal))) {
+          priceVal = "$" + Number(priceVal).toLocaleString();
+        }
+        tdCells.push(`<td class="py-3 px-4 text-right font-bold text-emerald-450 font-mono whitespace-nowrap">${priceVal || "N/A"}</td>`);
+        
+        // Index 17: Tax Creditable
+        tdCells.push(`<td class="py-3 px-4 font-semibold text-slate-300 whitespace-nowrap">${row[17] || ""}</td>`);
+
+        tr.innerHTML = tdCells.join('');
+        tbody.appendChild(tr);
+      });
+
+      // Apply visibility filter onto the new elements
+      applyColumnVisibility();
+    }
+
+    // Dynamic Filter handler ("All" value explicitly handled by skipping) (Supports Multi-Select)
+    function filterData() {
+      const filtered = equipmentData.filter(row => {
+        // Run checks dynamically on active filter configs
+        for (let i = 0; i < filterConfigs.length; i++) {
+          const cfg = filterConfigs[i];
+          const activeFilterArr = mobileFilterState[cfg.key];
+          if (activeFilterArr && activeFilterArr.length > 0) {
+            if (!activeFilterArr.includes(String(row[cfg.index] || "").trim())) {
+              return false;
+            }
+          }
+        }
+        return true;
+      });
+
+      renderTable(filtered);
+      updateHeaderIndicators();
+    }
+
+    // Toggle Drawer
+    function toggleDrawer() {
+      const drawer = document.getElementById('top-ribbon-drawer');
+      const chevron = document.getElementById('drawer-chevron');
+      if (drawer.style.maxHeight === '0px' || !drawer.style.maxHeight) {
+        drawer.style.maxHeight = '250px';
+        chevron.classList.add('rotate-180');
+      } else {
+        drawer.style.maxHeight = '0px';
+        chevron.classList.remove('rotate-180');
+      }
+    }
+
+    // Toggle Cart Modal
+    function openCartModal() {
+      document.getElementById('cart-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      updateTerminalOutput();
+    }
+
+    // Close Cart Modal
+    function closeCartModal() {
+      document.getElementById('cart-modal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    // F2 Keyboard Shortcut
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'F2') {
+        e.preventDefault();
+        const modal = document.getElementById('cart-modal');
+        if (modal.classList.contains('hidden')) {
+          openCartModal();
+        } else {
+          closeCartModal();
+        }
+      }
+    });
+
+    // Settings drawer controllers
+    function openSettingsModal() {
+      document.getElementById('settings-modal').classList.remove('hidden');
+    }
+
+    // Close Settings Modal
+    function closeSettingsModal() {
+      document.getElementById('settings-modal').classList.add('hidden');
+    }
+
+    // Local Storage Cart Syncing
+    function saveCartData() {
+      localStorage.setItem('changeout_cart_v1', JSON.stringify(cart));
+    }
+
+    // Load Cart Data
+    function loadCartData() {
+      const saved = localStorage.getItem('changeout_cart_v1');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          cart.length = 0; // Clear active reference
+          parsed.forEach(item => cart.push(item));
+        } catch (e) {
+          console.error("Error loading cart memory: ", e);
+        }
+      }
+      updateCartUI();
+    }
+
+    // Add Item to Cart
+    function addToCart(rowObj) {
+      if (cart.length >= 9) {
+        alert("Cart is full! Maximum 9 systems allowed.");
+        return;
+      }
+      cart.push(rowObj);
+      saveCartData();
+      updateCartUI();
+      filterData(); // Refresh highlights instantly
+    }
+
+    // Remove Item from Cart
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      saveCartData();
+      updateCartUI();
+      filterData(); // Refresh highlights instantly
+    }
+
+    // Remove item from Cart by matching Source Row index
+    function removeFromCartBySource(rowObj) {
+      const idx = cart.findIndex(item => String(item[0] || "").trim() === String(rowObj[0] || "").trim());
+      if (idx !== -1) {
+        removeFromCart(idx);
+      }
+    }
+
+    // Clear Cart
+    function clearCart() {
+      cart.length = 0;
+      saveCartData();
+      updateCartUI();
+      filterData(); // Wipes F2 highlights and resets buttons
+    }
+
+    function clearAllSelections() {
+      clearCart();
+      alert("Selections and proposal cart cleared!");
+    }
+
+    // HTML5 Drag-and-Drop Cart Reordering handlers
+    function handleCartDragStart(e, index) {
+      draggedCartIndex = index;
+      e.dataTransfer.effectAllowed = 'move';
+      e.currentTarget.classList.add('opacity-50', 'border-blue-500/50');
+    }
+
+    // Drag over cart item
+    function handleCartDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    }
+
+    function handleCartDrop(e, targetIndex) {
+      e.preventDefault();
+      if (draggedCartIndex !== null && draggedCartIndex !== targetIndex) {
+        // Move row values in array
+        const draggedItem = cart.splice(draggedCartIndex, 1)[0];
+        cart.splice(targetIndex, 0, draggedItem);
+        saveCartData();
+        updateCartUI();
+      }
+    }
+
+    // Drag end
+    function handleCartDragEnd(e) {
+      draggedCartIndex = null;
+      e.currentTarget.classList.remove('opacity-50', 'border-blue-500/50');
+    }
+
+    // System Details Pop-up logic (Clicking Series badge button)
+    function openSystemDetails(rowObj) {
+      const container = document.getElementById('system-details-content');
+      if (!container) return;
+
+      // Currency pricing formatter
+      let priceVal = rowObj[16] || "";
+      if (typeof priceVal === "number") {
+        priceVal = "$" + priceVal.toLocaleString();
+      } else if (priceVal !== "" && !isNaN(Number(priceVal))) {
+        priceVal = "$" + Number(priceVal).toLocaleString();
+      }
+
+      const widthVal = rowObj[14] ? rowObj[14] + '"' : "N/A";
+      const heightVal = rowObj[15] ? rowObj[15] + '"' : "N/A";
+
+      // Render grid layout for 18 specs
+      container.innerHTML = `
+        <div class="grid grid-cols-2 gap-4 border-b border-slate-750 pb-4 mb-4">
+          <div>
+            <span class="text-slate-400 block mb-0.5 uppercase tracking-wider text-[10px]">Brand</span>
+            <span class="text-base font-bold text-white">${rowObj[3] || "N/A"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block mb-0.5 uppercase tracking-wider text-[10px]">Series / Tier</span>
+            <span class="text-base font-bold text-blue-400">${rowObj[4] || "N/A"}</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-y-3 gap-x-6">
+          <div>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Source Row</span>
+            <span class="text-slate-200 font-semibold">${rowObj[0] || "N/A"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Capacity</span>
+            <span class="text-slate-200 font-semibold">${rowObj[1] || "N/A"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">System Type</span>
+            <span class="text-slate-200 font-semibold">${rowObj[2] || "N/A"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Mechanical Stage</span>
+            <span class="text-slate-200 font-semibold">${rowObj[5] || "N/A"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Application / Style</span>
+            <span class="text-slate-200 font-semibold">${rowObj[6] || "N/A"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">SEER2</span>
+            <span class="text-slate-200 font-semibold font-mono">${rowObj[7] || "N/A"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">EER2</span>
+            <span class="text-slate-200 font-semibold font-mono">${rowObj[8] || "N/A"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">HSPF2</span>
+            <span class="text-slate-200 font-semibold font-mono">${rowObj[9] || "N/A"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">AHRI #</span>
+            <span class="text-slate-200 font-semibold font-mono">${rowObj[10] || "N/A"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Cooling BTU</span>
+            <span class="text-slate-200 font-semibold font-mono">${rowObj[11] || "N/A"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Heating BTU</span>
+            <span class="text-slate-200 font-semibold font-mono">${rowObj[12] || "N/A"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">PAGE</span>
+            <span class="text-slate-200 font-semibold font-mono">${rowObj[13] || "N/A"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Cabinet Width</span>
+            <span class="text-slate-200 font-semibold font-mono">${widthVal}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Cabinet Height</span>
+            <span class="text-slate-200 font-semibold font-mono">${heightVal}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Tax Creditable</span>
+            <span class="text-slate-200 font-semibold">${rowObj[17] || "N/A"}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Investment Price</span>
+            <span class="text-emerald-450 font-bold font-mono text-sm">${priceVal || "N/A"}</span>
+          </div>
+        </div>
+      `;
+
+      // Check warranty conditions
+      const brand = String(rowObj[3] || "").trim().toUpperCase();
+      const seriesVal = String(rowObj[4] || "").trim().toUpperCase();
+      const stageVal = String(rowObj[5] || "").trim().toUpperCase();
+      
+      let warrantyText = "";
+      if (brand === "COMFORTMAKER" && seriesVal === "MAIN LINE") {
+        if (stageVal === "SINGLE STAGE") {
+          warrantyText = "No-Hassle Replacement: 5-Year Condenser / 5-Year Air Handler";
+        } else {
+          warrantyText = "No-Hassle Replacement: 10-Year Condenser / 5-Year Air Handler";
+        }
+      }
+
+      if (warrantyText) {
+        container.innerHTML += `
+          <div class="mt-4 p-3.5 bg-amber-500/10 border border-amber-500/30 text-amber-455 rounded-xl font-medium flex items-start space-x-2.5">
+            <span class="text-base leading-none select-none">🛡️</span>
+            <div>
+              <span class="font-bold text-amber-300 block mb-0.5">Manufacturer Warranty Highlight</span>
+              <span class="text-[11px] text-amber-200/90 leading-relaxed">${warrantyText}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      // Render Cart Action Buttons dynamically
+      const btnContainer = document.getElementById('system-details-action-btn-container');
+      if (btnContainer) {
+        const isInCart = cart.some(item => String(item[0] || "").trim() === String(rowObj[0] || "").trim());
+        if (isInCart) {
+          btnContainer.innerHTML = `
+            <button onclick='removeFromCartBySourceFromModal(${JSON.stringify(rowObj)})' class="w-full bg-red-655 hover:bg-red-555 text-white font-bold py-3 rounded-lg transition shadow-lg text-xs flex items-center justify-center space-x-2">
+              <span>✕</span>
+              <span>Remove from Proposal Cart</span>
+            </button>
+          `;
+        } else {
+          btnContainer.innerHTML = `
+            <button onclick='addToCartFromModal(${JSON.stringify(rowObj)})' class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition shadow-lg text-xs flex items-center justify-center space-x-2">
+              <span>🛒</span>
+              <span>Add to Proposal Cart</span>
+            </button>
+          `;
+        }
+      }
+
+      document.getElementById('system-details-modal').classList.remove('hidden');
+    }
+
+    function closeSystemDetails() {
+      document.getElementById('system-details-modal').classList.add('hidden');
+    }
+
+    function addToCartFromModal(rowObj) {
+      addToCart(rowObj);
+      closeSystemDetails();
+    }
+
+    function removeFromCartBySourceFromModal(rowObj) {
+      removeFromCartBySource(rowObj);
+      closeSystemDetails();
+    }
+
+    // Update Cart Badge and Lists (Vertical full-width list with Draggable elements)
+    function updateCartUI() {
+      document.getElementById('cart-counter').textContent = cart.length;
+      const collapsedBadge = document.getElementById('cart-collapsed-badge');
+      if (collapsedBadge) collapsedBadge.textContent = cart.length;
+      
+      const cartItemsDiv = document.getElementById('cart-items');
+      const emptyState = document.getElementById('cart-empty-state');
+      
+      cartItemsDiv.innerHTML = '';
+      
+      if (cart.length === 0) {
+        cartItemsDiv.appendChild(emptyState);
+      } else {
+        const wrapContainer = document.createElement('div');
+        wrapContainer.className = "flex flex-col gap-2.5 w-full";
+
+        cart.forEach((row, index) => {
+          let priceVal = row[16] || "";
+          if (typeof priceVal === "number") {
+            priceVal = "$" + priceVal.toLocaleString();
+          } else if (priceVal !== "" && !isNaN(Number(priceVal))) {
+            priceVal = "$" + Number(priceVal).toLocaleString();
+          }
+
+          const pill = document.createElement('div');
+          pill.className = "flex items-center w-full bg-slate-900 border border-slate-750 px-4 py-2.5 rounded-full text-xs font-semibold text-slate-200 select-none shadow space-x-2 cursor-grab active:cursor-grabbing transition-all hover:bg-slate-850";
+          pill.setAttribute('draggable', 'true');
+          
+          // Drag and drop event bindings
+          pill.addEventListener('dragstart', (e) => handleCartDragStart(e, index));
+          pill.addEventListener('dragover', handleCartDragOver);
+          pill.addEventListener('drop', (e) => handleCartDrop(e, index));
+          pill.addEventListener('dragend', handleCartDragEnd);
+
+          pill.innerHTML = `
+            <span class="text-slate-500 font-bold cursor-grab select-none">⋮⋮</span>
+            <span class="text-slate-400 font-extrabold mr-1">OPTION ${index + 1}:</span>
+            <span class="flex-grow text-left">${row[3]} | ${row[4]} | ${priceVal}</span>
+            <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-300 font-bold ml-1 transition hover:scale-110">✕</button>
+          `;
+          wrapContainer.appendChild(pill);
+        });
+
+        cartItemsDiv.appendChild(wrapContainer);
+      }
+      updateTerminalOutput();
+    }
+
+    // Update Compiled Proposal Terminal Box (Clean Proposal Output)
+    function updateTerminalOutput() {
+      const terminal = document.getElementById('terminal-box');
+      if (cart.length === 0) {
+        terminal.value = "";
+        return;
+      }
+      
+      let text = "";
+      cart.forEach((row, index) => {
+        const optionNum = index + 1;
+        const seer2 = row[7] || "";
+        const brand = row[3] || "";
+        const series = row[4] || "";
+        const capacity = row[1] || "";
+        const stage = String(row[5] || "").toLowerCase();
+        const type = String(row[2] || "").toLowerCase();
+        const ahri = row[10] || "";
+        
+        let priceVal = row[16] || "";
+        if (typeof priceVal === "number") {
+          priceVal = "$" + priceVal.toLocaleString();
+        } else if (priceVal !== "" && !isNaN(Number(priceVal))) {
+          priceVal = "$" + Number(priceVal).toLocaleString();
+        }
+
+        let line = `■ Option ${optionNum}: ___ SEER2 ${seer2} ${brand} ${series} ${capacity} R-454B ${stage} ${type} system AHRI #: ${ahri} Investment: ${priceVal}`;
+        
+        const taxVal = String(row[17] || "").toUpperCase().trim();
+        if (taxVal === 'YES' || taxVal === 'TAX') {
+          line += " (Tax Creditable: YES)";
+        }
+        text += line + "\n\n";
+      });
+      text = text.trim();
+
+      // Standard boilerplate block
+      text += "\n\n■ Platt’s Air and Heat has a 1-year workmanship warranty.";
+      text += "\n■ 10 year manufacturer parts warranty on new equipment after new system is registered online by homeowner within 90 days of installation. (Follow links on plattsairandheat.com. Products/Product Registration)";
+      text += "\n■ Financing option through FTL (Follow links on plattsairandheat.com. Financing)";
+
+      // Conditional Warranty Scanner for Comfortmaker Main Line
+      const hasMainLineSingle = cart.some(row => String(row[3] || "").toUpperCase() === "COMFORTMAKER" && String(row[4] || "").toUpperCase() === "MAIN LINE" && String(row[5] || "").toUpperCase() === "SINGLE STAGE");
+      const hasMainLineMulti = cart.some(row => String(row[3] || "").toUpperCase() === "COMFORTMAKER" && String(row[4] || "").toUpperCase() === "MAIN LINE" && String(row[5] || "").toUpperCase() !== "SINGLE STAGE");
+
+      if (hasMainLineSingle) {
+        text += "\n■ Your Comfortmaker Mainline System also comes with a No-Hassle unit swap that covers the condenser for 5 years and the air handler for 5 years.";
+      }
+      if (hasMainLineMulti) {
+        text += "\n■ Your Comfortmaker Mainline System also comes with a No-Hassle unit swap that covers the condenser for 10 years and the air handler for 5 years.";
+      }
+
+      terminal.value = text;
+    }
+
+    // Toggle Text Format
+    function toggleTextType() {
+      const isRich = document.getElementById('text-type-toggle').checked;
+      const terminal = document.getElementById('terminal-box');
+      if (isRich) {
+        terminal.classList.add('text-indigo-400');
+        terminal.classList.remove('text-blue-400');
+      } else {
+        terminal.classList.add('text-blue-400');
+        terminal.classList.remove('text-indigo-400');
+      }
+    }
+
+    // Copy to Clipboard
+    function copyTerminalToClipboard() {
+      const terminal = document.getElementById('terminal-box');
+      terminal.select();
+      terminal.setSelectionRange(0, 99999); // For mobile devices
+      
+      navigator.clipboard.writeText(terminal.value)
+        .then(() => {
+          alert("Proposal terminal compiled content successfully copied to clipboard!");
+        })
+        .catch(err => {
+          alert("Failed to copy text: " + err);
+        });
+    }
+  </script>
+</body>
+</html>
