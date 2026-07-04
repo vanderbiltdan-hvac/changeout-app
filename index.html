@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v01.24 | Top Logo, Extreme Space Saver & Settings Sidebar -->
+<!-- Changeout Lookup v01.25 | Compare Mode, Sticky Headers & Fullscreen -->
 <!DOCTYPE html>
 <html lang="en" style="overscroll-behavior: none;">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Changeout Lookup v01.24</title>
+  <title>Changeout Lookup v01.25</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -32,6 +32,17 @@
     summary::-webkit-details-marker {
       display: none;
     }
+
+    /* Sticky Table Headers */
+    #results-table thead { position: sticky; top: 0; z-index: 20; background-color: #0f172a; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+
+    /* Vertical Compare Mode Pivot */
+    .compare-mode { display: flex; overflow-x: auto; align-items: flex-start; }
+    .compare-mode thead { display: block; position: sticky; left: 0; z-index: 30; border-right: 2px solid #334155; }
+    .compare-mode thead tr { display: flex; flex-direction: column; }
+    .compare-mode tbody { display: flex; }
+    .compare-mode tbody tr { display: flex; flex-direction: column; min-width: 180px; border-right: 1px solid #1e293b; }
+    .compare-mode th, .compare-mode td { display: flex; align-items: center; min-height: 55px; border-bottom: 1px solid #334155; white-space: normal; width: 100%; max-width: none; }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col no-scrollbar selection:bg-blue-500 selection:text-white pb-32" style="overscroll-behavior: none;">
@@ -100,8 +111,9 @@
     <!-- THE LIVE RESULTS CANVAS -->
     <section class="bg-slate-800 border border-slate-700 rounded-2xl flex-grow overflow-hidden flex flex-col shadow-xl">
       <!-- Live Results Header -->
-      <div class="px-4 py-2 border-b border-slate-700 flex justify-between items-center bg-slate-800/80 sticky top-0 z-10">
+      <div class="px-4 py-2 border-b border-slate-700 flex justify-between items-center bg-slate-800/95 sticky top-0 z-30">
         <h2 class="text-sm font-bold font-outfit text-white tracking-wide">Live Matches</h2>
+        <button onclick="toggleCompareMode()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-[10px] font-bold tracking-wider uppercase shadow-sm transition-colors flex items-center border border-blue-500"><span class="mr-1 text-xs">⇄</span> Compare</button>
       </div>
 
       <!-- Scrollable Canvas -->
@@ -288,6 +300,11 @@
         </div>
         <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white transition bg-slate-900 border border-slate-700 rounded-full w-8 h-8 flex items-center justify-center">✕</button>
       </div>
+      <!-- Fullscreen App Mode -->
+      <button onclick="toggleFullScreen()" class="w-full mt-2 bg-slate-700 hover:bg-slate-600 text-white border border-slate-500 rounded py-2 px-4 flex justify-between items-center transition-colors text-xs font-bold tracking-wide">
+        <span>⛶ Toggle App Fullscreen</span>
+        <span class="text-[10px] text-slate-400 font-normal">Hides address bar</span>
+      </button>
 
       <!-- Column Visibility Checklist (18 Columns Expanded) -->
       <div class="space-y-3">
@@ -453,7 +470,7 @@
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
           <span>Lookup</span>
-          <span class="text-[8px] font-normal text-blue-400">v01.24</span>
+          <span class="text-[8px] font-normal text-blue-400">v01.25</span>
         </span>
       </button>
 
@@ -1526,6 +1543,25 @@
         .catch(err => {
           alert("Failed to copy text: " + err);
         });
+    }
+
+    // Toggle Vertical Compare Mode
+    function toggleCompareMode() {
+        const table = document.getElementById('results-table');
+        if(table) table.classList.toggle('compare-mode');
+    }
+
+    // Native Fullscreen API
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.log(`Error attempting to enable fullscreen: ${err.message}`);
+            });
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
     }
   </script>
 </body>
