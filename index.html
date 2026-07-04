@@ -1,14 +1,14 @@
-<!-- Changeout Lookup v01.29 | Text Stacking, Stage Cleanup, Abbreviations & Card Colors -->
+<!-- Changeout Lookup v01.30 | Memory Settings, Header Stacking & "T" Abbreviations -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v01.29</title>
+  <title>Changeout Lookup v01.30</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <!-- Tailwind CSS CDN --> 
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Inter & Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -46,6 +46,12 @@
     .compare-mode tbody tr { display: flex; flex-direction: column; min-width: 180px; border-right: 1px solid #1e293b; }
     .compare-mode th, .compare-mode td { display: flex; align-items: center; min-height: 55px; border-bottom: 1px solid #334155; white-space: normal; width: 100%; max-width: none; }
     .compare-mode th.hidden, .compare-mode td.hidden { display: none !important; }
+
+    /* Dynamic Table Density & Font Overrides */
+    #results-table { transition: font-size 0.2s ease; }
+    #results-table.pad-compact th, #results-table.pad-compact td { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+    #results-table.pad-standard th, #results-table.pad-standard td { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+    #results-table.pad-relaxed th, #results-table.pad-relaxed td { padding-left: 1rem !important; padding-right: 1rem !important; }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col no-scrollbar selection:bg-blue-500 selection:text-white pb-32">
@@ -68,13 +74,16 @@
         <img src="./platts.png" alt="Platt's Air and Heat" class="transition-all h-[40px] md:h-[60px] w-auto object-contain">
       </div>
 
-      <!-- Right: Compare & Mic Buttons -->
+      <!-- Right: Compare, Mic & Settings Buttons -->
       <div class="flex items-center space-x-2 shrink-0">
         <button onclick="toggleCompareMode()" class="flex items-center space-x-1 bg-blue-600 hover:bg-blue-500 transition border border-blue-500 rounded py-1 px-2 text-[10px] font-medium text-white shadow-sm">
           <span>⇄</span><span class="hidden sm:inline">Compare</span>
         </button>
         <button onclick="activateVoiceCommand()" id="top-mic-btn" class="flex items-center justify-center bg-red-600 hover:bg-red-500 transition border border-red-500 rounded-full w-7 h-7 text-xs text-white shadow-sm" title="Voice Search">
           🎙️
+        </button>
+        <button onclick="openSettingsModal()" class="flex items-center justify-center bg-slate-700 hover:bg-slate-600 transition border border-slate-500 rounded-full w-7 h-7 text-xs text-white shadow-sm" title="Settings">
+          ⚙️
         </button>
       </div>
     </div>
@@ -98,9 +107,6 @@
         </button>
         <button class="flex-shrink-0 min-w-[60px] h-12 bg-slate-800 hover:bg-slate-700 text-white flex flex-col items-center justify-center rounded-lg transition-colors border border-slate-600 shadow-sm" title="Manuals">
           <span class="text-base leading-none mb-1">📚</span><span class="text-[8px] font-bold uppercase tracking-wider">Manuals</span>
-        </button>
-        <button onclick="openSettingsModal()" class="flex-shrink-0 min-w-[60px] h-12 bg-slate-800 hover:bg-slate-700 text-white flex flex-col items-center justify-center rounded-lg transition-colors border border-slate-600 shadow-sm" title="Settings">
-          <span class="text-base leading-none mb-1">⚙️</span><span class="text-[8px] font-bold uppercase tracking-wider">Settings</span>
         </button>
         <button onclick="openMobileFilterHubAll()" class="flex-shrink-0 min-w-[60px] h-12 bg-slate-800 hover:bg-slate-700 text-white flex flex-col items-center justify-center rounded-lg transition-colors border border-slate-600 shadow-sm" title="Filters">
           <span class="text-base leading-none mb-1">🔍</span><span class="text-[8px] font-bold uppercase tracking-wider">Filters</span>
@@ -128,10 +134,10 @@
               <th id="th-add" class="py-3 px-4 text-center w-16 whitespace-nowrap">Add</th>
               <th id="th-source" onclick="openFilterFor('source')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Source Row</th>
               <th id="th-capacity" onclick="openFilterFor('capacity')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[80px] max-w-[100px] leading-tight">Capacity</th>
-              <th id="th-type" onclick="openFilterFor('type')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">System Type</th>
+              <th id="th-type" onclick="openFilterFor('type')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[80px] leading-tight">System Type</th>
               <th id="th-brand" onclick="openFilterFor('brand')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap min-w-[160px]">Brand</th>
               <th id="th-series" onclick="openFilterFor('series')" class="py-3 px-4 cursor-pointer hover:bg-slate-805 transition whitespace-nowrap">Series / Tier</th>
-              <th id="th-stage" onclick="openFilterFor('stage')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Mechanical Stage</th>
+              <th id="th-stage" onclick="openFilterFor('stage')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[85px] leading-tight">Mechanical Stage</th>
               <th id="th-style" onclick="openFilterFor('style')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[100px] max-w-[130px] leading-tight break-words">Application / Style</th>
               <th id="th-seer2" onclick="openFilterFor('seer2')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">SEER2</th>
               <th id="th-eer2" onclick="openFilterFor('eer2')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">EER2</th>
@@ -391,16 +397,24 @@
 
 
 
-      <!-- Table Font Scaler -->
-      <div class="space-y-2 border-t border-slate-700 pt-4 mt-4">
-          <div class="flex justify-between">
-              <div>
-                  <h4 class="text-xs font-bold text-white tracking-wide">Results Table Font Scaler</h4>
-                  <p class="text-[10px] text-slate-400 mt-0.5">Adjust main table text size for legibility.</p>
-              </div>
-              <span id="tbl-font-scale-value" class="text-xs font-bold text-blue-400 font-mono">12px</span>
+      <!-- Memory-Locked Display Settings -->
+      <div class="space-y-4 border-t border-slate-700 pt-4 mt-4">
+        <div>
+          <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Table Text Size</h4>
+          <div class="flex gap-2 w-full">
+            <button id="btn-font-14px" onclick="setTableFontSize('14px')" class="flex-1 bg-slate-900 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded text-xs transition-colors">Small</button>
+            <button id="btn-font-16px" onclick="setTableFontSize('16px')" class="flex-1 bg-slate-900 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded text-xs transition-colors">Normal</button>
+            <button id="btn-font-18px" onclick="setTableFontSize('18px')" class="flex-1 bg-slate-900 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded text-xs transition-colors">Large</button>
           </div>
-          <input type="range" min="10" max="24" value="12" oninput="scaleTableFont(this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500">
+        </div>
+        <div>
+          <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Column Density (Padding)</h4>
+          <div class="flex gap-2 w-full">
+            <button id="btn-pad-compact" onclick="setTablePadding('compact')" class="flex-1 bg-slate-900 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded text-xs transition-colors">Compact</button>
+            <button id="btn-pad-standard" onclick="setTablePadding('standard')" class="flex-1 bg-slate-900 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded text-xs transition-colors">Standard</button>
+            <button id="btn-pad-relaxed" onclick="setTablePadding('relaxed')" class="flex-1 bg-slate-900 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded text-xs transition-colors">Relaxed</button>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -445,7 +459,7 @@
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
           <span>Lookup</span>
-          <span class="text-[8px] font-normal text-blue-400">v01.29</span>
+          <span class="text-[8px] font-normal text-blue-400">v01.30</span>
         </span>
       </button>
 
@@ -480,6 +494,59 @@
     let draggedCartIndex = null;
     let currentOpenAccordion = null;
     let useAbbreviations = false;
+
+    let currentFontSize = '16px';
+    let currentPadding = 'standard';
+
+    function setTableFontSize(size) {
+        currentFontSize = size;
+        localStorage.setItem('changeout_font_v1', size);
+        applyDisplaySettings();
+    }
+
+    function setTablePadding(pad) {
+        currentPadding = pad;
+        localStorage.setItem('changeout_padding_v1', pad);
+        applyDisplaySettings();
+    }
+
+    function applyDisplaySettings() {
+        const table = document.getElementById('results-table');
+        if (!table) return;
+        
+        // Apply Font Size
+        table.style.fontSize = currentFontSize;
+        
+        // Apply Padding Class
+        table.classList.remove('pad-compact', 'pad-standard', 'pad-relaxed');
+        table.classList.add('pad-' + currentPadding);
+        
+        // Update Button UI (Font)
+        ['14px', '16px', '18px'].forEach(s => {
+            const btn = document.getElementById('btn-font-' + s);
+            if (btn) {
+                if (s === currentFontSize) btn.classList.add('bg-blue-600', 'text-white', 'border-blue-500');
+                else btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-500');
+            }
+        });
+        
+        // Update Button UI (Padding)
+        ['compact', 'standard', 'relaxed'].forEach(p => {
+            const btn = document.getElementById('btn-pad-' + p);
+            if (btn) {
+                if (p === currentPadding) btn.classList.add('bg-blue-600', 'text-white', 'border-blue-500');
+                else btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-500');
+            }
+        });
+    }
+
+    function loadDisplaySettings() {
+        const savedFont = localStorage.getItem('changeout_font_v1');
+        const savedPad = localStorage.getItem('changeout_padding_v1');
+        if (savedFont) currentFontSize = savedFont;
+        if (savedPad) currentPadding = savedPad;
+        applyDisplaySettings();
+    }
 
     function toggleAbbreviation() {
         const checkbox = document.getElementById('toggle-abbreviate');
@@ -560,6 +627,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       loadCartData();
       loadColumnSettings();
+      loadDisplaySettings();
     });
     window.addEventListener('load', loadData);
 
@@ -937,7 +1005,12 @@
         // Index 0: Source Row
         tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${row[0] || ""}</td>`);
         // Index 1: Capacity
-        tdCells.push(`<td class="py-3 px-4 whitespace-normal break-words min-w-[80px] max-w-[100px] leading-tight font-medium text-slate-355">${row[1] || ""}</td>`);
+        // Index 1: Capacity
+        let capText = String(row[1] || "").trim();
+        if (useAbbreviations) {
+            capText = capText.replace(/Ton/gi, "T");
+        }
+        tdCells.push(`<td class="py-3 px-4 font-semibold text-white whitespace-nowrap">${capText}</td>`);
         // Index 2: System Type
         let rawSysType = String(row[2] || "").toUpperCase();
         let mainType = row[2] || "";
