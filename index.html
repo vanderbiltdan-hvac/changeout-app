@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v03.01 | Widget Menus, Sliders & Geometry Fix | Lines: 1919 -->
+<!-- Changeout Lookup v03.02 | Widget Menu Polish | Lines: 1974 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v03.01</title>
+  <title>Changeout Lookup v03.02</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -145,46 +145,46 @@
       <!-- Scrollable Canvas -->
       <div id="results-canvas" class="overflow-y-auto no-scrollbar">
         <!-- Dynamic Resizing Header Map -->
-        <div id="results-header" class="sticky top-0 z-20 bg-slate-900 border-b border-slate-700 px-4 py-2.5 hidden md:flex items-center text-[10px] uppercase font-bold text-slate-400 tracking-wider shadow shrink-0 select-none">
+        <div id="results-header" class="sticky top-0 z-20 bg-slate-900 border-b border-slate-700 px-4 py-2.5 hidden md:flex items-center gap-4 text-[10px] uppercase font-bold text-slate-400 tracking-wider shadow shrink-0 select-none">
           <!-- Column 1: Source Row -->
-          <div data-col-key="source" style="flex: var(--col-width-source);" class="cursor-pointer hover:text-white transition flex flex-col justify-center">
-              <span onclick="event.stopPropagation(); openCategoryModal('source', 'Source Row')">Source</span>
+          <div data-col-key="source" onclick="openCategoryModal('source', 'Source Row')" style="flex: var(--col-width-source);" class="cursor-pointer hover:text-white transition flex flex-col justify-center">
+              <span>Source</span>
           </div>
           <!-- Column 2: Brand / Tier -->
-          <div id="header-brand-group" onclick="handleHeaderClick('brand', 'brand-tier')" class="cursor-pointer hover:text-white transition flex flex-col justify-start" style="flex: var(--col-width-brand);">
-              <span data-col-key="brand" onclick="event.stopPropagation(); openCategoryModal('brand', 'Brand')">Brand</span>
-              <span data-col-key="series" onclick="event.stopPropagation(); openCategoryModal('series', 'Tier')" class="text-[8px] text-slate-500">Tier</span>
+          <div id="header-brand-group" onclick="openCategoryModal('brand', 'Brand / Tier')" class="cursor-pointer hover:text-white transition flex flex-col justify-start" style="flex: var(--col-width-brand);">
+              <span data-col-key="brand">Brand</span>
+              <span data-col-key="series" class="text-[8px] text-slate-500">Tier</span>
           </div>
           <!-- Column 3: Capacity / Type / Stage -->
-          <div id="header-capacity-group" onclick="handleHeaderClick('capacity', 'capacity-type-stage')" class="cursor-pointer hover:text-white transition flex flex-col justify-center gap-0.5" style="flex: var(--col-width-capacity);">
-              <span data-col-key="capacity" onclick="event.stopPropagation(); openCategoryModal('capacity', 'Capacity')" class="leading-none">Capacity</span>
-              <span data-col-key="type" onclick="event.stopPropagation(); openCategoryModal('type', 'Type')" class="text-[8px] text-slate-500 leading-none">Type</span>
-              <span data-col-key="stage" onclick="event.stopPropagation(); openCategoryModal('stage', 'Stage')" class="text-[8px] text-slate-500 leading-none">Stage</span>
+          <div id="header-capacity-group" onclick="openCategoryModal('capacity', 'Capacity / Type / Stage')" class="cursor-pointer hover:text-white transition flex flex-col justify-center gap-0.5" style="flex: var(--col-width-capacity);">
+              <span data-col-key="capacity" class="leading-none">Capacity</span>
+              <span data-col-key="type" class="text-[8px] text-slate-500 leading-none">Type</span>
+              <span data-col-key="stage" class="text-[8px] text-slate-500 leading-none">Stage</span>
           </div>
           <!-- Column 4: Efficiency -->
-          <div id="header-efficiency-group" onclick="handleHeaderClick('seer2')" class="cursor-pointer hover:text-white transition flex flex-col justify-start" style="flex: var(--col-width-efficiency);">
+          <div id="header-efficiency-group" onclick="openCategoryModal('seer2', 'Efficiency')" class="cursor-pointer hover:text-white transition flex flex-col justify-start" style="flex: var(--col-width-efficiency);">
               <span>Efficiency</span>
               <span class="text-[8px] text-slate-500 flex flex-wrap gap-1">
-                <span data-col-key="seer2" onclick="event.stopPropagation(); openCategoryModal('seer2', 'SEER2')">SEER2</span>
-                <span data-col-key="eer2" onclick="event.stopPropagation(); openCategoryModal('eer2', 'EER2')">/ EER2</span>
-                <span data-col-key="hspf2" onclick="event.stopPropagation(); openCategoryModal('hspf2', 'HSPF2')">/ HSPF2</span>
-                <span data-col-key="ahri" onclick="event.stopPropagation(); openCategoryModal('ahri', 'AHRI')">/ AHRI</span>
+                <span data-col-key="seer2">SEER2</span>
+                <span data-col-key="eer2">/ EER2</span>
+                <span data-col-key="hspf2">/ HSPF2</span>
+                <span data-col-key="ahri">/ AHRI</span>
               </span>
           </div>
           <!-- Column 5: Specs -->
-          <div id="header-dimensions-group" onclick="handleHeaderClick('width')" class="cursor-pointer hover:text-white transition flex flex-col justify-start" style="flex: var(--col-width-specs);">
+          <div id="header-dimensions-group" onclick="openCategoryModal('width', 'Specs')" class="cursor-pointer hover:text-white transition flex flex-col justify-start" style="flex: var(--col-width-specs);">
               <span>Specs</span>
               <span class="text-[8px] text-slate-500 flex flex-wrap gap-1">
-                <span data-col-key="coolbtu" onclick="event.stopPropagation(); openCategoryModal('coolbtu', 'Cool BTU')">Cool BTU</span>
-                <span data-col-key="heatbtu" onclick="event.stopPropagation(); openCategoryModal('heatbtu', 'Heat BTU')">/ Heat BTU</span>
-                <span data-col-key="width" onclick="event.stopPropagation(); openCategoryModal('width', 'Dims')">/ Dims</span>
-                <span data-col-key="page" onclick="event.stopPropagation(); openCategoryModal('page', 'Page')">/ Page</span>
+                <span data-col-key="coolbtu">Cool BTU</span>
+                <span data-col-key="heatbtu">/ Heat BTU</span>
+                <span data-col-key="width">/ Dims</span>
+                <span data-col-key="page">/ Page</span>
               </span>
           </div>
           <!-- Column 6: Price -->
-          <div id="header-price-group" onclick="handleHeaderClick('price')" class="cursor-pointer hover:text-white transition flex flex-col justify-start text-right" style="flex: var(--col-width-price);">
-              <span data-col-key="price" onclick="event.stopPropagation(); openCategoryModal('price', 'Price')">Price</span>
-              <span data-col-key="tax" onclick="event.stopPropagation(); openCategoryModal('tax', 'Tax Incentive')" class="text-[8px] text-slate-500">Tax Incentive</span>
+          <div id="header-price-group" onclick="openCategoryModal('price', 'Price')" class="cursor-pointer hover:text-white transition flex flex-col justify-start text-right" style="flex: var(--col-width-price);">
+              <span data-col-key="price">Price</span>
+              <span data-col-key="tax" class="text-[8px] text-slate-500">Tax Incentive</span>
           </div>
         </div>
 
@@ -251,7 +251,10 @@
           <input type="range" id="widget-width-slider" min="0.2" max="5.0" step="0.1" class="w-full accent-blue-500 h-1.5 bg-slate-850 rounded-lg appearance-none cursor-pointer">
         </div>
 
-        <button onclick="saveWidgetConfig()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-550 border border-blue-500 rounded-xl font-bold text-white text-sm shadow transition-all">Save Changes</button>
+        <div class="flex flex-col gap-2 pt-2">
+          <button onclick="saveWidgetConfig()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-550 border border-blue-500 rounded-xl font-bold text-white text-sm shadow transition-all">Save Changes</button>
+          <button id="widget-filter-btn" onclick="triggerWidgetFilter()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 rounded-xl font-bold text-slate-200 text-sm shadow transition-all">🔍 Filter this Category</button>
+        </div>
       </div>
     </div>
   </div>
@@ -525,7 +528,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v03.01</span>
+          <span class="text-[8px] font-normal text-blue-400">v03.02</span>
         </span>
       </button>
 
@@ -988,6 +991,47 @@
 
     let currentConfigColKey = null;
 
+    const parentVarMapping = {
+      source: 'source',
+      brand: 'brand',
+      series: 'brand',
+      capacity: 'capacity',
+      type: 'capacity',
+      stage: 'capacity',
+      seer2: 'efficiency',
+      eer2: 'efficiency',
+      hspf2: 'efficiency',
+      ahri: 'efficiency',
+      coolbtu: 'specs',
+      heatbtu: 'specs',
+      width: 'specs',
+      height: 'specs',
+      page: 'specs',
+      price: 'price',
+      tax: 'price'
+    };
+
+    const headerFilterMapping = {
+      source: { defaultCategory: 'source', groupKey: null },
+      brand: { defaultCategory: 'brand', groupKey: 'brand-tier' },
+      series: { defaultCategory: 'series', groupKey: 'brand-tier' },
+      capacity: { defaultCategory: 'capacity', groupKey: 'capacity-type-stage' },
+      type: { defaultCategory: 'type', groupKey: 'capacity-type-stage' },
+      stage: { defaultCategory: 'stage', groupKey: 'capacity-type-stage' },
+      style: { defaultCategory: 'style', groupKey: 'style-seer2' },
+      seer2: { defaultCategory: 'seer2', groupKey: 'style-seer2' },
+      eer2: { defaultCategory: 'eer2', groupKey: null },
+      hspf2: { defaultCategory: 'hspf2', groupKey: null },
+      ahri: { defaultCategory: 'ahri', groupKey: null },
+      coolbtu: { defaultCategory: 'coolbtu', groupKey: null },
+      heatbtu: { defaultCategory: 'heatbtu', groupKey: null },
+      page: { defaultCategory: 'page', groupKey: null },
+      width: { defaultCategory: 'width', groupKey: null },
+      height: { defaultCategory: 'height', groupKey: null },
+      price: { defaultCategory: 'price', groupKey: null },
+      tax: { defaultCategory: 'tax', groupKey: null }
+    };
+
     function openCategoryModal(colKey, defaultTitle) {
       currentConfigColKey = colKey;
       
@@ -1006,15 +1050,16 @@
       labelInput.value = labelSpan ? labelSpan.textContent.trim() : defaultTitle;
       
       // Look up current CSS variable value
+      const varKey = parentVarMapping[colKey] || colKey;
       const computedStyle = getComputedStyle(document.documentElement);
-      const varVal = computedStyle.getPropertyValue(`--col-width-${colKey}`).trim() || "1.0";
+      const varVal = computedStyle.getPropertyValue(`--col-width-${varKey}`).trim() || "1.0";
       slider.value = parseFloat(varVal);
       sliderValText.textContent = varVal;
       
       // Update slider value text in real-time on input
       slider.oninput = function() {
         sliderValText.textContent = this.value;
-        document.documentElement.style.setProperty(`--col-width-${colKey}`, this.value);
+        document.documentElement.style.setProperty(`--col-width-${varKey}`, this.value);
       };
       
       modal.classList.remove('hidden');
@@ -1038,6 +1083,16 @@
       }
       
       closeWidgetModal();
+    }
+
+    function triggerWidgetFilter() {
+      if (!currentConfigColKey) return;
+      
+      const mapping = headerFilterMapping[currentConfigColKey];
+      if (mapping) {
+        closeWidgetModal();
+        handleHeaderClick(mapping.defaultCategory, mapping.groupKey);
+      }
     }
 
     // Column Visibility controls
