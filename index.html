@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v01.31 | Prototyping Sliders for Header Sizing -->
+<!-- Changeout Lookup v02.00 | Major UI Update, Header Lock & Compact Freeze Layout -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v01.31</title>
+  <title>Changeout Lookup v02.00</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -49,9 +49,10 @@
 
     /* Dynamic Table Density & Font Overrides */
     #results-table { transition: font-size 0.2s ease; }
-    #results-table.pad-compact th, #results-table.pad-compact td { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+    #results-table.pad-compact th, #results-table.pad-compact td { padding-left: 0.25rem !important; padding-right: 0.25rem !important; }
     #results-table.pad-standard th, #results-table.pad-standard td { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
-    #results-table.pad-relaxed th, #results-table.pad-relaxed td { padding-left: 1rem !important; padding-right: 1rem !important; }
+    #results-table.pad-relaxed th, #results-table.pad-relaxed td { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
+    .freeze-col { position: sticky; left: 0; z-index: 15; box-shadow: 2px 0 5px -2px rgba(0,0,0,0.5); }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col no-scrollbar selection:bg-blue-500 selection:text-white pb-32">
@@ -69,9 +70,9 @@
         <span class="text-[10px] font-semibold tracking-wider text-slate-300 sm:hidden">#24908</span>
       </div>
 
-      <!-- Center: Platt's Logo -->
-      <div class="flex-1 flex justify-center px-2 shrink">
-        <img src="./platts.png" alt="Platt's Air and Heat" class="transition-all w-auto object-contain" style="height: var(--platts-test-h, 60px);">
+      <!-- Center: Secret Logo Button -->
+      <div onclick="toggleDrawer()" class="flex-1 flex justify-center px-2 shrink cursor-pointer group" title="Menu">
+        <img src="./platts.png" alt="Platt's Air and Heat" class="transition-transform group-hover:scale-105 h-[60px] md:h-[80px] w-auto object-contain">
       </div>
 
       <!-- Right: Compare, Mic & Settings Buttons -->
@@ -88,9 +89,19 @@
       </div>
     </div>
 
-    <!-- Accordion Toggle Bar -->
-    <div onclick="toggleDrawer()" class="w-full bg-slate-850 border-t border-slate-700 flex justify-center cursor-pointer hover:bg-slate-800 transition items-center" style="height: var(--status-test-h, 24px);">
-      <svg id="drawer-chevron" class="w-4 h-4 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+    <!-- Smart Status Bar -->
+    <div class="w-full bg-slate-850 border-t border-slate-700 flex justify-between items-center px-2 md:px-4 shadow-inner h-[30px] md:h-[40px]">
+        <!-- Left: Job Ticket -->
+        <div class="flex items-center space-x-2 bg-slate-900 border border-slate-700 rounded-full px-2 md:px-3 py-1 shadow-sm shrink-0 cursor-pointer">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+            <span class="text-[10px] font-semibold tracking-wider text-slate-300 hidden sm:block">JOB #24908: SMITH</span>
+            <span class="text-[10px] font-semibold tracking-wider text-slate-300 sm:hidden">#24908</span>
+        </div>
+        <!-- Right: Superimposed Cart -->
+        <button onclick="openCartModal()" class="relative flex items-center justify-center w-7 h-7 md:w-9 md:h-9 bg-slate-800 hover:bg-slate-700 transition border border-slate-600 rounded-full shadow-sm shrink-0" title="View Cart">
+            <span class="text-sm md:text-base opacity-40">🛒</span>
+            <span id="cart-counter" class="absolute inset-0 flex items-center justify-center text-[10px] md:text-[12px] font-extrabold text-blue-400 drop-shadow-md">0</span>
+        </button>
     </div>
 
     <!-- Horizontal Quick Actions Drawer -->
@@ -131,7 +142,7 @@
         <table id="results-table" class="w-full text-left border-collapse transition-all duration-200">
           <thead>
             <tr class="bg-slate-900 text-slate-400 text-[10px] uppercase font-bold tracking-wider border-b border-slate-700 select-none">
-              <th id="th-add" class="py-3 px-4 text-center w-16 whitespace-nowrap">Add</th>
+
               <th id="th-source" onclick="openFilterFor('source')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Source Row</th>
               <th id="th-capacity" onclick="openFilterFor('capacity')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[80px] max-w-[100px] leading-tight">Capacity</th>
               <th id="th-type" onclick="openFilterFor('type')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[80px] leading-tight">System Type</th>
@@ -188,12 +199,7 @@
       <span class="text-xl">🔄</span>
   </button>
 
-  <!-- FLOATING HUB BUTTON (THE CART) -->
-  <button onclick="openCartModal()" class="fixed bottom-20 right-4 z-50 bg-blue-600 hover:bg-blue-500 active:scale-95 transition-all text-white font-bold px-5 py-3 rounded-full flex items-center space-x-2 shadow-2xl group border border-blue-400/30">
-    <span class="text-lg">🛒</span>
-    <span class="text-xs font-bold uppercase tracking-wider">CART</span>
-    <span id="cart-counter" class="bg-white text-blue-600 font-extrabold text-xs w-5 h-5 flex items-center justify-center rounded-full shadow-inner transform group-hover:scale-110 transition-transform">0</span>
-  </button>
+
 
   <!-- HIDDEN CART MODAL (THE "F2" PROPOSAL HUD) -->
   <div id="cart-modal" class="hidden fixed inset-0 z-50 bg-slate-900/95 flex flex-col items-center justify-center p-4">
@@ -315,6 +321,11 @@
         <span class="text-xs font-bold tracking-wide">Abbreviate System Types</span>
         <input type="checkbox" id="toggle-abbreviate" onchange="toggleAbbreviation()" class="rounded border-slate-900 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-4 h-4">
       </label>
+      <!-- Compact Mobile Layout Toggle -->
+      <label class="flex items-center justify-between cursor-pointer w-full mt-2 bg-slate-700 hover:bg-slate-600 text-white border border-slate-500 rounded py-2 px-4 transition-colors">
+        <span class="text-xs font-bold tracking-wide">Compact Mobile Layout (Freeze)</span>
+        <input type="checkbox" id="toggle-compact-layout" onchange="toggleCompactMode()" class="rounded border-slate-900 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-4 h-4">
+      </label>
 
       <!-- Column Visibility Checklist (18 Columns Expanded) -->
       <div class="space-y-3">
@@ -415,18 +426,6 @@
             <button id="btn-pad-relaxed" onclick="setTablePadding('relaxed')" class="flex-1 bg-slate-900 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded text-xs transition-colors">Relaxed</button>
           </div>
         </div>
-        <!-- TEMPORARY PROTOTYPING STUDIO -->
-        <div class="space-y-4 border-t border-dashed border-yellow-500 pt-4 mt-4 bg-yellow-900/10 p-3 rounded-lg">
-          <h4 class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest mb-2 flex items-center gap-2"><span>🛠️</span> Prototyping Studio</h4>
-          <div>
-            <div class="flex justify-between"><label class="text-[10px] text-slate-300 font-bold">Platt's Logo Height</label><span id="val-platts-test-h" class="text-[10px] text-yellow-400 font-mono font-bold">60px</span></div>
-            <input type="range" min="30" max="120" value="60" oninput="updatePrototypeSize('platts-test-h', this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-yellow-500">
-          </div>
-          <div>
-            <div class="flex justify-between"><label class="text-[10px] text-slate-300 font-bold">Secondary Bar Height</label><span id="val-status-test-h" class="text-[10px] text-yellow-400 font-mono font-bold">24px</span></div>
-            <input type="range" min="15" max="80" value="24" oninput="updatePrototypeSize('status-test-h', this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-yellow-500">
-          </div>
-        </div>
       </div>
 
     </div>
@@ -471,7 +470,7 @@
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
           <span>Lookup</span>
-          <span class="text-[8px] font-normal text-blue-400">v01.31</span>
+          <span class="text-[8px] font-normal text-blue-400">v02.00</span>
         </span>
       </button>
 
@@ -526,8 +525,11 @@
         const table = document.getElementById('results-table');
         if (!table) return;
         
-        // Apply Font Size
-        table.style.fontSize = currentFontSize;
+        // Apply Font Size (Exaggerated mapping)
+        let fontSizeToApply = currentFontSize;
+        if (currentFontSize === '14px') fontSizeToApply = '12px';
+        else if (currentFontSize === '18px') fontSizeToApply = '20px';
+        table.style.fontSize = fontSizeToApply;
         
         // Apply Padding Class
         table.classList.remove('pad-compact', 'pad-standard', 'pad-relaxed');
@@ -552,13 +554,18 @@
         });
     }
 
-    // Temporary Prototyping Slider Function
-    function updatePrototypeSize(prop, val) {
-        document.documentElement.style.setProperty('--' + prop, val + 'px');
-        const displayElement = document.getElementById('val-' + prop);
-        if (displayElement) {
-            displayElement.innerText = val + 'px';
-        }
+    let useCompactLayout = false;
+    function toggleCompactMode() {
+        const checkbox = document.getElementById('toggle-compact-layout');
+        useCompactLayout = checkbox ? checkbox.checked : false;
+        filterData();
+    }
+
+    function toggleCartItem(rowStr) {
+        const rowObj = JSON.parse(rowStr);
+        const isInCart = cart.some(item => String(item[0] || "").trim() === String(rowObj[0] || "").trim());
+        if (isInCart) removeFromCartBySource(rowObj);
+        else addToCart(rowObj);
     }
 
     function loadDisplaySettings() {
@@ -931,11 +938,11 @@
       // Mask cells in tbody
       const rows = table.querySelectorAll('tbody tr');
       rows.forEach(row => {
-        if (row.cells.length < 19) return; // Skip loading or empty rows
+        if (row.cells.length < 18) return; // Skip loading or empty rows
         
         keys.forEach((key, colIndex) => {
           const isVisible = columnVisibility[key];
-          const td = row.cells[colIndex + 1]; // Offset by 1 for Add button td
+          const td = row.cells[colIndex];
           if (td) {
             if (isVisible) {
               td.classList.remove('hidden');
@@ -994,7 +1001,7 @@
       tbody.innerHTML = '';
 
       if (dataToRender.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="19" class="py-12 text-center text-xs text-slate-500 font-medium whitespace-nowrap">No matches found matching the filter criteria.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="18" class="py-12 text-center text-xs text-slate-500 font-medium whitespace-nowrap">No matches found matching the filter criteria.</td></tr>`;
         return;
       }
 
@@ -1008,24 +1015,8 @@
 
         const tdCells = [];
         
-        // Add / Undo Button
-        if (isInCart) {
-          tdCells.push(`
-            <td class="py-3 px-4 text-center whitespace-nowrap">
-              <button onclick='removeFromCartBySource(${JSON.stringify(row)})' class="bg-red-600/35 hover:bg-red-600 hover:text-white transition text-red-400 w-7 h-7 rounded-full font-bold text-sm shadow">✕</button>
-            </td>
-          `);
-        } else {
-          tdCells.push(`
-            <td class="py-3 px-4 text-center whitespace-nowrap">
-              <button onclick='addToCart(${JSON.stringify(row)})' class="bg-blue-600/35 hover:bg-blue-600 hover:text-white transition text-blue-400 w-7 h-7 rounded-full font-bold text-sm shadow">＋</button>
-            </td>
-          `);
-        }
-
         // Index 0: Source Row
         tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${row[0] || ""}</td>`);
-        // Index 1: Capacity
         // Index 1: Capacity
         let capText = String(row[1] || "").trim();
         if (useAbbreviations) {
@@ -1054,31 +1045,33 @@
             tdCells.push(`<td class="py-3 px-4 whitespace-nowrap leading-tight"><span class="font-semibold text-slate-300 block">${mainType}</span><span class="text-[10px] text-slate-500 font-normal">${subType}</span></td>`);
         }
         
-        // Index 3: Brand (Embedded SVG/Typography logos)
-        const brandVal = String(row[3] || "").trim().toUpperCase();
+        // Index 3 & 4: Brand & Series
+        let brandVal = String(row[3] || "").trim().toUpperCase();
         let brandHtml = row[3] || "";
-        if (brandVal === "CARRIER") {
-            brandHtml = `<img src="./carrier.png" alt="Carrier" class="h-[35px] md:h-[40px] w-auto object-contain">`;
-        } else if (brandVal === "COMFORTMAKER") {
-            brandHtml = `<img src="./comfortmaker.png" alt="Comfortmaker" class="h-[40px] md:h-[45px] w-auto object-contain">`;
-        } else {
-            brandHtml = `<span class="font-bold text-white">${row[3] || ""}</span>`;
-        }
-        tdCells.push('<td class="py-3 px-4 min-w-[160px] font-semibold text-white">' + brandHtml + '</td>');
-        
-        // Index 4: Series / Tier (Badge button markup)
+        if (brandVal === "CARRIER") brandHtml = `<img src="./carrier.png" alt="Carrier" class="h-6 md:h-8 w-auto object-contain">`;
+        else if (brandVal === "COMFORTMAKER") brandHtml = `<img src="./comfortmaker.png" alt="Comfortmaker" class="h-8 md:h-10 w-auto object-contain">`;
+        else brandHtml = `<span class="font-bold text-white">${row[3] || ""}</span>`;
+
         const series = String(row[4] || "").toUpperCase();
         let badgeClass = "bg-slate-900/40 text-slate-355 border-slate-800/40";
-        if (series === "INFINITY" || series === "MAIN LINE") {
-          badgeClass = "bg-blue-900/40 text-blue-300 border-blue-800/40";
-        } else if (series === "PERFORMANCE" || series === "PERFORMER") {
-          badgeClass = "bg-green-900/40 text-green-300 border-green-800/40";
-        } else if (series === "COMFORT" || series === "BUILDER") {
-          badgeClass = "bg-amber-900/40 text-amber-300 border-amber-800/40";
-        } else if (series === "⚠️ UNRECOGNIZED COLOR") {
-          badgeClass = "bg-red-955/40 text-red-400 border-red-900/40";
+        if (series === "INFINITY" || series === "MAIN LINE") badgeClass = "bg-blue-900/40 text-blue-300 border-blue-800/40";
+        else if (series === "PERFORMANCE" || series === "PERFORMER") badgeClass = "bg-green-900/40 text-green-300 border-green-800/40";
+        else if (series === "COMFORT" || series === "BUILDER") badgeClass = "bg-amber-900/40 text-amber-300 border-amber-800/40";
+
+        const badgeHtml = `<button onclick='event.stopPropagation(); openSystemDetails(${JSON.stringify(row)})' class="px-2.5 py-0.5 mt-1 rounded text-[10px] font-semibold border ${badgeClass} hover:scale-105 transition-transform shadow-sm">${row[4] || ""}</button>`;
+
+        if (useCompactLayout) {
+            tdCells.push(`<td onclick='toggleCartItem(${JSON.stringify(row).replace(/'/g, "&apos;")})' class="py-2 px-4 cursor-pointer hover:bg-slate-700 transition freeze-col bg-slate-800 border-r border-slate-700">
+                <div class="flex flex-col items-start justify-center min-w-[120px]">
+                    ${brandHtml}
+                    ${badgeHtml}
+                </div>
+            </td>`);
+            tdCells.push(`<td class="hidden"></td>`); // Placeholder to maintain column index sync
+        } else {
+            tdCells.push(`<td onclick='toggleCartItem(${JSON.stringify(row).replace(/'/g, "&apos;")})' class="py-3 px-4 font-semibold text-white whitespace-nowrap cursor-pointer hover:bg-slate-700 transition">${brandHtml}</td>`);
+            tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${badgeHtml}</td>`);
         }
-        tdCells.push(`<td class="py-3 px-4 whitespace-nowrap"><button onclick='openSystemDetails(${JSON.stringify(row)})' class="px-2.5 py-0.5 rounded text-xs font-semibold border ${badgeClass} hover:scale-105 transition-transform shadow-sm">${row[4] || ""}</button></td>`);
         
         // Index 5: Mechanical Stage
         let mechStage = row[5] || "";
