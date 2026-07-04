@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v02.08 | Cart Crash Hotfixes | Lines: 1722 -->
+<!-- Changeout Lookup v02.09 | Universal Mini-Modal & Map Selector | Lines: 1811 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v02.08</title>
+  <title>Changeout Lookup v02.09</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -147,29 +147,29 @@
           <thead>
             <tr class="bg-slate-900 text-slate-400 text-[10px] uppercase font-bold tracking-wider border-b border-slate-700 select-none">
               <th id="th-source" onclick="openFilterFor('source')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Source Row</th>
-              <th id="th-brand" onclick="openFilterFor('brand')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap min-w-[160px] align-top">
+              <th id="th-brand" onclick="handleHeaderClick('brand', 'brand-tier')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap min-w-[160px] align-top">
                   <span class="head-desktop">Brand</span>
                   <div class="head-compact flex-col items-start gap-1 w-full">
                       <span class="text-slate-300 font-bold uppercase tracking-wider">Brand</span>
-                      <span onclick="event.stopPropagation(); openFilterFor('series')" class="text-[10px] text-slate-500 hover:text-blue-400 font-bold uppercase tracking-wider">Tier</span>
+                      <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Tier</span>
                   </div>
               </th>
               <th id="th-series" onclick="openFilterFor('series')" class="py-3 px-4 cursor-pointer hover:bg-slate-805 transition whitespace-nowrap">Series / Tier</th>
-              <th id="th-capacity" onclick="openFilterFor('capacity')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap min-w-[80px] max-w-[100px] leading-tight align-top">
+              <th id="th-capacity" onclick="handleHeaderClick('capacity', 'capacity-type-stage')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap min-w-[80px] max-w-[100px] leading-tight align-top">
                   <span class="head-desktop">Capacity</span>
                   <div class="head-compact flex-col items-start gap-1 w-full">
                       <span class="text-slate-300 font-bold uppercase tracking-wider">Capacity</span>
-                      <span onclick="event.stopPropagation(); openFilterFor('type')" class="text-[10px] text-slate-500 hover:text-blue-400 font-bold uppercase tracking-wider">Type</span>
-                      <span onclick="event.stopPropagation(); openFilterFor('stage')" class="text-[10px] text-slate-500 hover:text-blue-400 font-bold uppercase tracking-wider">Stage</span>
+                      <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Type</span>
+                      <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Stage</span>
                   </div>
               </th>
               <th id="th-type" onclick="openFilterFor('type')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[80px] leading-tight">System Type</th>
               <th id="th-stage" onclick="openFilterFor('stage')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[85px] leading-tight">Mechanical Stage</th>
-              <th id="th-style" onclick="openFilterFor('style')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap min-w-[100px] max-w-[130px] leading-tight break-words align-top">
+              <th id="th-style" onclick="handleHeaderClick('style', 'style-seer2')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap min-w-[100px] max-w-[130px] leading-tight break-words align-top">
                   <span class="head-desktop">Style</span>
                   <div class="head-compact flex-col items-start gap-1 w-full">
                       <span class="text-slate-300 font-bold uppercase tracking-wider">Style</span>
-                      <span onclick="event.stopPropagation(); openFilterFor('seer2')" class="text-[10px] text-slate-500 hover:text-blue-400 font-bold uppercase tracking-wider">SEER2</span>
+                      <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">SEER2</span>
                   </div>
               </th>
               <th id="th-seer2" onclick="openFilterFor('seer2')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">SEER2</th>
@@ -198,21 +198,29 @@
     </section>
   </main>
 
-  <!-- FULL-SCREEN MOBILE FILTER HUB MODAL -->
-  <div id="mobile-filter-hub" class="hidden fixed inset-0 z-50 bg-slate-900 flex flex-col p-4 overflow-y-auto no-scrollbar">
-    <!-- Header -->
-    <div class="flex justify-between items-center pb-4 border-b border-slate-800">
-      <div class="flex items-center space-x-2">
-        <span class="text-xl">🔍</span>
-        <h2 class="text-base font-bold font-outfit text-white">Filter Catalog Options</h2>
-        <button onclick="activateVoiceCommand()" id="voice-btn" class="ml-2 bg-slate-700 hover:bg-red-600 text-white p-2 rounded-full shadow border border-slate-600 transition-colors flex items-center justify-center animate-none"><span class="text-lg">🎙️</span></button>
+  <!-- DYNAMIC MINI-MODAL FOR FILTERS & CATEGORIES -->
+  <div id="mobile-filter-hub" class="hidden fixed inset-0 z-50 bg-slate-955/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-750 w-full max-w-md rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
+      <!-- Header -->
+      <div class="flex justify-between items-center px-4 py-3 border-b border-slate-800 shrink-0">
+        <div class="flex items-center space-x-2">
+          <span class="text-lg">🔍</span>
+          <h2 id="modal-title-text" class="text-sm font-bold font-outfit text-white">Filter Catalog Options</h2>
+          <button onclick="activateVoiceCommand()" id="voice-btn" class="ml-2 bg-slate-800 hover:bg-red-600 text-white p-1.5 rounded-full border border-slate-700 flex items-center justify-center animate-none"><span class="text-xs">🎙️</span></button>
+        </div>
+        <button onclick="closeMobileFilterHub()" class="text-slate-400 hover:text-white bg-slate-800 border border-slate-700/50 rounded-full w-7 h-7 flex items-center justify-center text-xs">✕</button>
       </div>
-      <button onclick="closeMobileFilterHub()" class="text-slate-400 hover:text-white bg-slate-805 border border-slate-700/50 rounded-full p-2 w-9 h-9 flex items-center justify-center">✕</button>
-    </div>
-    
-    <!-- Content: Accordions with Large Option Buttons (Dynamically generated) -->
-    <div id="mobile-filter-accordions" class="flex-grow py-6 space-y-4">
-      <!-- Generated dynamically in JS -->
+      
+      <!-- Content Area -->
+      <div class="flex-grow overflow-y-auto no-scrollbar p-4">
+        <!-- The Mirrored Map Selector -->
+        <div id="modal-map-selector" class="hidden flex flex-col gap-3 py-2"></div>
+        
+        <!-- Accordions -->
+        <div id="mobile-filter-accordions" class="space-y-4">
+          <!-- Generated dynamically in JS -->
+        </div>
+      </div>
     </div>
   </div>
 
@@ -485,7 +493,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v02.08</span>
+          <span class="text-[8px] font-normal text-blue-400">v02.09</span>
         </span>
       </button>
 
@@ -844,6 +852,15 @@
 
     function openMobileFilterHubAll() {
       currentOpenAccordion = null;
+      
+      const mapContainer = document.getElementById('modal-map-selector');
+      const accordionsContainer = document.getElementById('mobile-filter-accordions');
+      const titleText = document.getElementById('modal-title-text');
+      
+      if (titleText) titleText.textContent = "Filter Catalog Options";
+      if (mapContainer) mapContainer.classList.add('hidden');
+      if (accordionsContainer) accordionsContainer.classList.remove('hidden');
+
       openMobileFilterHub();
       buildAllMobileFilters();
       const accordions = document.querySelectorAll('.mobile-filter-group');
@@ -865,8 +882,80 @@
 
     // Opens filter hub and isolates only the clicked category (Filter Amnesia Fix)
     function openFilterFor(categoryKey) {
+      const mapContainer = document.getElementById('modal-map-selector');
+      const accordionsContainer = document.getElementById('mobile-filter-accordions');
+      const titleText = document.getElementById('modal-title-text');
+      
+      if (mapContainer) mapContainer.classList.add('hidden');
+      if (accordionsContainer) accordionsContainer.classList.remove('hidden');
+      
+      const cfg = filterConfigs.find(c => c.key === categoryKey);
+      if (titleText && cfg) {
+        titleText.textContent = cfg.name + " Options";
+      }
+
       currentOpenAccordion = categoryKey;
       openMobileFilterHub();
+      buildAllMobileFilters();
+    }
+
+    function handleHeaderClick(defaultCategory, groupKey) {
+      if (useCompactLayout && groupKey) {
+        openStackedSelector(groupKey);
+      } else {
+        openFilterFor(defaultCategory);
+      }
+    }
+
+    function openStackedSelector(groupKey) {
+      openMobileFilterHub();
+      
+      const mapContainer = document.getElementById('modal-map-selector');
+      const accordionsContainer = document.getElementById('mobile-filter-accordions');
+      const titleText = document.getElementById('modal-title-text');
+      
+      if (titleText) titleText.textContent = "Select Category";
+      if (mapContainer) mapContainer.classList.remove('hidden');
+      if (accordionsContainer) accordionsContainer.classList.add('hidden');
+      
+      let buttonsHtml = "";
+      if (groupKey === 'brand-tier') {
+        buttonsHtml = `
+          <div class="flex flex-col gap-2.5 w-full">
+            <button onclick="selectCategoryFromMap('brand', 'Brand Options')" class="w-full py-4 bg-slate-800 hover:bg-blue-600/80 hover:border-blue-500 border border-slate-700 rounded-xl font-bold text-white text-sm tracking-wider uppercase shadow transition-all duration-150">Brand</button>
+            <button onclick="selectCategoryFromMap('series', 'Tier Options')" class="w-full py-4 bg-slate-850 hover:bg-blue-650/85 hover:border-blue-500 border border-slate-750 rounded-xl font-bold text-slate-300 text-sm tracking-wider uppercase shadow transition-all duration-150">Tier / Series</button>
+          </div>
+        `;
+      } else if (groupKey === 'capacity-type-stage') {
+        buttonsHtml = `
+          <div class="flex flex-col gap-2.5 w-full">
+            <button onclick="selectCategoryFromMap('capacity', 'Capacity Options')" class="w-full py-4 bg-slate-800 hover:bg-blue-600/80 hover:border-blue-500 border border-slate-700 rounded-xl font-bold text-white text-sm tracking-wider uppercase shadow transition-all duration-150">Capacity</button>
+            <button onclick="selectCategoryFromMap('type', 'System Type Options')" class="w-full py-4 bg-slate-850 hover:bg-blue-650/85 hover:border-blue-500 border border-slate-750 rounded-xl font-bold text-slate-300 text-sm tracking-wider uppercase shadow transition-all duration-150">System Type</button>
+            <button onclick="selectCategoryFromMap('stage', 'Stage Options')" class="w-full py-4 bg-slate-900 hover:bg-blue-700/90 hover:border-blue-500 border border-slate-800 rounded-xl font-bold text-slate-400 text-sm tracking-wider uppercase shadow transition-all duration-150">Mechanical Stage</button>
+          </div>
+        `;
+      } else if (groupKey === 'style-seer2') {
+        buttonsHtml = `
+          <div class="flex flex-col gap-2.5 w-full">
+            <button onclick="selectCategoryFromMap('style', 'Style Options')" class="w-full py-4 bg-slate-800 hover:bg-blue-600/80 hover:border-blue-500 border border-slate-700 rounded-xl font-bold text-white text-sm tracking-wider uppercase shadow transition-all duration-150">Application / Style</button>
+            <button onclick="selectCategoryFromMap('seer2', 'SEER2 Options')" class="w-full py-4 bg-slate-850 hover:bg-blue-650/85 hover:border-blue-500 border border-slate-750 rounded-xl font-bold text-slate-300 text-sm tracking-wider uppercase shadow transition-all duration-150">SEER2 Rating</button>
+          </div>
+        `;
+      }
+      
+      if (mapContainer) mapContainer.innerHTML = buttonsHtml;
+    }
+
+    function selectCategoryFromMap(categoryKey, titleLabel) {
+      const mapContainer = document.getElementById('modal-map-selector');
+      const accordionsContainer = document.getElementById('mobile-filter-accordions');
+      const titleText = document.getElementById('modal-title-text');
+      
+      if (titleText) titleText.textContent = titleLabel;
+      if (mapContainer) mapContainer.classList.add('hidden');
+      if (accordionsContainer) accordionsContainer.classList.remove('hidden');
+      
+      currentOpenAccordion = categoryKey;
       buildAllMobileFilters();
     }
 
