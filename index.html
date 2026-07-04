@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v01.21 | Desktop Filter, Logo Lock & Platts Logo -->
+<!-- Changeout Lookup v01.22 | Table Font Scaler & Platts Logo Lock -->
 <!DOCTYPE html>
 <html lang="en" style="overscroll-behavior: none;">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Changeout Lookup v01.21</title>
+  <title>Changeout Lookup v01.22</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -104,7 +104,7 @@
       <!-- Live Results Header -->
       <div class="px-6 py-4 border-b border-slate-700 flex flex-wrap justify-between items-center bg-slate-800/80 sticky top-0 z-10 gap-3">
         <div class="flex items-center space-x-4">
-          <img src="./platts.png" alt="Platt's Air and Heat" style="height: var(--platt-h, 30px); width: var(--platt-w, auto); object-fit: contain;">
+          <img src="./platts.png" alt="Platt's Air and Heat" style="height: var(--platt-h, 50px); width: var(--platt-w, auto); object-fit: contain;">
           <h2 class="text-base font-bold font-outfit text-white tracking-wide">Live Matches</h2>
           <button onclick="openMobileFilterHubAll()" class="md:hidden ml-2 bg-blue-600 text-white p-1.5 rounded-lg shadow-sm border border-blue-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg></button>
         </div>
@@ -396,14 +396,26 @@
                   <input type="range" min="0" max="150" value="0" oninput="updateLogoSize('cm-w', this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500">
               </div>
               <div>
-                  <div class="flex justify-between"><label class="text-[10px] text-slate-400">Platt's Height</label><span id="val-platt-h" class="text-[10px] text-blue-400">30px</span></div>
-                  <input type="range" min="10" max="80" value="30" oninput="updateLogoSize('platt-h', this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                  <div class="flex justify-between"><label class="text-[10px] text-slate-400">Platt's Height</label><span id="val-platt-h" class="text-[10px] text-blue-400">50px</span></div>
+                  <input type="range" min="10" max="80" value="50" oninput="updateLogoSize('platt-h', this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500">
               </div>
               <div>
                   <div class="flex justify-between"><label class="text-[10px] text-slate-400">Platt's Width</label><span id="val-platt-w" class="text-[10px] text-blue-400">auto</span></div>
                   <input type="range" min="0" max="250" value="0" oninput="updateLogoSize('platt-w', this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500">
               </div>
           </div>
+      </div>
+
+      <!-- Table Font Scaler -->
+      <div class="space-y-2 border-t border-slate-700 pt-4 mt-4">
+          <div class="flex justify-between">
+              <div>
+                  <h4 class="text-xs font-bold text-white tracking-wide">Results Table Font Scaler</h4>
+                  <p class="text-[10px] text-slate-400 mt-0.5">Adjust main table text size for legibility.</p>
+              </div>
+              <span id="tbl-font-scale-value" class="text-xs font-bold text-blue-400 font-mono">12px</span>
+          </div>
+          <input type="range" min="10" max="24" value="12" oninput="scaleTableFont(this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500">
       </div>
 
     </div>
@@ -448,7 +460,7 @@
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
           <span>Lookup</span>
-          <span class="text-[8px] font-normal text-blue-400">v01.21</span>
+          <span class="text-[8px] font-normal text-blue-400">v01.22</span>
         </span>
       </button>
 
@@ -789,6 +801,12 @@
         document.documentElement.style.setProperty('--' + prop, val == 0 ? 'auto' : val + 'px');
     }
 
+    // Table Font Scaler
+    function scaleTableFont(value) {
+        document.getElementById('tbl-font-scale-value').textContent = value + "px";
+        document.documentElement.style.setProperty('--tbl-font', value + "px");
+    }
+
     function applyColumnVisibility() {
       const table = document.getElementById('results-table');
       if (!table) return;
@@ -903,8 +921,9 @@
         const isInCart = cart.some(item => String(item[0] || "").trim() === String(row[0] || "").trim());
         const tr = document.createElement('tr');
         tr.className = isInCart 
-          ? "bg-blue-900/30 hover:bg-blue-850/50 transition border-b border-blue-500/30 text-xs" 
-          : "hover:bg-slate-750/50 transition border-b border-slate-750/40 text-xs";
+          ? "bg-blue-900/30 hover:bg-blue-850/50 transition border-b border-blue-500/30" 
+          : "hover:bg-slate-750/50 transition border-b border-slate-750/40";
+        tr.style.fontSize = "var(--tbl-font, 12px)";
 
         const tdCells = [];
         
