@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v02.00 | Major UI Update, Header Lock & Compact Freeze Layout -->
+<!-- Changeout Lookup v02.01 | Font Lock, Column Reorder, Decoupled Freeze & Blue Pill Cart -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v02.00</title>
+  <title>Changeout Lookup v02.01</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -48,11 +48,12 @@
     .compare-mode th.hidden, .compare-mode td.hidden { display: none !important; }
 
     /* Dynamic Table Density & Font Overrides */
-    #results-table { transition: font-size 0.2s ease; }
+    #results-table { transition: padding 0.2s ease; }
     #results-table.pad-compact th, #results-table.pad-compact td { padding-left: 0.25rem !important; padding-right: 0.25rem !important; }
     #results-table.pad-standard th, #results-table.pad-standard td { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
     #results-table.pad-relaxed th, #results-table.pad-relaxed td { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
     .freeze-col { position: sticky; left: 0; z-index: 15; box-shadow: 2px 0 5px -2px rgba(0,0,0,0.5); }
+    th.freeze-col { z-index: 25; }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col no-scrollbar selection:bg-blue-500 selection:text-white pb-32">
@@ -97,10 +98,11 @@
             <span class="text-[10px] font-semibold tracking-wider text-slate-300 hidden sm:block">JOB #24908: SMITH</span>
             <span class="text-[10px] font-semibold tracking-wider text-slate-300 sm:hidden">#24908</span>
         </div>
-        <!-- Right: Superimposed Cart -->
-        <button onclick="openCartModal()" class="relative flex items-center justify-center w-7 h-7 md:w-9 md:h-9 bg-slate-800 hover:bg-slate-700 transition border border-slate-600 rounded-full shadow-sm shrink-0" title="View Cart">
-            <span class="text-sm md:text-base opacity-40">🛒</span>
-            <span id="cart-counter" class="absolute inset-0 flex items-center justify-center text-[10px] md:text-[12px] font-extrabold text-blue-400 drop-shadow-md">0</span>
+        <!-- Right: Blue Pill Cart -->
+        <button onclick="openCartModal()" class="flex items-center justify-between h-6 md:h-8 px-2.5 md:px-4 bg-blue-600 hover:bg-blue-500 transition border border-blue-400 rounded-full shadow-sm shrink-0 space-x-1.5 md:space-x-2" title="View Cart">
+          <span class="text-[11px] md:text-sm">🛒</span>
+          <span class="text-[10px] md:text-xs font-bold text-white tracking-wider">CART</span>
+          <span id="cart-counter" class="bg-white text-blue-600 font-extrabold text-[9px] md:text-[11px] w-4 h-4 md:w-5 md:h-5 flex items-center justify-center rounded-full shadow-inner leading-none">0</span>
         </button>
     </div>
 
@@ -142,12 +144,11 @@
         <table id="results-table" class="w-full text-left border-collapse transition-all duration-200">
           <thead>
             <tr class="bg-slate-900 text-slate-400 text-[10px] uppercase font-bold tracking-wider border-b border-slate-700 select-none">
-
-              <th id="th-source" onclick="openFilterFor('source')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Source Row</th>
-              <th id="th-capacity" onclick="openFilterFor('capacity')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[80px] max-w-[100px] leading-tight">Capacity</th>
-              <th id="th-type" onclick="openFilterFor('type')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[80px] leading-tight">System Type</th>
               <th id="th-brand" onclick="openFilterFor('brand')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap min-w-[160px]">Brand</th>
               <th id="th-series" onclick="openFilterFor('series')" class="py-3 px-4 cursor-pointer hover:bg-slate-805 transition whitespace-nowrap">Series / Tier</th>
+              <th id="th-capacity" onclick="openFilterFor('capacity')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[80px] max-w-[100px] leading-tight">Capacity</th>
+              <th id="th-type" onclick="openFilterFor('type')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[80px] leading-tight">System Type</th>
+              <th id="th-source" onclick="openFilterFor('source')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Source Row</th>
               <th id="th-stage" onclick="openFilterFor('stage')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[85px] leading-tight">Mechanical Stage</th>
               <th id="th-style" onclick="openFilterFor('style')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[100px] max-w-[130px] leading-tight break-words">Application / Style</th>
               <th id="th-seer2" onclick="openFilterFor('seer2')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">SEER2</th>
@@ -323,8 +324,13 @@
       </label>
       <!-- Compact Mobile Layout Toggle -->
       <label class="flex items-center justify-between cursor-pointer w-full mt-2 bg-slate-700 hover:bg-slate-600 text-white border border-slate-500 rounded py-2 px-4 transition-colors">
-        <span class="text-xs font-bold tracking-wide">Compact Mobile Layout (Freeze)</span>
+        <span class="text-xs font-bold tracking-wide">Compact Mobile Layout (Stacked)</span>
         <input type="checkbox" id="toggle-compact-layout" onchange="toggleCompactMode()" class="rounded border-slate-900 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-4 h-4">
+      </label>
+      <!-- Freeze Column Toggle -->
+      <label class="flex items-center justify-between cursor-pointer w-full mt-2 bg-slate-700 hover:bg-slate-600 text-white border border-slate-500 rounded py-2 px-4 transition-colors">
+        <span class="text-xs font-bold tracking-wide">Freeze Left Column</span>
+        <input type="checkbox" id="toggle-freeze-column" onchange="toggleFreezeMode()" class="rounded border-slate-900 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-4 h-4">
       </label>
 
       <!-- Column Visibility Checklist (18 Columns Expanded) -->
@@ -411,14 +417,6 @@
       <!-- Memory-Locked Display Settings -->
       <div class="space-y-4 border-t border-slate-700 pt-4 mt-4">
         <div>
-          <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Table Text Size</h4>
-          <div class="flex gap-2 w-full">
-            <button id="btn-font-14px" onclick="setTableFontSize('14px')" class="flex-1 bg-slate-900 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded text-xs transition-colors">Small</button>
-            <button id="btn-font-16px" onclick="setTableFontSize('16px')" class="flex-1 bg-slate-900 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded text-xs transition-colors">Normal</button>
-            <button id="btn-font-18px" onclick="setTableFontSize('18px')" class="flex-1 bg-slate-900 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded text-xs transition-colors">Large</button>
-          </div>
-        </div>
-        <div>
           <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Column Density (Padding)</h4>
           <div class="flex gap-2 w-full">
             <button id="btn-pad-compact" onclick="setTablePadding('compact')" class="flex-1 bg-slate-900 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded text-xs transition-colors">Compact</button>
@@ -469,8 +467,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span>Lookup</span>
-          <span class="text-[8px] font-normal text-blue-400">v02.00</span>
+          <span class="text-[8px] font-normal text-blue-400">v02.01</span>
         </span>
       </button>
 
@@ -506,14 +503,7 @@
     let currentOpenAccordion = null;
     let useAbbreviations = false;
 
-    let currentFontSize = '16px';
     let currentPadding = 'standard';
-
-    function setTableFontSize(size) {
-        currentFontSize = size;
-        localStorage.setItem('changeout_font_v1', size);
-        applyDisplaySettings();
-    }
 
     function setTablePadding(pad) {
         currentPadding = pad;
@@ -525,24 +515,9 @@
         const table = document.getElementById('results-table');
         if (!table) return;
         
-        // Apply Font Size (Exaggerated mapping)
-        let fontSizeToApply = currentFontSize;
-        if (currentFontSize === '14px') fontSizeToApply = '12px';
-        else if (currentFontSize === '18px') fontSizeToApply = '20px';
-        table.style.fontSize = fontSizeToApply;
-        
         // Apply Padding Class
         table.classList.remove('pad-compact', 'pad-standard', 'pad-relaxed');
         table.classList.add('pad-' + currentPadding);
-        
-        // Update Button UI (Font)
-        ['14px', '16px', '18px'].forEach(s => {
-            const btn = document.getElementById('btn-font-' + s);
-            if (btn) {
-                if (s === currentFontSize) btn.classList.add('bg-blue-600', 'text-white', 'border-blue-500');
-                else btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-500');
-            }
-        });
         
         // Update Button UI (Padding)
         ['compact', 'standard', 'relaxed'].forEach(p => {
@@ -555,9 +530,19 @@
     }
 
     let useCompactLayout = false;
+    let useFreezeColumn = false;
+
     function toggleCompactMode() {
         const checkbox = document.getElementById('toggle-compact-layout');
         useCompactLayout = checkbox ? checkbox.checked : false;
+        const brandCfg = filterConfigs.find(c => c.key === 'brand');
+        if(brandCfg) brandCfg.name = useCompactLayout ? "Brand / Tier" : "Brand";
+        filterData();
+    }
+
+    function toggleFreezeMode() {
+        const checkbox = document.getElementById('toggle-freeze-column');
+        useFreezeColumn = checkbox ? checkbox.checked : false;
         filterData();
     }
 
@@ -569,9 +554,7 @@
     }
 
     function loadDisplaySettings() {
-        const savedFont = localStorage.getItem('changeout_font_v1');
         const savedPad = localStorage.getItem('changeout_padding_v1');
-        if (savedFont) currentFontSize = savedFont;
         if (savedPad) currentPadding = savedPad;
         applyDisplaySettings();
     }
@@ -889,22 +872,16 @@
         document.documentElement.style.setProperty('--' + prop, val == 0 ? 'auto' : val + 'px');
     }
 
-    // Table Font Scaler
-    function scaleTableFont(value) {
-        document.getElementById('tbl-font-scale-value').textContent = value + "px";
-        document.documentElement.style.setProperty('--tbl-font', value + "px");
-    }
-
     function applyColumnVisibility() {
       const table = document.getElementById('results-table');
       if (!table) return;
 
       const colMapping = {
-        source: 'th-source',
-        capacity: 'th-capacity',
-        type: 'th-type',
         brand: 'th-brand',
         series: 'th-series',
+        capacity: 'th-capacity',
+        type: 'th-type',
+        source: 'th-source',
         stage: 'th-stage',
         style: 'th-style',
         seer2: 'th-seer2',
@@ -927,29 +904,32 @@
         const headerId = colMapping[key];
         const th = document.getElementById(headerId);
         if (th) {
-          if (columnVisibility[key]) {
-            th.classList.remove('hidden');
-          } else {
-            th.classList.add('hidden');
-          }
+            let isVisible = columnVisibility[key];
+            if (key === 'series' && useCompactLayout) isVisible = false; // Hide if compact
+            
+            if (isVisible) th.classList.remove('hidden');
+            else th.classList.add('hidden');
+            
+            if (key === 'brand') {
+                if (useFreezeColumn) th.classList.add('freeze-col');
+                else th.classList.remove('freeze-col');
+            }
         }
       });
 
       // Mask cells in tbody
       const rows = table.querySelectorAll('tbody tr');
       rows.forEach(row => {
-        if (row.cells.length < 18) return; // Skip loading or empty rows
-        
+        if (row.cells.length < 18) return; 
         keys.forEach((key, colIndex) => {
-          const isVisible = columnVisibility[key];
-          const td = row.cells[colIndex];
-          if (td) {
-            if (isVisible) {
-              td.classList.remove('hidden');
-            } else {
-              td.classList.add('hidden');
+            let isVisible = columnVisibility[key];
+            if (key === 'series' && useCompactLayout) isVisible = false;
+
+            const td = row.cells[colIndex];
+            if (td) {
+                if (isVisible) td.classList.remove('hidden');
+                else td.classList.add('hidden');
             }
-          }
         });
       });
     }
@@ -1009,43 +989,12 @@
         const isInCart = cart.some(item => String(item[0] || "").trim() === String(row[0] || "").trim());
         const tr = document.createElement('tr');
         tr.className = isInCart 
-          ? "bg-blue-900/30 hover:bg-blue-850/50 transition border-b border-blue-500/30" 
-          : "hover:bg-slate-750/50 transition border-b border-slate-750/40";
-        tr.style.fontSize = "var(--tbl-font, 12px)";
+          ? "bg-blue-900/30 hover:bg-blue-850/50 transition border-b border-blue-500/30 leading-tight" 
+          : "hover:bg-slate-750/50 transition border-b border-slate-750/40 leading-tight";
 
         const tdCells = [];
         
-        // Index 0: Source Row
-        tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${row[0] || ""}</td>`);
-        // Index 1: Capacity
-        let capText = String(row[1] || "").trim();
-        if (useAbbreviations) {
-            capText = capText.replace(/Ton/gi, "T");
-        }
-        tdCells.push(`<td class="py-3 px-4 font-semibold text-white whitespace-nowrap">${capText}</td>`);
-        // Index 2: System Type
-        let rawSysType = String(row[2] || "").toUpperCase();
-        let mainType = row[2] || "";
-        let subType = "";
-
-        if (rawSysType.includes("STRAIGHT COOL") || rawSysType === "AC") {
-            mainType = "AC";
-            subType = "(Straight Cool)";
-        } else if (rawSysType.includes("HEAT PUMP") || rawSysType === "HP") {
-            mainType = "HP";
-            subType = "(Heat Pump)";
-        } else if (rawSysType.includes("GAS FURNACE") || rawSysType.includes("FURNACE")) {
-            mainType = "FURN";
-            subType = "(Gas Furnace)";
-        }
-
-        if (useAbbreviations) {
-            tdCells.push(`<td class="py-3 px-4 font-semibold text-slate-300 whitespace-nowrap">${mainType}</td>`);
-        } else {
-            tdCells.push(`<td class="py-3 px-4 whitespace-nowrap leading-tight"><span class="font-semibold text-slate-300 block">${mainType}</span><span class="text-[10px] text-slate-500 font-normal">${subType}</span></td>`);
-        }
-        
-        // Index 3 & 4: Brand & Series
+        // 1. BRAND & SERIES (Indexes 3 & 4)
         let brandVal = String(row[3] || "").trim().toUpperCase();
         let brandHtml = row[3] || "";
         if (brandVal === "CARRIER") brandHtml = `<img src="./carrier.png" alt="Carrier" class="h-6 md:h-8 w-auto object-contain">`;
@@ -1057,35 +1006,52 @@
         if (series === "INFINITY" || series === "MAIN LINE") badgeClass = "bg-blue-900/40 text-blue-300 border-blue-800/40";
         else if (series === "PERFORMANCE" || series === "PERFORMER") badgeClass = "bg-green-900/40 text-green-300 border-green-800/40";
         else if (series === "COMFORT" || series === "BUILDER") badgeClass = "bg-amber-900/40 text-amber-300 border-amber-800/40";
-
+        
         const badgeHtml = `<button onclick='event.stopPropagation(); openSystemDetails(${JSON.stringify(row)})' class="px-2.5 py-0.5 mt-1 rounded text-[10px] font-semibold border ${badgeClass} hover:scale-105 transition-transform shadow-sm">${row[4] || ""}</button>`;
 
+        let freezeClass = useFreezeColumn ? "freeze-col" : "";
         if (useCompactLayout) {
-            tdCells.push(`<td onclick='toggleCartItem(${JSON.stringify(row).replace(/'/g, "&apos;")})' class="py-2 px-4 cursor-pointer hover:bg-slate-700 transition freeze-col bg-slate-800 border-r border-slate-700">
+            tdCells.push(`<td onclick='toggleCartItem(${JSON.stringify(row).replace(/'/g, "&apos;")})' class="py-2 px-4 cursor-pointer hover:bg-slate-700 transition ${freezeClass} bg-slate-800 border-r border-slate-700">
                 <div class="flex flex-col items-start justify-center min-w-[120px]">
                     ${brandHtml}
                     ${badgeHtml}
                 </div>
             </td>`);
-            tdCells.push(`<td class="hidden"></td>`); // Placeholder to maintain column index sync
+            tdCells.push(`<td class="hidden"></td>`); // Placeholder to sync column index
         } else {
-            tdCells.push(`<td onclick='toggleCartItem(${JSON.stringify(row).replace(/'/g, "&apos;")})' class="py-3 px-4 font-semibold text-white whitespace-nowrap cursor-pointer hover:bg-slate-700 transition">${brandHtml}</td>`);
+            let activeFreeze = useFreezeColumn ? "freeze-col bg-slate-800 border-r border-slate-700" : "";
+            tdCells.push(`<td onclick='toggleCartItem(${JSON.stringify(row).replace(/'/g, "&apos;")})' class="py-3 px-4 font-semibold text-white whitespace-nowrap cursor-pointer hover:bg-slate-700 transition ${activeFreeze}">${brandHtml}</td>`);
             tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${badgeHtml}</td>`);
         }
-        
-        // Index 5: Mechanical Stage
+
+        // 2. CAPACITY (Index 1)
+        let capText = String(row[1] || "").trim();
+        if (useAbbreviations) capText = capText.replace(/Ton/gi, "T");
+        tdCells.push(`<td class="py-3 px-4 font-semibold text-white whitespace-nowrap">${capText}</td>`);
+
+        // 3. SYSTEM TYPE (Index 2)
+        let rawSysType = String(row[2] || "").toUpperCase();
+        let mainType = row[2] || "";
+        let subType = "";
+        if (rawSysType.includes("STRAIGHT COOL") || rawSysType === "AC") { mainType = "AC"; subType = "(Straight Cool)"; } 
+        else if (rawSysType.includes("HEAT PUMP") || rawSysType === "HP") { mainType = "HP"; subType = "(Heat Pump)"; } 
+        else if (rawSysType.includes("GAS FURNACE") || rawSysType === "FURNACE") { mainType = "FURN"; subType = "(Gas Furnace)"; }
+
+        if (useAbbreviations) tdCells.push(`<td class="py-3 px-4 font-semibold text-slate-300 whitespace-nowrap">${mainType}</td>`);
+        else tdCells.push(`<td class="py-3 px-4 whitespace-nowrap"><span class="font-semibold text-slate-300 block">${mainType}</span><span class="text-[10px] text-slate-500 font-normal">${subType}</span></td>`);
+
+        // 4. SOURCE ROW (Index 0)
+        tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${row[0] || ""}</td>`);
+
+        // 5. MECHANICAL STAGE (Index 5)
         let mechStage = row[5] || "";
         let upperStage = String(mechStage).toUpperCase();
-        if (upperStage.includes("SINGLE STAGE") || upperStage === "1 STAGE") {
-            mechStage = useAbbreviations ? "1 STG" : "1 Stage";
-        } else if (upperStage.includes("2 STAGE") || upperStage.includes("TWO STAGE")) {
-            mechStage = useAbbreviations ? "2 STG" : "2 Stage";
-        } else if (upperStage.includes("VARIABLE SPEED") || upperStage.includes("VAR")) {
-            mechStage = useAbbreviations ? "VAR" : "Variable Speed";
-        }
+        if (upperStage.includes("SINGLE STAGE") || upperStage === "1 STAGE") mechStage = useAbbreviations ? "1 STG" : "1 Stage";
+        else if (upperStage.includes("2 STAGE") || upperStage.includes("TWO STAGE")) mechStage = useAbbreviations ? "2 STG" : "2 Stage";
+        else if (upperStage.includes("VARIABLE SPEED") || upperStage.includes("VAR")) mechStage = useAbbreviations ? "VAR" : "Variable Speed";
         tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${mechStage}</td>`);
 
-        // Index 6: Application / Style
+        // 6. APP / STYLE (Index 6)
         let styleText = row[6] || "";
         if (useAbbreviations) {
             let upperStyle = String(styleText).toUpperCase();
@@ -1095,37 +1061,25 @@
             else if (upperStyle.includes("CROSSOVER")) styleText = "CROSS";
             else if (upperStyle.includes("STANDARD")) styleText = "STD";
         }
-        tdCells.push(`<td class="py-3 px-4 whitespace-normal break-words min-w-[100px] max-w-[130px] leading-tight text-slate-300">${styleText}</td>`);
-        // Index 7: SEER2
-        tdCells.push(`<td class="py-3 px-4 font-mono font-medium whitespace-nowrap">${row[7] || ""}</td>`);
-        // Index 8: EER2
-        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[8] || ""}</td>`);
-        // Index 9: HSPF2
-        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[9] || ""}</td>`);
-        // Index 10: AHRI
-        tdCells.push(`<td class="py-3 px-4 font-mono text-xs text-slate-400 whitespace-nowrap">${row[10] || "N/A"}</td>`);
-        // Index 11: Cooling BTU
-        tdCells.push(`<td class="py-3 px-4 font-mono whitespace-nowrap">${row[11] || ""}</td>`);
-        // Index 12: Heating BTU
-        tdCells.push(`<td class="py-3 px-4 font-mono whitespace-nowrap">${row[12] || ""}</td>`);
-        // Index 13: PAGE
-        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-400 whitespace-nowrap">${row[13] || ""}</td>`);
-        // Index 14: Width (with double quote format)
-        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[14] ? row[14] + '"' : ""}</td>`);
-        // Index 15: Height (with double quote format)
-        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[15] ? row[15] + '"' : ""}</td>`);
+        tdCells.push(`<td class="py-3 px-4 whitespace-normal break-words min-w-[100px] max-w-[130px] text-slate-300">${styleText}</td>`);
         
-        // Index 16: Price (Currency format)
+        // REST OF THE DATA
+        tdCells.push(`<td class="py-3 px-4 font-mono font-medium whitespace-nowrap">${row[7] || ""}</td>`); // SEER2
+        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[8] || ""}</td>`); // EER2
+        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[9] || ""}</td>`); // HSPF2
+        tdCells.push(`<td class="py-3 px-4 font-mono text-xs text-slate-400 whitespace-nowrap">${row[10] || "N/A"}</td>`); // AHRI
+        tdCells.push(`<td class="py-3 px-4 font-mono whitespace-nowrap">${row[11] || ""}</td>`); // Cool BTU
+        tdCells.push(`<td class="py-3 px-4 font-mono whitespace-nowrap">${row[12] || ""}</td>`); // Heat BTU
+        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-400 whitespace-nowrap">${row[13] || ""}</td>`); // PAGE
+        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[14] ? row[14] + '"' : ""}</td>`); // W
+        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[15] ? row[15] + '"' : ""}</td>`); // H
+
         let priceVal = row[16] || "";
-        if (typeof priceVal === "number") {
-          priceVal = "$" + Math.round(priceVal).toLocaleString();
-        } else if (priceVal !== "" && !isNaN(Number(priceVal))) {
-          priceVal = "$" + Math.round(Number(priceVal)).toLocaleString();
-        }
-        tdCells.push(`<td class="py-3 px-4 text-right font-bold text-emerald-455 font-mono whitespace-nowrap">${priceVal || "N/A"}</td>`);
-        
-        // Index 17: Tax Creditable
-        tdCells.push(`<td class="py-3 px-4 font-semibold text-slate-300 whitespace-nowrap">${row[17] || ""}</td>`);
+        if (typeof priceVal === "number") priceVal = "$" + Math.round(priceVal).toLocaleString();
+        else if (priceVal !== "" && !isNaN(Number(priceVal))) priceVal = "$" + Math.round(Number(priceVal)).toLocaleString();
+        tdCells.push(`<td class="py-3 px-4 text-right font-bold text-emerald-455 font-mono whitespace-nowrap">${priceVal || "N/A"}</td>`); // PRICE
+
+        tdCells.push(`<td class="py-3 px-4 font-semibold text-slate-300 whitespace-nowrap">${row[17] || ""}</td>`); // TAX
 
         tr.innerHTML = tdCells.join('');
         tbody.appendChild(tr);
