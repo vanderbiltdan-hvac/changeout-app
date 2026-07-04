@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v02.05 | UI Cleanup & Core Mechanics (Session 1) -->
+<!-- Changeout Lookup v02.06 | Cart Toggle & Highlight Hotfixes -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v02.05</title>
+  <title>Changeout Lookup v02.06</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -485,7 +485,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v02.05</span>
+          <span class="text-[8px] font-normal text-blue-400">v02.06</span>
         </span>
       </button>
 
@@ -1030,9 +1030,9 @@
         let brandVal = String(row[3] || "").trim().toUpperCase();
         let brandHtml = row[3] || "";
         const rowStrEsc = JSON.stringify(row).replace(/'/g, "&apos;");
-        if (brandVal === "CARRIER") brandHtml = `<img onclick='event.stopPropagation(); addToCart(${rowStrEsc})' src="./carrier.png" alt="Carrier" class="h-6 md:h-8 w-auto object-contain cursor-pointer hover:scale-105 transition-transform" title="Add to Cart">`;
-        else if (brandVal === "COMFORTMAKER") brandHtml = `<img onclick='event.stopPropagation(); addToCart(${rowStrEsc})' src="./comfortmaker.png" alt="Comfortmaker" class="h-8 md:h-10 w-auto object-contain cursor-pointer hover:scale-105 transition-transform" title="Add to Cart">`;
-        else brandHtml = `<span onclick='event.stopPropagation(); addToCart(${rowStrEsc})' class="font-bold text-white cursor-pointer hover:underline" title="Add to Cart">${row[3] || ""}</span>`;
+        if (brandVal === "CARRIER") brandHtml = `<img onclick='event.stopPropagation(); toggleCartItem(${rowStrEsc})' src="./carrier.png" alt="Carrier" class="h-6 md:h-8 w-auto object-contain cursor-pointer hover:scale-105 transition-transform" title="Add to Cart">`;
+        else if (brandVal === "COMFORTMAKER") brandHtml = `<img onclick='event.stopPropagation(); toggleCartItem(${rowStrEsc})' src="./comfortmaker.png" alt="Comfortmaker" class="h-8 md:h-10 w-auto object-contain cursor-pointer hover:scale-105 transition-transform" title="Add to Cart">`;
+        else brandHtml = `<span onclick='event.stopPropagation(); toggleCartItem(${rowStrEsc})' class="font-bold text-white cursor-pointer hover:underline" title="Add to Cart">${row[3] || ""}</span>`;
 
         const series = String(row[4] || "").toUpperCase();
         let badgeClass = "bg-slate-900/40 text-slate-355 border-slate-800/40";
@@ -1044,7 +1044,8 @@
 
         let freezeClass = useFreezeColumn ? "freeze-col" : "";
         if (useCompactLayout) {
-            tdCells.push(`<td onclick='toggleCartItem(${JSON.stringify(row).replace(/'/g, "&apos;")})' class="py-2 px-4 cursor-pointer hover:bg-slate-700 transition ${freezeClass} bg-slate-800 border-r border-slate-700 align-top">
+            let cellBgClass = isInCart ? "bg-blue-900 border-r border-blue-500" : "bg-slate-800 border-r border-slate-700";
+            tdCells.push(`<td onclick='toggleCartItem(${JSON.stringify(row).replace(/'/g, "&apos;")})' class="py-2 px-4 cursor-pointer hover:bg-slate-700 transition ${freezeClass} ${cellBgClass} align-top">
                 <div class="flex flex-col items-start justify-start min-w-[120px] gap-1">
                     ${brandHtml}
                     ${badgeHtml}
@@ -1052,7 +1053,12 @@
             </td>`);
             tdCells.push(`<td class="hidden"></td>`); // Series sync
         } else {
-            let activeFreeze = useFreezeColumn ? "freeze-col bg-slate-800 border-r border-slate-700" : "";
+            let activeFreeze = "";
+            if (useFreezeColumn) {
+                activeFreeze = isInCart 
+                    ? "freeze-col bg-blue-900 border-r border-blue-500" 
+                    : "freeze-col bg-slate-800 border-r border-slate-700";
+            }
             tdCells.push(`<td onclick='toggleCartItem(${JSON.stringify(row).replace(/'/g, "&apos;")})' class="py-3 px-4 font-semibold text-white whitespace-nowrap cursor-pointer hover:bg-slate-700 transition ${activeFreeze}">${brandHtml}</td>`);
             tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${badgeHtml}</td>`);
         }
@@ -1527,7 +1533,7 @@
     function updateTerminalOutput() {
       const terminal = document.getElementById('terminal-box');
       if (cart.length === 0) {
-        terminal.value = "";
+        terminal.value = "SYSTEM OPTIONS SELECTED:\n-------------------------\n(No systems in proposal cart)";
         return;
       }
       
