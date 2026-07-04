@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v01.30 | Memory Settings, Header Stacking & "T" Abbreviations -->
+<!-- Changeout Lookup v01.31 | Prototyping Sliders for Header Sizing -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v01.30</title>
+  <title>Changeout Lookup v01.31</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -71,7 +71,7 @@
 
       <!-- Center: Platt's Logo -->
       <div class="flex-1 flex justify-center px-2 shrink">
-        <img src="./platts.png" alt="Platt's Air and Heat" class="transition-all h-[40px] md:h-[60px] w-auto object-contain">
+        <img src="./platts.png" alt="Platt's Air and Heat" class="transition-all w-auto object-contain" style="height: var(--platts-test-h, 60px);">
       </div>
 
       <!-- Right: Compare, Mic & Settings Buttons -->
@@ -89,7 +89,7 @@
     </div>
 
     <!-- Accordion Toggle Bar -->
-    <div onclick="toggleDrawer()" class="w-full bg-slate-850 border-t border-slate-700 flex justify-center py-0.5 cursor-pointer hover:bg-slate-800 transition">
+    <div onclick="toggleDrawer()" class="w-full bg-slate-850 border-t border-slate-700 flex justify-center cursor-pointer hover:bg-slate-800 transition items-center" style="height: var(--status-test-h, 24px);">
       <svg id="drawer-chevron" class="w-4 h-4 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
     </div>
 
@@ -415,6 +415,18 @@
             <button id="btn-pad-relaxed" onclick="setTablePadding('relaxed')" class="flex-1 bg-slate-900 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded text-xs transition-colors">Relaxed</button>
           </div>
         </div>
+        <!-- TEMPORARY PROTOTYPING STUDIO -->
+        <div class="space-y-4 border-t border-dashed border-yellow-500 pt-4 mt-4 bg-yellow-900/10 p-3 rounded-lg">
+          <h4 class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest mb-2 flex items-center gap-2"><span>🛠️</span> Prototyping Studio</h4>
+          <div>
+            <div class="flex justify-between"><label class="text-[10px] text-slate-300 font-bold">Platt's Logo Height</label><span id="val-platts-test-h" class="text-[10px] text-yellow-400 font-mono font-bold">60px</span></div>
+            <input type="range" min="30" max="120" value="60" oninput="updatePrototypeSize('platts-test-h', this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-yellow-500">
+          </div>
+          <div>
+            <div class="flex justify-between"><label class="text-[10px] text-slate-300 font-bold">Secondary Bar Height</label><span id="val-status-test-h" class="text-[10px] text-yellow-400 font-mono font-bold">24px</span></div>
+            <input type="range" min="15" max="80" value="24" oninput="updatePrototypeSize('status-test-h', this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-yellow-500">
+          </div>
+        </div>
       </div>
 
     </div>
@@ -459,7 +471,7 @@
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
           <span>Lookup</span>
-          <span class="text-[8px] font-normal text-blue-400">v01.30</span>
+          <span class="text-[8px] font-normal text-blue-400">v01.31</span>
         </span>
       </button>
 
@@ -538,6 +550,15 @@
                 else btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-500');
             }
         });
+    }
+
+    // Temporary Prototyping Slider Function
+    function updatePrototypeSize(prop, val) {
+        document.documentElement.style.setProperty('--' + prop, val + 'px');
+        const displayElement = document.getElementById('val-' + prop);
+        if (displayElement) {
+            displayElement.innerText = val + 'px';
+        }
     }
 
     function loadDisplaySettings() {
