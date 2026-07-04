@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v01.28 | Header Redesign, Accordion Drawer & Cart Cleanup -->
+<!-- Changeout Lookup v01.29 | Text Stacking, Stage Cleanup, Abbreviations & Card Colors -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v01.28</title>
+  <title>Changeout Lookup v01.29</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -445,7 +445,7 @@
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
           <span>Lookup</span>
-          <span class="text-[8px] font-normal text-blue-400">v01.28</span>
+          <span class="text-[8px] font-normal text-blue-400">v01.29</span>
         </span>
       </button>
 
@@ -939,14 +939,26 @@
         // Index 1: Capacity
         tdCells.push(`<td class="py-3 px-4 whitespace-normal break-words min-w-[80px] max-w-[100px] leading-tight font-medium text-slate-355">${row[1] || ""}</td>`);
         // Index 2: System Type
-        let sysType = row[2] || "";
-        if (useAbbreviations) {
-            let upperType = String(sysType).toUpperCase();
-            if (upperType.includes("STRAIGHT COOL")) sysType = "SC";
-            else if (upperType.includes("HEAT PUMP")) sysType = "HP";
-            else if (upperType.includes("GAS FURNACE") || upperType.includes("FURNACE")) sysType = "FURN";
+        let rawSysType = String(row[2] || "").toUpperCase();
+        let mainType = row[2] || "";
+        let subType = "";
+
+        if (rawSysType.includes("STRAIGHT COOL") || rawSysType === "AC") {
+            mainType = "AC";
+            subType = "(Straight Cool)";
+        } else if (rawSysType.includes("HEAT PUMP") || rawSysType === "HP") {
+            mainType = "HP";
+            subType = "(Heat Pump)";
+        } else if (rawSysType.includes("GAS FURNACE") || rawSysType.includes("FURNACE")) {
+            mainType = "FURN";
+            subType = "(Gas Furnace)";
         }
-        tdCells.push(`<td class="py-3 px-4 font-semibold text-slate-300 whitespace-nowrap">${sysType}</td>`);
+
+        if (useAbbreviations) {
+            tdCells.push(`<td class="py-3 px-4 font-semibold text-slate-300 whitespace-nowrap">${mainType}</td>`);
+        } else {
+            tdCells.push(`<td class="py-3 px-4 whitespace-nowrap leading-tight"><span class="font-semibold text-slate-300 block">${mainType}</span><span class="text-[10px] text-slate-500 font-normal">${subType}</span></td>`);
+        }
         
         // Index 3: Brand (Embedded SVG/Typography logos)
         const brandVal = String(row[3] || "").trim().toUpperCase();
@@ -975,12 +987,26 @@
         tdCells.push(`<td class="py-3 px-4 whitespace-nowrap"><button onclick='openSystemDetails(${JSON.stringify(row)})' class="px-2.5 py-0.5 rounded text-xs font-semibold border ${badgeClass} hover:scale-105 transition-transform shadow-sm">${row[4] || ""}</button></td>`);
         
         // Index 5: Mechanical Stage
-        tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${row[5] || ""}</td>`);
+        let mechStage = row[5] || "";
+        let upperStage = String(mechStage).toUpperCase();
+        if (upperStage.includes("SINGLE STAGE") || upperStage === "1 STAGE") {
+            mechStage = useAbbreviations ? "1 STG" : "1 Stage";
+        } else if (upperStage.includes("2 STAGE") || upperStage.includes("TWO STAGE")) {
+            mechStage = useAbbreviations ? "2 STG" : "2 Stage";
+        } else if (upperStage.includes("VARIABLE SPEED") || upperStage.includes("VAR")) {
+            mechStage = useAbbreviations ? "VAR" : "Variable Speed";
+        }
+        tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${mechStage}</td>`);
 
         // Index 6: Application / Style
         let styleText = row[6] || "";
-        if (useAbbreviations && String(styleText).toUpperCase().includes("STANDARD")) {
-            styleText = "STND";
+        if (useAbbreviations) {
+            let upperStyle = String(styleText).toUpperCase();
+            if (upperStyle.includes("APARTMENT COASTAL")) styleText = "APT CSTL";
+            else if (upperStyle.includes("APARTMENT")) styleText = "APT";
+            else if (upperStyle.includes("COASTAL")) styleText = "CSTL";
+            else if (upperStyle.includes("CROSSOVER")) styleText = "CROSS";
+            else if (upperStyle.includes("STANDARD")) styleText = "STD";
         }
         tdCells.push(`<td class="py-3 px-4 whitespace-normal break-words min-w-[100px] max-w-[130px] leading-tight text-slate-300">${styleText}</td>`);
         // Index 7: SEER2
@@ -1187,6 +1213,14 @@
       const container = document.getElementById('system-details-content');
       if (!container) return;
 
+      // Dynamic Series Color for the Card
+      const seriesForCard = String(rowObj[4] || "").toUpperCase();
+      let cardSeriesColor = "text-slate-300";
+      if (seriesForCard === "INFINITY" || seriesForCard === "MAIN LINE") cardSeriesColor = "text-blue-400";
+      else if (seriesForCard === "PERFORMANCE" || seriesForCard === "PERFORMER") cardSeriesColor = "text-green-400";
+      else if (seriesForCard === "COMFORT" || seriesForCard === "BUILDER") cardSeriesColor = "text-amber-400";
+      else if (seriesForCard === "⚠️ UNRECOGNIZED COLOR") cardSeriesColor = "text-red-400";
+
       // Currency pricing formatter
       let priceVal = rowObj[16] || "";
       if (typeof priceVal === "number") {
@@ -1207,7 +1241,7 @@
           </div>
           <div>
             <span class="text-slate-400 block mb-0.5 uppercase tracking-wider text-[10px]">Series / Tier</span>
-            <span class="text-base font-bold text-blue-400">${rowObj[4] || "N/A"}</span>
+            <span class="text-base font-bold ${cardSeriesColor}">${rowObj[4] || "N/A"}</span>
           </div>
         </div>
 
