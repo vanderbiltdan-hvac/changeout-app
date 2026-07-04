@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v03.07 | CSS Grid Syntax Fix | Lines: 2021 -->
+<!-- Changeout Lookup v03.08 | Mobile Scroll Fix (minmax) | Lines: 2016 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v03.07</title>
+  <title>Changeout Lookup v03.08</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -46,12 +46,7 @@
       overflow-y: auto;
       overflow-x: auto;
       display: grid;
-      grid-template-columns: 
-        var(--col-width-source)
-        var(--col-width-brand)
-        var(--col-width-capacity)
-        var(--col-width-efficiency)
-        var(--col-width-price);
+      grid-template-columns: minmax(120px, var(--col-width-source)) minmax(120px, var(--col-width-brand)) minmax(120px, var(--col-width-capacity)) minmax(120px, var(--col-width-efficiency)) minmax(120px, var(--col-width-price));
       gap: 0.5rem 0.75rem; /* Row gap and column gap */
       padding: 1rem;
       align-items: stretch;
@@ -531,7 +526,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v03.07</span>
+          <span class="text-[8px] font-normal text-blue-400">v03.08</span>
         </span>
       </button>
 
@@ -1189,11 +1184,11 @@
       const canvas = document.getElementById('results-canvas');
       if (canvas) {
         const template = [
-          col1Visible ? 'var(--col-width-source)' : '0px',
-          col2Visible ? 'var(--col-width-brand)' : '0px',
-          col3Visible ? 'var(--col-width-capacity)' : '0px',
-          col4Visible ? 'var(--col-width-efficiency)' : '0px',
-          col5Visible ? 'var(--col-width-price)' : '0px'
+          col1Visible ? 'minmax(120px, var(--col-width-source))' : '0px',
+          col2Visible ? 'minmax(120px, var(--col-width-brand))' : '0px',
+          col3Visible ? 'minmax(120px, var(--col-width-capacity))' : '0px',
+          col4Visible ? 'minmax(120px, var(--col-width-efficiency))' : '0px',
+          col5Visible ? 'minmax(120px, var(--col-width-price))' : '0px'
         ].join(' ');
         canvas.style.gridTemplateColumns = template;
       }
