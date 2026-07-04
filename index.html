@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v02.02 | Blue Pill Cart Fix & Visibility Offset Patch -->
+<!-- Changeout Lookup v02.03 | Mega-Column Compact Mode & Stacked Headers -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v02.02</title>
+  <title>Changeout Lookup v02.03</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -54,6 +54,8 @@
     #results-table.pad-relaxed th, #results-table.pad-relaxed td { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
     .freeze-col { position: sticky; left: 0; z-index: 15; box-shadow: 2px 0 5px -2px rgba(0,0,0,0.5); }
     th.freeze-col { z-index: 25; }
+    #results-table.layout-compact .head-desktop { display: none; }
+    #results-table.layout-compact .head-compact { display: flex; }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col no-scrollbar selection:bg-blue-500 selection:text-white pb-32">
@@ -144,13 +146,32 @@
         <table id="results-table" class="w-full text-left border-collapse transition-all duration-200">
           <thead>
             <tr class="bg-slate-900 text-slate-400 text-[10px] uppercase font-bold tracking-wider border-b border-slate-700 select-none">
-              <th id="th-brand" onclick="openFilterFor('brand')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap min-w-[160px]">Brand</th>
+              <th id="th-brand" onclick="openFilterFor('brand')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap min-w-[160px] align-top">
+                  <span class="head-desktop">Brand</span>
+                  <div class="head-compact hidden flex-col items-start gap-1 w-full">
+                      <span class="text-slate-300 font-bold uppercase tracking-wider">Brand</span>
+                      <span onclick="event.stopPropagation(); openFilterFor('series')" class="text-[10px] text-slate-500 hover:text-blue-400 font-bold uppercase tracking-wider">Tier</span>
+                  </div>
+              </th>
               <th id="th-series" onclick="openFilterFor('series')" class="py-3 px-4 cursor-pointer hover:bg-slate-805 transition whitespace-nowrap">Series / Tier</th>
-              <th id="th-capacity" onclick="openFilterFor('capacity')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[80px] max-w-[100px] leading-tight">Capacity</th>
+              <th id="th-capacity" onclick="openFilterFor('capacity')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap min-w-[80px] max-w-[100px] leading-tight align-top">
+                  <span class="head-desktop">Capacity</span>
+                  <div class="head-compact hidden flex-col items-start gap-1 w-full">
+                      <span class="text-slate-300 font-bold uppercase tracking-wider">Capacity</span>
+                      <span onclick="event.stopPropagation(); openFilterFor('type')" class="text-[10px] text-slate-500 hover:text-blue-400 font-bold uppercase tracking-wider">Type</span>
+                      <span onclick="event.stopPropagation(); openFilterFor('stage')" class="text-[10px] text-slate-500 hover:text-blue-400 font-bold uppercase tracking-wider">Stage</span>
+                  </div>
+              </th>
               <th id="th-type" onclick="openFilterFor('type')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[80px] leading-tight">System Type</th>
               <th id="th-source" onclick="openFilterFor('source')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Source Row</th>
               <th id="th-stage" onclick="openFilterFor('stage')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[85px] leading-tight">Mechanical Stage</th>
-              <th id="th-style" onclick="openFilterFor('style')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[100px] max-w-[130px] leading-tight break-words">Application / Style</th>
+              <th id="th-style" onclick="openFilterFor('style')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap min-w-[100px] max-w-[130px] leading-tight break-words align-top">
+                  <span class="head-desktop">Style</span>
+                  <div class="head-compact hidden flex-col items-start gap-1 w-full">
+                      <span class="text-slate-300 font-bold uppercase tracking-wider">Style</span>
+                      <span onclick="event.stopPropagation(); openFilterFor('seer2')" class="text-[10px] text-slate-500 hover:text-blue-400 font-bold uppercase tracking-wider">SEER2</span>
+                  </div>
+              </th>
               <th id="th-seer2" onclick="openFilterFor('seer2')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">SEER2</th>
               <th id="th-eer2" onclick="openFilterFor('eer2')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">EER2</th>
               <th id="th-hspf2" onclick="openFilterFor('hspf2')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">HSPF2</th>
@@ -467,7 +488,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v02.02</span>
+          <span class="text-[8px] font-normal text-blue-400">v02.03</span>
         </span>
       </button>
 
@@ -535,8 +556,11 @@
     function toggleCompactMode() {
         const checkbox = document.getElementById('toggle-compact-layout');
         useCompactLayout = checkbox ? checkbox.checked : false;
-        const brandCfg = filterConfigs.find(c => c.key === 'brand');
-        if(brandCfg) brandCfg.name = useCompactLayout ? "Brand / Tier" : "Brand";
+        const table = document.getElementById('results-table');
+        if (table) {
+            if (useCompactLayout) table.classList.add('layout-compact');
+            else table.classList.remove('layout-compact');
+        }
         filterData();
     }
 
@@ -905,7 +929,7 @@
         const th = document.getElementById(headerId);
         if (th) {
             let isVisible = columnVisibility[key];
-            if (key === 'series' && useCompactLayout) isVisible = false; // Hide if compact
+            if (useCompactLayout && (key === 'series' || key === 'type' || key === 'stage' || key === 'seer2')) isVisible = false; // Hide if compact
             
             if (isVisible) th.classList.remove('hidden');
             else th.classList.add('hidden');
@@ -923,7 +947,7 @@
         if (row.cells.length < 18) return; 
         keys.forEach((key, colIndex) => {
             let isVisible = columnVisibility[key];
-            if (key === 'series' && useCompactLayout) isVisible = false;
+            if (useCompactLayout && (key === 'series' || key === 'type' || key === 'stage' || key === 'seer2')) isVisible = false;
 
             const td = row.cells[colIndex];
             if (td) {
@@ -994,7 +1018,7 @@
 
         const tdCells = [];
         
-        // 1. BRAND & SERIES (Indexes 3 & 4)
+        // --- COL 1 & 2: BRAND & SERIES ---
         let brandVal = String(row[3] || "").trim().toUpperCase();
         let brandHtml = row[3] || "";
         if (brandVal === "CARRIER") brandHtml = `<img src="./carrier.png" alt="Carrier" class="h-6 md:h-8 w-auto object-contain">`;
@@ -1011,47 +1035,61 @@
 
         let freezeClass = useFreezeColumn ? "freeze-col" : "";
         if (useCompactLayout) {
-            tdCells.push(`<td onclick='toggleCartItem(${JSON.stringify(row).replace(/'/g, "&apos;")})' class="py-2 px-4 cursor-pointer hover:bg-slate-700 transition ${freezeClass} bg-slate-800 border-r border-slate-700">
-                <div class="flex flex-col items-start justify-center min-w-[120px]">
+            tdCells.push(`<td onclick='toggleCartItem(${JSON.stringify(row).replace(/'/g, "&apos;")})' class="py-2 px-4 cursor-pointer hover:bg-slate-700 transition ${freezeClass} bg-slate-800 border-r border-slate-700 align-top">
+                <div class="flex flex-col items-start justify-start min-w-[120px] gap-1">
                     ${brandHtml}
                     ${badgeHtml}
                 </div>
             </td>`);
-            tdCells.push(`<td class="hidden"></td>`); // Placeholder to sync column index
+            tdCells.push(`<td class="hidden"></td>`); // Series sync
         } else {
             let activeFreeze = useFreezeColumn ? "freeze-col bg-slate-800 border-r border-slate-700" : "";
             tdCells.push(`<td onclick='toggleCartItem(${JSON.stringify(row).replace(/'/g, "&apos;")})' class="py-3 px-4 font-semibold text-white whitespace-nowrap cursor-pointer hover:bg-slate-700 transition ${activeFreeze}">${brandHtml}</td>`);
             tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${badgeHtml}</td>`);
         }
 
-        // 2. CAPACITY (Index 1)
+        // --- COL 3, 4, 6: CAPACITY, TYPE, STAGE ---
         let capText = String(row[1] || "").trim();
         if (useAbbreviations) capText = capText.replace(/Ton/gi, "T");
-        tdCells.push(`<td class="py-3 px-4 font-semibold text-white whitespace-nowrap">${capText}</td>`);
 
-        // 3. SYSTEM TYPE (Index 2)
         let rawSysType = String(row[2] || "").toUpperCase();
         let mainType = row[2] || "";
         let subType = "";
         if (rawSysType.includes("STRAIGHT COOL") || rawSysType === "AC") { mainType = "AC"; subType = "(Straight Cool)"; } 
         else if (rawSysType.includes("HEAT PUMP") || rawSysType === "HP") { mainType = "HP"; subType = "(Heat Pump)"; } 
-        else if (rawSysType.includes("GAS FURNACE") || rawSysType === "FURNACE") { mainType = "FURN"; subType = "(Gas Furnace)"; }
+        else if (rawSysType.includes("GAS FURNACE") || rawSysType.includes("FURNACE")) { mainType = "FURN"; subType = "(Gas Furnace)"; }
+        let typeHtml = useAbbreviations ? mainType : `<span class="block">${mainType}</span><span class="text-[10px] text-slate-500 font-normal">${subType}</span>`;
 
-        if (useAbbreviations) tdCells.push(`<td class="py-3 px-4 font-semibold text-slate-300 whitespace-nowrap">${mainType}</td>`);
-        else tdCells.push(`<td class="py-3 px-4 whitespace-nowrap"><span class="font-semibold text-slate-300 block">${mainType}</span><span class="text-[10px] text-slate-500 font-normal">${subType}</span></td>`);
-
-        // 4. SOURCE ROW (Index 0)
-        tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${row[0] || ""}</td>`);
-
-        // 5. MECHANICAL STAGE (Index 5)
         let mechStage = row[5] || "";
         let upperStage = String(mechStage).toUpperCase();
         if (upperStage.includes("SINGLE STAGE") || upperStage === "1 STAGE") mechStage = useAbbreviations ? "1 STG" : "1 Stage";
         else if (upperStage.includes("2 STAGE") || upperStage.includes("TWO STAGE")) mechStage = useAbbreviations ? "2 STG" : "2 Stage";
         else if (upperStage.includes("VARIABLE SPEED") || upperStage.includes("VAR")) mechStage = useAbbreviations ? "VAR" : "Variable Speed";
-        tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${mechStage}</td>`);
 
-        // 6. APP / STYLE (Index 6)
+        if (useCompactLayout) {
+            tdCells.push(`<td class="py-2 px-4 whitespace-nowrap align-top border-r border-slate-700/50 bg-slate-800/20">
+                <div class="flex flex-col items-start gap-1">
+                    <span class="font-bold text-white text-[14px] leading-none">${capText}</span>
+                    <span class="text-[11px] font-semibold text-slate-300 leading-none">${mainType}</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase leading-none">${mechStage}</span>
+                </div>
+            </td>`);
+            tdCells.push(`<td class="hidden"></td>`); // Type sync
+        } else {
+            tdCells.push(`<td class="py-3 px-4 font-semibold text-white whitespace-nowrap">${capText}</td>`);
+            tdCells.push(`<td class="py-3 px-4 font-semibold text-slate-300 whitespace-nowrap">${typeHtml}</td>`);
+        }
+
+        // --- COL 5: SOURCE ROW ---
+        tdCells.push(`<td class="py-3 px-4 whitespace-nowrap text-slate-400 text-xs">${row[0] || ""}</td>`);
+
+        if (useCompactLayout) {
+            tdCells.push(`<td class="hidden"></td>`); // Stage sync (Source Row pushed earlier to match array order)
+        } else {
+            tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${mechStage}</td>`);
+        }
+
+        // --- COL 7 & 8: STYLE & SEER2 ---
         let styleText = row[6] || "";
         if (useAbbreviations) {
             let upperStyle = String(styleText).toUpperCase();
@@ -1061,10 +1099,19 @@
             else if (upperStyle.includes("CROSSOVER")) styleText = "CROSS";
             else if (upperStyle.includes("STANDARD")) styleText = "STD";
         }
-        tdCells.push(`<td class="py-3 px-4 whitespace-normal break-words min-w-[100px] max-w-[130px] text-slate-300">${styleText}</td>`);
-        
-        // REST OF THE DATA
-        tdCells.push(`<td class="py-3 px-4 font-mono font-medium whitespace-nowrap">${row[7] || ""}</td>`); // SEER2
+
+        if (useCompactLayout) {
+            tdCells.push(`<td class="py-2 px-4 whitespace-nowrap align-top border-r border-slate-700/50 bg-slate-800/20">
+                <div class="flex flex-col items-start gap-1">
+                    <span class="font-bold text-white text-[12px] leading-none">${styleText || "STD"}</span>
+                    <span class="text-[11px] font-mono font-bold text-blue-400 leading-none">${row[7] || ""} <span class="text-[9px] text-slate-500 font-sans">SEER2</span></span>
+                </div>
+            </td>`);
+            tdCells.push(`<td class="hidden"></td>`); // SEER2 sync
+        } else {
+            tdCells.push(`<td class="py-3 px-4 whitespace-normal break-words min-w-[100px] max-w-[130px] text-slate-300">${styleText}</td>`);
+            tdCells.push(`<td class="py-3 px-4 font-mono font-medium whitespace-nowrap">${row[7] || ""}</td>`);
+        }
         tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[8] || ""}</td>`); // EER2
         tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[9] || ""}</td>`); // HSPF2
         tdCells.push(`<td class="py-3 px-4 font-mono text-xs text-slate-400 whitespace-nowrap">${row[10] || "N/A"}</td>`); // AHRI
