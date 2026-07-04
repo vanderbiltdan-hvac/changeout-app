@@ -1,20 +1,28 @@
-<!-- Changeout Lookup v03.00 | Flex-Grid Foundation | Lines: 1820 -->
+<!-- Changeout Lookup v03.01 | Widget Menus, Sliders & Geometry Fix | Lines: 1919 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"> 
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v03.00</title>
+  <title>Changeout Lookup v03.01</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Inter & Outfit --> 
+  <!-- Google Fonts: Inter & Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --col-width-source: 0.5;
+      --col-width-brand: 1.5;
+      --col-width-capacity: 1.5;
+      --col-width-efficiency: 2;
+      --col-width-specs: 2;
+      --col-width-price: 1.5;
+    }
     body {
       font-family: 'Inter', sans-serif;
     }
@@ -40,7 +48,7 @@
     #results-canvas.compare-mode #results-header { display: none !important; }
     #results-canvas.compare-mode #results-grid { display: flex; flex-direction: row; overflow-x: auto; overflow-y: visible; align-items: stretch; max-height: none; p-4 }
     #results-canvas.compare-mode #results-grid > div { flex-direction: column !important; min-width: 220px; flex-shrink: 0; align-items: stretch; }
-    #results-canvas.compare-mode #results-grid > div > div { border-right: none !important; border-bottom: 1px solid #1e293b; padding-bottom: 0.5rem; padding-top: 0.5rem; width: 100%; flex: 1; }
+    #results-canvas.compare-mode #results-grid > div > div { flex: 1 !important; border-right: none !important; border-bottom: 1px solid #1e293b; padding-bottom: 0.5rem; padding-top: 0.5rem; width: 100%; }
     #results-canvas.compare-mode #results-grid > div > div:last-child { border-bottom: none !important; }
 
     /* Dynamic Grid Density */
@@ -138,41 +146,45 @@
       <div id="results-canvas" class="overflow-y-auto no-scrollbar">
         <!-- Dynamic Resizing Header Map -->
         <div id="results-header" class="sticky top-0 z-20 bg-slate-900 border-b border-slate-700 px-4 py-2.5 hidden md:flex items-center text-[10px] uppercase font-bold text-slate-400 tracking-wider shadow shrink-0 select-none">
-          <div id="header-brand-group" onclick="handleHeaderClick('brand', 'brand-tier')" class="flex-[1.5] cursor-pointer hover:text-white transition flex flex-col justify-start">
-              <span data-col-key="brand">Brand</span>
-              <span class="text-[8px] text-slate-500 flex gap-1">
-                <span data-col-key="series">Tier</span>
-                <span data-col-key="source">/ Source</span>
-              </span>
+          <!-- Column 1: Source Row -->
+          <div data-col-key="source" style="flex: var(--col-width-source);" class="cursor-pointer hover:text-white transition flex flex-col justify-center">
+              <span onclick="event.stopPropagation(); openCategoryModal('source', 'Source Row')">Source</span>
           </div>
-          <div id="header-capacity-group" onclick="handleHeaderClick('capacity', 'capacity-type-stage')" class="flex-[1.5] cursor-pointer hover:text-white transition flex flex-col justify-start">
-              <span data-col-key="capacity">Capacity</span>
-              <span class="text-[8px] text-slate-500 flex flex-wrap gap-1">
-                <span data-col-key="type">Type</span>
-                <span data-col-key="stage">/ Stage</span>
-              </span>
+          <!-- Column 2: Brand / Tier -->
+          <div id="header-brand-group" onclick="handleHeaderClick('brand', 'brand-tier')" class="cursor-pointer hover:text-white transition flex flex-col justify-start" style="flex: var(--col-width-brand);">
+              <span data-col-key="brand" onclick="event.stopPropagation(); openCategoryModal('brand', 'Brand')">Brand</span>
+              <span data-col-key="series" onclick="event.stopPropagation(); openCategoryModal('series', 'Tier')" class="text-[8px] text-slate-500">Tier</span>
           </div>
-          <div id="header-efficiency-group" onclick="handleHeaderClick('seer2')" class="flex-[2] cursor-pointer hover:text-white transition flex flex-col justify-start">
+          <!-- Column 3: Capacity / Type / Stage -->
+          <div id="header-capacity-group" onclick="handleHeaderClick('capacity', 'capacity-type-stage')" class="cursor-pointer hover:text-white transition flex flex-col justify-center gap-0.5" style="flex: var(--col-width-capacity);">
+              <span data-col-key="capacity" onclick="event.stopPropagation(); openCategoryModal('capacity', 'Capacity')" class="leading-none">Capacity</span>
+              <span data-col-key="type" onclick="event.stopPropagation(); openCategoryModal('type', 'Type')" class="text-[8px] text-slate-500 leading-none">Type</span>
+              <span data-col-key="stage" onclick="event.stopPropagation(); openCategoryModal('stage', 'Stage')" class="text-[8px] text-slate-500 leading-none">Stage</span>
+          </div>
+          <!-- Column 4: Efficiency -->
+          <div id="header-efficiency-group" onclick="handleHeaderClick('seer2')" class="cursor-pointer hover:text-white transition flex flex-col justify-start" style="flex: var(--col-width-efficiency);">
               <span>Efficiency</span>
               <span class="text-[8px] text-slate-500 flex flex-wrap gap-1">
-                <span data-col-key="seer2">SEER2</span>
-                <span data-col-key="eer2">/ EER2</span>
-                <span data-col-key="hspf2">/ HSPF2</span>
-                <span data-col-key="ahri">/ AHRI</span>
+                <span data-col-key="seer2" onclick="event.stopPropagation(); openCategoryModal('seer2', 'SEER2')">SEER2</span>
+                <span data-col-key="eer2" onclick="event.stopPropagation(); openCategoryModal('eer2', 'EER2')">/ EER2</span>
+                <span data-col-key="hspf2" onclick="event.stopPropagation(); openCategoryModal('hspf2', 'HSPF2')">/ HSPF2</span>
+                <span data-col-key="ahri" onclick="event.stopPropagation(); openCategoryModal('ahri', 'AHRI')">/ AHRI</span>
               </span>
           </div>
-          <div id="header-dimensions-group" onclick="handleHeaderClick('width')" class="flex-[2] cursor-pointer hover:text-white transition flex flex-col justify-start">
+          <!-- Column 5: Specs -->
+          <div id="header-dimensions-group" onclick="handleHeaderClick('width')" class="cursor-pointer hover:text-white transition flex flex-col justify-start" style="flex: var(--col-width-specs);">
               <span>Specs</span>
               <span class="text-[8px] text-slate-500 flex flex-wrap gap-1">
-                <span data-col-key="coolbtu">Cool BTU</span>
-                <span data-col-key="heatbtu">/ Heat BTU</span>
-                <span data-col-key="width">/ Dims</span>
-                <span data-col-key="page">/ Page</span>
+                <span data-col-key="coolbtu" onclick="event.stopPropagation(); openCategoryModal('coolbtu', 'Cool BTU')">Cool BTU</span>
+                <span data-col-key="heatbtu" onclick="event.stopPropagation(); openCategoryModal('heatbtu', 'Heat BTU')">/ Heat BTU</span>
+                <span data-col-key="width" onclick="event.stopPropagation(); openCategoryModal('width', 'Dims')">/ Dims</span>
+                <span data-col-key="page" onclick="event.stopPropagation(); openCategoryModal('page', 'Page')">/ Page</span>
               </span>
           </div>
-          <div id="header-price-group" onclick="handleHeaderClick('price')" class="flex-[1.5] cursor-pointer hover:text-white transition flex flex-col justify-start text-right">
-              <span data-col-key="price">Price</span>
-              <span data-col-key="tax" class="text-[8px] text-slate-500">Tax Incentive</span>
+          <!-- Column 6: Price -->
+          <div id="header-price-group" onclick="handleHeaderClick('price')" class="cursor-pointer hover:text-white transition flex flex-col justify-start text-right" style="flex: var(--col-width-price);">
+              <span data-col-key="price" onclick="event.stopPropagation(); openCategoryModal('price', 'Price')">Price</span>
+              <span data-col-key="tax" onclick="event.stopPropagation(); openCategoryModal('tax', 'Tax Incentive')" class="text-[8px] text-slate-500">Tax Incentive</span>
           </div>
         </div>
 
@@ -209,6 +221,37 @@
         <div id="mobile-filter-accordions" class="space-y-4">
           <!-- Generated dynamically in JS -->
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WIDGET CONFIGURATION MODAL -->
+  <div id="widget-menu-modal" class="hidden fixed inset-0 z-50 bg-slate-955/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-750 w-full max-w-sm rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="flex justify-between items-center px-4 py-3 border-b border-slate-800 shrink-0">
+        <h2 id="widget-modal-title" class="text-sm font-bold font-outfit text-white">Configure Column</h2>
+        <button onclick="closeWidgetModal()" class="text-slate-400 hover:text-white bg-slate-800 border border-slate-700/50 rounded-full w-7 h-7 flex items-center justify-center text-xs">✕</button>
+      </div>
+      
+      <!-- Content Area -->
+      <div class="p-4 space-y-4">
+        <!-- Assign label -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Custom Header Label</label>
+          <input type="text" id="widget-column-label" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Enter custom label">
+        </div>
+        
+        <!-- Real-Time Width Slider -->
+        <div class="flex flex-col gap-1.5">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Column Width factor</label>
+            <span id="widget-slider-value" class="text-xs font-mono font-bold text-blue-400">1.5</span>
+          </div>
+          <input type="range" id="widget-width-slider" min="0.2" max="5.0" step="0.1" class="w-full accent-blue-500 h-1.5 bg-slate-850 rounded-lg appearance-none cursor-pointer">
+        </div>
+
+        <button onclick="saveWidgetConfig()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-550 border border-blue-500 rounded-xl font-bold text-white text-sm shadow transition-all">Save Changes</button>
       </div>
     </div>
   </div>
@@ -434,9 +477,9 @@
         <div>
           <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Column Density (Padding)</h4>
           <div class="flex gap-2 w-full">
-            <button id="btn-pad-compact" onclick="setTablePadding('compact')" class="flex-1 bg-slate-900 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded text-xs transition-colors">Compact</button>
-            <button id="btn-pad-standard" onclick="setTablePadding('standard')" class="flex-1 bg-slate-900 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded text-xs transition-colors">Standard</button>
-            <button id="btn-pad-relaxed" onclick="setTablePadding('relaxed')" class="flex-1 bg-slate-900 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded text-xs transition-colors">Relaxed</button>
+            <button id="btn-pad-compact" onclick="setGridPadding('compact')" class="flex-1 bg-slate-900 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded text-xs transition-colors">Compact</button>
+            <button id="btn-pad-standard" onclick="setGridPadding('standard')" class="flex-1 bg-slate-900 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded text-xs transition-colors">Standard</button>
+            <button id="btn-pad-relaxed" onclick="setGridPadding('relaxed')" class="flex-1 bg-slate-900 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded text-xs transition-colors">Relaxed</button>
           </div>
         </div>
       </div>
@@ -520,7 +563,7 @@
 
     let currentPadding = 'standard';
 
-    function setTablePadding(pad) {
+    function setGridPadding(pad) {
         currentPadding = pad;
         localStorage.setItem('changeout_padding_v1', pad);
         applyDisplaySettings();
@@ -943,6 +986,60 @@
       buildAllMobileFilters();
     }
 
+    let currentConfigColKey = null;
+
+    function openCategoryModal(colKey, defaultTitle) {
+      currentConfigColKey = colKey;
+      
+      const modal = document.getElementById('widget-menu-modal');
+      const title = document.getElementById('widget-modal-title');
+      const labelInput = document.getElementById('widget-column-label');
+      const slider = document.getElementById('widget-width-slider');
+      const sliderValText = document.getElementById('widget-slider-value');
+      
+      if (!modal) return;
+      
+      title.textContent = `Configure Column: ${defaultTitle}`;
+      
+      // Look up current text label
+      const labelSpan = document.querySelector(`#results-header [data-col-key="${colKey}"]`);
+      labelInput.value = labelSpan ? labelSpan.textContent.trim() : defaultTitle;
+      
+      // Look up current CSS variable value
+      const computedStyle = getComputedStyle(document.documentElement);
+      const varVal = computedStyle.getPropertyValue(`--col-width-${colKey}`).trim() || "1.0";
+      slider.value = parseFloat(varVal);
+      sliderValText.textContent = varVal;
+      
+      // Update slider value text in real-time on input
+      slider.oninput = function() {
+        sliderValText.textContent = this.value;
+        document.documentElement.style.setProperty(`--col-width-${colKey}`, this.value);
+      };
+      
+      modal.classList.remove('hidden');
+    }
+
+    function closeWidgetModal() {
+      const modal = document.getElementById('widget-menu-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function saveWidgetConfig() {
+      const labelInput = document.getElementById('widget-column-label');
+      const labelVal = labelInput.value.trim();
+      
+      if (currentConfigColKey && labelVal) {
+        // Update header label text
+        const labelSpans = document.querySelectorAll(`#results-header [data-col-key="${currentConfigColKey}"]`);
+        labelSpans.forEach(span => {
+          span.textContent = labelVal;
+        });
+      }
+      
+      closeWidgetModal();
+    }
+
     // Column Visibility controls
     function toggleColumnVisibility(colKey) {
       const checkbox = document.getElementById(`toggle-col-${colKey}`);
@@ -1167,24 +1264,26 @@
 
         // Card HTML Template Construction
         card.innerHTML = `
+          <!-- SECTION 0: SOURCE ROW -->
+          <div data-col-key="source" style="flex: var(--col-width-source);" class="flex flex-col justify-center border-b md:border-b-0 md:border-r border-slate-800 pb-2 md:pb-0">
+            <span class="text-[10px] text-slate-500 font-mono font-semibold">#${row[map.sourceRow] || ""}</span>
+          </div>
+
           <!-- SECTION 1: HERO BRAND & SERIES -->
-          <div onclick="event.stopPropagation(); toggleCartItem(${rowStrEsc})" class="flex-[1.5] flex flex-row md:flex-col justify-between items-start gap-2 border-b md:border-b-0 md:border-r border-slate-800 pb-2 md:pb-0 cursor-pointer">
-            <div class="flex items-center gap-2">
-              <span data-col-key="source" class="text-[10px] text-slate-500 font-mono font-semibold">#${row[map.sourceRow] || ""}</span>
-              <div data-col-key="brand">${brandHtml}</div>
-            </div>
+          <div onclick="event.stopPropagation(); toggleCartItem(${rowStrEsc})" style="flex: var(--col-width-brand);" class="flex flex-row md:flex-col justify-between items-start gap-2 border-b md:border-b-0 md:border-r border-slate-800 pb-2 md:pb-0 cursor-pointer">
+            <div data-col-key="brand">${brandHtml}</div>
             <div data-col-key="series">${badgeHtml}</div>
           </div>
 
           <!-- SECTION 2: CAPACITY & SYSTEM TYPE -->
-          <div class="flex-[1.5] flex flex-col justify-center items-start gap-1 border-b md:border-b-0 md:border-r border-slate-800 pb-2 md:pb-0">
+          <div style="flex: var(--col-width-capacity);" class="flex flex-col justify-center items-start gap-1 border-b md:border-b-0 md:border-r border-slate-800 pb-2 md:pb-0">
             <span data-col-key="capacity" class="font-extrabold text-white text-[15px] md:text-[17px] leading-none">${capText}</span>
             <span data-col-key="type" class="text-[12px] font-semibold text-slate-300 leading-tight">${typeHtml}</span>
             <span data-col-key="stage" class="text-[11px] font-bold text-slate-500 uppercase leading-none">${mechStage}</span>
           </div>
 
           <!-- SECTION 3: EFFICIENCY BLOCK -->
-          <div class="flex-[2] flex flex-col justify-center gap-1 border-b md:border-b-0 md:border-r border-slate-800 pb-2 md:pb-0 pr-2">
+          <div style="flex: var(--col-width-efficiency);" class="flex flex-col justify-center gap-1 border-b md:border-b-0 md:border-r border-slate-800 pb-2 md:pb-0 pr-2">
             ${seer2Html}
             ${eer2Html}
             ${hspf2Html}
@@ -1192,7 +1291,7 @@
           </div>
 
           <!-- SECTION 4: SPEC DETAILS -->
-          <div class="flex-[2] flex flex-col justify-center gap-1 border-b md:border-b-0 md:border-r border-slate-800 pb-2 md:pb-0 pr-2">
+          <div style="flex: var(--col-width-specs);" class="flex flex-col justify-center gap-1 border-b md:border-b-0 md:border-r border-slate-800 pb-2 md:pb-0 pr-2">
             ${coolBtuHtml}
             ${heatBtuHtml}
             ${dimsHtml}
@@ -1200,8 +1299,8 @@
           </div>
 
           <!-- SECTION 5: PRICING -->
-          <div class="flex-[1.5] flex flex-row md:flex-col justify-between md:justify-center items-center md:items-end gap-1">
-            <span data-col-key="price" class="font-extrabold text-emerald-400 font-mono text-[16px] md:text-[18px] tracking-tight">${priceVal || "N/A"}</span>
+          <div style="flex: var(--col-width-price);" class="flex flex-row md:flex-col justify-between md:justify-center items-center md:items-end gap-1">
+            <span data-col-key="price" class="font-extrabold text-emerald-450 font-mono text-[16px] md:text-[18px] tracking-tight">${priceVal || "N/A"}</span>
             ${taxHtml}
           </div>
         `;
