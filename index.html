@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v03.05 | Vertical Silo Architecture | Lines: 2007 -->
+<!-- Changeout Lookup v03.06 | CSS Grid Architecture | Lines: 2021 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v03.05</title>
+  <title>Changeout Lookup v03.06</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -40,27 +40,27 @@
       display: none;
     }
 
-    /* Scrollable Results Canvas with strictly vertical silos */
+    /* Scrollable Results Canvas - Pure CSS Grid Layout */
     #results-canvas {
       max-height: 75vh;
       overflow-y: auto;
       overflow-x: auto;
-      display: flex;
-      flex-direction: row;
-      align-items: stretch;
-      gap: 0.75rem;
+      display: grid;
+      grid-template-columns: 
+        calc(var(--col-width-source) * 1fr)
+        calc(var(--col-width-brand) * 1fr)
+        calc(var(--col-width-capacity) * 1fr)
+        calc(var(--col-width-efficiency) * 1fr)
+        calc(var(--col-width-price) * 1fr);
+      gap: 0.5rem 0.75rem; /* Row gap and column gap */
       padding: 1rem;
+      align-items: stretch;
     }
 
-    .silo-column {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      min-width: 120px;
-      transition: flex-basis 0.2s ease;
-    }
-
-    .silo-header {
+    .grid-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
       height: 3rem;
       display: flex;
       flex-direction: column;
@@ -78,13 +78,14 @@
       user-select: none;
       transition: all 0.15s ease;
     }
-    .silo-header:hover {
+    .grid-header:hover {
       color: #ffffff;
       border-color: #475569;
+      background-color: #1e293b;
     }
 
-    .silo-cell {
-      height: 7rem; /* 112px */
+    .grid-cell {
+      min-height: 7rem; /* 112px */
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -96,18 +97,18 @@
     }
 
     /* Row highlight styles */
-    .silo-cell.row-hovered {
+    .grid-cell.row-hovered {
       background-color: #334155 !important; /* slate-700 hover state */
       border-color: #475569 !important;
     }
 
-    /* Dynamic Silo Density */
-    #results-canvas.pad-compact { gap: 0.35rem; }
-    #results-canvas.pad-compact .silo-cell { height: 6rem; padding: 0.5rem; }
-    #results-canvas.pad-standard { gap: 0.75rem; }
-    #results-canvas.pad-standard .silo-cell { height: 7rem; padding: 0.75rem; }
-    #results-canvas.pad-relaxed { gap: 1.25rem; }
-    #results-canvas.pad-relaxed .silo-cell { height: 8.5rem; padding: 1rem; }
+    /* Dynamic Grid Density */
+    #results-canvas.pad-compact { gap: 0.35rem 0.5rem; }
+    #results-canvas.pad-compact .grid-cell { min-height: 6rem; padding: 0.5rem; }
+    #results-canvas.pad-standard { gap: 0.5rem 0.75rem; }
+    #results-canvas.pad-standard .grid-cell { min-height: 7rem; padding: 0.75rem; }
+    #results-canvas.pad-relaxed { gap: 0.75rem 1.25rem; }
+    #results-canvas.pad-relaxed .grid-cell { min-height: 8.5rem; padding: 1rem; }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col no-scrollbar selection:bg-blue-500 selection:text-white pb-32">
@@ -530,7 +531,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v03.05</span>
+          <span class="text-[8px] font-normal text-blue-400">v03.06</span>
         </span>
       </button>
 
@@ -1141,36 +1142,61 @@
           isVisible = false;
         }
 
-        const elements = document.querySelectorAll(`[data-col-key="${key}"]`);
+        const elements = document.querySelectorAll(`#results-canvas [data-col-key="${key}"]`);
         elements.forEach(el => {
           if (isVisible) el.classList.remove('hidden');
           else el.classList.add('hidden');
         });
       });
 
-      // Show/Hide header groups dynamically based on whether they contain any visible items
-      const groups = {
-        'header-brand-group': ['brand', 'series', 'source'],
-        'header-capacity-group': ['capacity', 'type', 'stage'],
-        'header-efficiency-group': ['seer2', 'eer2', 'hspf2', 'ahri'],
-        'header-dimensions-group': ['coolbtu', 'heatbtu', 'width', 'height', 'page'],
-        'header-price-group': ['price', 'tax']
+      // Calculate which of the 5 Grid Columns should be visible
+      const col1Visible = columnVisibility['source'];
+      const col2Visible = columnVisibility['brand'] || columnVisibility['series'];
+      
+      let capacityVisible = columnVisibility['capacity'];
+      let typeVisible = columnVisibility['type'];
+      let stageVisible = columnVisibility['stage'];
+      if (useCompactLayout) {
+        typeVisible = false;
+        stageVisible = false;
+      }
+      const col3Visible = capacityVisible || typeVisible || stageVisible;
+
+      let seer2Visible = columnVisibility['seer2'];
+      if (useCompactLayout) seer2Visible = false;
+      const col4Visible = seer2Visible || columnVisibility['eer2'] || columnVisibility['hspf2'] || columnVisibility['ahri'] || columnVisibility['coolbtu'] || columnVisibility['heatbtu'] || columnVisibility['width'] || columnVisibility['page'];
+
+      const col5Visible = columnVisibility['price'] || columnVisibility['tax'];
+
+      const colVisibilityMap = {
+        'col-source': col1Visible,
+        'col-brand': col2Visible,
+        'col-capacity': col3Visible,
+        'col-efficiency': col4Visible,
+        'col-price': col5Visible
       };
 
-      Object.keys(groups).forEach(groupId => {
-        const groupEl = document.getElementById(groupId);
-        if (!groupEl) return;
-        
-        const childKeys = groups[groupId];
-        const hasVisibleChild = childKeys.some(key => {
-          let isVisible = columnVisibility[key];
-          if (useCompactLayout && (key === 'series' || key === 'type' || key === 'stage' || key === 'seer2')) isVisible = false;
-          return isVisible;
+      Object.keys(colVisibilityMap).forEach(colClass => {
+        const isVisible = colVisibilityMap[colClass];
+        const elements = document.querySelectorAll(`#results-canvas .${colClass}`);
+        elements.forEach(el => {
+          if (isVisible) el.classList.remove('hidden');
+          else el.classList.add('hidden');
         });
-        
-        if (hasVisibleChild) groupEl.classList.remove('hidden', 'md:hidden');
-        else groupEl.classList.add('hidden', 'md:hidden');
       });
+
+      // Update gridTemplateColumns on results-canvas
+      const canvas = document.getElementById('results-canvas');
+      if (canvas) {
+        const template = [
+          col1Visible ? 'calc(var(--col-width-source) * 1fr)' : '0px',
+          col2Visible ? 'calc(var(--col-width-brand) * 1fr)' : '0px',
+          col3Visible ? 'calc(var(--col-width-capacity) * 1fr)' : '0px',
+          col4Visible ? 'calc(var(--col-width-efficiency) * 1fr)' : '0px',
+          col5Visible ? 'calc(var(--col-width-price) * 1fr)' : '0px'
+        ].join(' ');
+        canvas.style.gridTemplateColumns = template;
+      }
     }
 
     // Smart Headers: Update header styles if filters are active (displays selected filters length)
@@ -1178,8 +1204,7 @@
       const groups = {
         'header-brand-group': ['brand', 'series'],
         'header-capacity-group': ['capacity', 'type', 'stage'],
-        'header-efficiency-group': ['seer2', 'eer2', 'hspf2', 'ahri'],
-        'header-dimensions-group': ['coolbtu', 'heatbtu', 'width', 'height', 'page'],
+        'header-efficiency-group': ['seer2', 'eer2', 'hspf2', 'ahri', 'coolbtu', 'heatbtu', 'width', 'page'],
         'header-price-group': ['price', 'tax']
       };
       
@@ -1230,39 +1255,33 @@
     };
 
     // Render Table logic dynamically generating cards for all 18 database indexes
+    // Render Grid logic dynamically generating grid cells for all 18 database indexes
     function renderTable(dataToRender) {
       const canvas = document.getElementById('results-canvas');
       if (!canvas) return;
       canvas.innerHTML = '';
 
       if (dataToRender.length === 0) {
-        canvas.innerHTML = `<div class="w-full py-12 text-center text-sm text-slate-500 font-semibold bg-slate-850 border border-slate-750/50 rounded-xl">No results match your criteria.</div>`;
+        canvas.innerHTML = `<div class="col-span-5 py-12 text-center text-sm text-slate-500 font-semibold bg-slate-850 border border-slate-750/50 rounded-xl">No results match your criteria.</div>`;
         return;
       }
 
-      // Create the 5 Column Silos
+      // Create the 5 Column Headers
       const colSpecs = [
-        { key: 'source', title: 'Source Row', flexVar: '--col-width-source' },
-        { key: 'brand', title: 'Brand & Tier', flexVar: '--col-width-brand' },
-        { key: 'capacity', title: 'Capacity & Stage', flexVar: '--col-width-capacity' },
-        { key: 'efficiency', title: 'Efficiency', flexVar: '--col-width-efficiency' },
-        { key: 'price', title: 'Price', flexVar: '--col-width-price' }
+        { key: 'source', id: 'header-source-group', title: 'Source Row', colClass: 'col-source' },
+        { key: 'brand', id: 'header-brand-group', title: 'Brand & Tier', colClass: 'col-brand' },
+        { key: 'capacity', id: 'header-capacity-group', title: 'Capacity & Stage', colClass: 'col-capacity' },
+        { key: 'efficiency', id: 'header-efficiency-group', title: 'Efficiency', colClass: 'col-efficiency' },
+        { key: 'price', id: 'header-price-group', title: 'Price', colClass: 'col-price' }
       ];
 
-      const columns = colSpecs.map(spec => {
-        const colDiv = document.createElement('div');
-        colDiv.className = 'silo-column';
-        colDiv.style.flex = `var(${spec.flexVar})`;
-        colDiv.setAttribute('data-col-key', spec.key);
-
-        // Header Block
+      colSpecs.forEach(spec => {
         const header = document.createElement('div');
-        header.className = 'silo-header';
+        header.id = spec.id;
+        header.className = `grid-header ${spec.colClass}`;
         header.onclick = () => openCategoryModal(spec.key, spec.title);
         header.innerHTML = `<span data-col-key="${spec.key}">${spec.title}</span>`;
-        colDiv.appendChild(header);
-
-        return { spec, colDiv };
+        canvas.appendChild(header);
       });
 
       // Populate cells
@@ -1272,14 +1291,14 @@
 
         // Cell Class based on cart status
         const baseCellClass = isInCart
-          ? "silo-cell border-blue-500/50 bg-blue-950/20 text-white cursor-pointer"
-          : "silo-cell border-slate-750 bg-slate-850 text-slate-300 hover:bg-slate-800 hover:border-slate-700 cursor-pointer";
+          ? "grid-cell border border-blue-500/50 bg-blue-950/20 text-white cursor-pointer"
+          : "grid-cell border border-slate-750 bg-slate-850 text-slate-300 hover:bg-slate-800 hover:border-slate-700 cursor-pointer";
 
         // Generate data html for each silo
-        // Silo 1: Source Row
+        // Cell 1: Source Row
         const sourceHtml = `<span class="text-[10px] text-slate-500 font-mono font-semibold">#${row[map.sourceRow] || ""}</span>`;
 
-        // Silo 2: Brand & Tier
+        // Cell 2: Brand & Tier
         let brandVal = String(row[map.brand] || "").trim().toUpperCase();
         let brandHtml = row[map.brand] || "";
         if (brandVal === "CARRIER") brandHtml = `<img src="./carrier.png" alt="Carrier" class="h-6 md:h-8 w-auto object-contain transition-transform" title="Toggle Selection">`;
@@ -1298,7 +1317,7 @@
           <div data-col-key="series">${badgeHtml}</div>
         `;
 
-        // Silo 3: Capacity & Stage
+        // Cell 3: Capacity & Stage
         let capText = String(row[map.capacity] || "").trim();
         if (useAbbreviations) capText = capText.replace(/Ton/gi, "T");
 
@@ -1310,7 +1329,7 @@
           <span data-col-key="stage" class="text-[11px] font-bold text-slate-500 uppercase leading-none">${mechStage}</span>
         `;
 
-        // Silo 4: Efficiency & Specs (Combines both blocks for rich details)
+        // Cell 4: Efficiency & Specs (Combines both blocks for rich details)
         let seer2Html = row[map.seer2] ? `<div data-col-key="seer2" class="flex items-center justify-start gap-2 text-[11px] font-mono text-blue-400 font-bold"><span>SEER2:</span><span>${row[map.seer2]}</span></div>` : '';
         let eer2Html = row[map.eer2] ? `<div data-col-key="eer2" class="flex items-center justify-start gap-2 text-[11px] font-mono text-slate-355"><span>EER2:</span><span>${row[map.eer2]}</span></div>` : '';
         let hspf2Html = (row[map.hspf2] && String(row[map.type]).toUpperCase() !== "STRAIGHT COOL" && String(row[map.type]).toUpperCase() !== "AC") 
@@ -1341,7 +1360,7 @@
           ${pageHtml}
         `;
 
-        // Silo 5: Price
+        // Cell 5: Price
         let priceVal = row[map.price] || "";
         if (typeof priceVal === "number") priceVal = "$" + Math.round(priceVal).toLocaleString();
         else if (priceVal !== "" && !isNaN(Number(priceVal))) priceVal = "$" + Math.round(Number(priceVal)).toLocaleString();
@@ -1360,12 +1379,12 @@
           priceHtml
         ];
 
-        // Create cells in each column
-        columns.forEach((col, colIdx) => {
+        // Create cells in each column directly inside CSS Grid results-canvas
+        columnContents.forEach((htmlContent, colIdx) => {
           const cell = document.createElement('div');
-          cell.className = baseCellClass;
+          cell.className = `grid-cell col-${colSpecs[colIdx].key}`;
           cell.setAttribute('data-row-index', rowIndex);
-          cell.innerHTML = columnContents[colIdx];
+          cell.innerHTML = htmlContent;
 
           // Setup interactions
           cell.onmouseenter = () => highlightRow(rowIndex, true);
@@ -1375,13 +1394,8 @@
             toggleCartItem(row);
           };
 
-          col.colDiv.appendChild(cell);
+          canvas.appendChild(cell);
         });
-      });
-
-      // Append columns to canvas
-      columns.forEach(col => {
-        canvas.appendChild(col.colDiv);
       });
 
       // Apply visibility filters to card sub-elements
