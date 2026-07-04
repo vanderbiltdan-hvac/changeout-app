@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v02.03 | Mega-Column Compact Mode & Stacked Headers -->
+<!-- Changeout Lookup v02.04 | Header Stacking Fix & Font Size Bump -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v02.03</title>
+  <title>Changeout Lookup v02.04</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -54,8 +54,9 @@
     #results-table.pad-relaxed th, #results-table.pad-relaxed td { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
     .freeze-col { position: sticky; left: 0; z-index: 15; box-shadow: 2px 0 5px -2px rgba(0,0,0,0.5); }
     th.freeze-col { z-index: 25; }
-    #results-table.layout-compact .head-desktop { display: none; }
-    #results-table.layout-compact .head-compact { display: flex; }
+    #results-table.layout-compact .head-desktop { display: none !important; }
+    #results-table.layout-compact .head-compact { display: flex !important; }
+    .head-compact { display: none; }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col no-scrollbar selection:bg-blue-500 selection:text-white pb-32">
@@ -148,7 +149,7 @@
             <tr class="bg-slate-900 text-slate-400 text-[10px] uppercase font-bold tracking-wider border-b border-slate-700 select-none">
               <th id="th-brand" onclick="openFilterFor('brand')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap min-w-[160px] align-top">
                   <span class="head-desktop">Brand</span>
-                  <div class="head-compact hidden flex-col items-start gap-1 w-full">
+                  <div class="head-compact flex-col items-start gap-1 w-full">
                       <span class="text-slate-300 font-bold uppercase tracking-wider">Brand</span>
                       <span onclick="event.stopPropagation(); openFilterFor('series')" class="text-[10px] text-slate-500 hover:text-blue-400 font-bold uppercase tracking-wider">Tier</span>
                   </div>
@@ -156,7 +157,7 @@
               <th id="th-series" onclick="openFilterFor('series')" class="py-3 px-4 cursor-pointer hover:bg-slate-805 transition whitespace-nowrap">Series / Tier</th>
               <th id="th-capacity" onclick="openFilterFor('capacity')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap min-w-[80px] max-w-[100px] leading-tight align-top">
                   <span class="head-desktop">Capacity</span>
-                  <div class="head-compact hidden flex-col items-start gap-1 w-full">
+                  <div class="head-compact flex-col items-start gap-1 w-full">
                       <span class="text-slate-300 font-bold uppercase tracking-wider">Capacity</span>
                       <span onclick="event.stopPropagation(); openFilterFor('type')" class="text-[10px] text-slate-500 hover:text-blue-400 font-bold uppercase tracking-wider">Type</span>
                       <span onclick="event.stopPropagation(); openFilterFor('stage')" class="text-[10px] text-slate-500 hover:text-blue-400 font-bold uppercase tracking-wider">Stage</span>
@@ -167,7 +168,7 @@
               <th id="th-stage" onclick="openFilterFor('stage')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[85px] leading-tight">Mechanical Stage</th>
               <th id="th-style" onclick="openFilterFor('style')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap min-w-[100px] max-w-[130px] leading-tight break-words align-top">
                   <span class="head-desktop">Style</span>
-                  <div class="head-compact hidden flex-col items-start gap-1 w-full">
+                  <div class="head-compact flex-col items-start gap-1 w-full">
                       <span class="text-slate-300 font-bold uppercase tracking-wider">Style</span>
                       <span onclick="event.stopPropagation(); openFilterFor('seer2')" class="text-[10px] text-slate-500 hover:text-blue-400 font-bold uppercase tracking-wider">SEER2</span>
                   </div>
@@ -488,7 +489,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v02.03</span>
+          <span class="text-[8px] font-normal text-blue-400">v02.04</span>
         </span>
       </button>
 
@@ -1068,10 +1069,10 @@
 
         if (useCompactLayout) {
             tdCells.push(`<td class="py-2 px-4 whitespace-nowrap align-top border-r border-slate-700/50 bg-slate-800/20">
-                <div class="flex flex-col items-start gap-1">
-                    <span class="font-bold text-white text-[14px] leading-none">${capText}</span>
-                    <span class="text-[11px] font-semibold text-slate-300 leading-none">${mainType}</span>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase leading-none">${mechStage}</span>
+                <div class="flex flex-col items-start gap-1.5">
+                    <span class="font-bold text-white text-[16px] md:text-[18px] leading-none">${capText}</span>
+                    <span class="text-[12px] md:text-[14px] font-semibold text-slate-300 leading-none">${mainType}</span>
+                    <span class="text-[11px] md:text-[12px] font-bold text-slate-500 uppercase leading-none">${mechStage}</span>
                 </div>
             </td>`);
             tdCells.push(`<td class="hidden"></td>`); // Type sync
@@ -1102,9 +1103,9 @@
 
         if (useCompactLayout) {
             tdCells.push(`<td class="py-2 px-4 whitespace-nowrap align-top border-r border-slate-700/50 bg-slate-800/20">
-                <div class="flex flex-col items-start gap-1">
-                    <span class="font-bold text-white text-[12px] leading-none">${styleText || "STD"}</span>
-                    <span class="text-[11px] font-mono font-bold text-blue-400 leading-none">${row[7] || ""} <span class="text-[9px] text-slate-500 font-sans">SEER2</span></span>
+                <div class="flex flex-col items-start gap-1.5">
+                    <span class="font-bold text-white text-[14px] md:text-[16px] leading-none">${styleText || "STD"}</span>
+                    <span class="text-[13px] md:text-[14px] font-mono font-bold text-blue-400 leading-none">${row[7] || ""} <span class="text-[10px] text-slate-500 font-sans">SEER2</span></span>
                 </div>
             </td>`);
             tdCells.push(`<td class="hidden"></td>`); // SEER2 sync
@@ -1124,7 +1125,7 @@
         let priceVal = row[16] || "";
         if (typeof priceVal === "number") priceVal = "$" + Math.round(priceVal).toLocaleString();
         else if (priceVal !== "" && !isNaN(Number(priceVal))) priceVal = "$" + Math.round(Number(priceVal)).toLocaleString();
-        tdCells.push(`<td class="py-3 px-4 text-right font-bold text-emerald-455 font-mono whitespace-nowrap">${priceVal || "N/A"}</td>`); // PRICE
+        tdCells.push(`<td class="py-3 px-4 text-right font-bold text-emerald-455 font-mono whitespace-nowrap text-[16px] md:text-[18px]">${priceVal || "N/A"}</td>`); // PRICE
 
         tdCells.push(`<td class="py-3 px-4 font-semibold text-slate-300 whitespace-nowrap">${row[17] || ""}</td>`); // TAX
 
