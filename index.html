@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v04.02 | Live Sliders & Split Font Controls | Lines: 2128 -->
+<!-- Changeout Lookup v04.03 | Floating Ribbon, Full-Row Highlight & Memory Lock -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v04.02</title>
+  <title>Changeout Lookup v04.03</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -53,18 +53,22 @@
       display: none;
     }
 
-    /* Scrollable Results Canvas - Pure CSS Grid Layout (Spreadsheet Mode) */
+    /* Kill focus rings globally on all interactive elements */
+    *, *:focus, *:active, button, img, select, input, .grid-cell {
+      outline: none !important;
+    }
+
+    /* Scrollable Results Canvas - Pure CSS Grid Layout (Floating Ribbon Mode) */
     #results-canvas {
       max-height: 75vh;
       overflow-y: auto;
       overflow-x: auto;
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 0px; /* No gaps for traditional spreadsheet look */
+      row-gap: 8px; /* Horizontal gap between ribbons */
+      column-gap: 0px; /* No gaps within columns of the ribbon */
       padding: 1rem;
       align-items: stretch;
-      border-left: 1px solid #334155;
-      border-top: 1px solid #334155;
     }
 
     .grid-header {
@@ -77,8 +81,6 @@
       justify-content: center;
       padding: 0.5rem 0.75rem;
       background-color: #0f172a; /* Slate 900 */
-      border-right: 1px solid #334155;
-      border-bottom: 2px solid #475569;
       font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
@@ -98,9 +100,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 4px 8px; /* Strict tight spreadsheet padding */
-      border-right: 1px solid #334155;
-      border-bottom: 1px solid #334155;
+      padding: 4px 8px; /* Tight spreadsheet padding */
       transition: all 0.15s ease;
       overflow: hidden;
       user-select: none;
@@ -111,9 +111,35 @@
       background-color: #334155 !important; /* slate-700 hover state */
     }
 
-    /* Dynamic Grid Density (Only adjusting min-height and padding inside the cells, no gaps) */
+    /* Floating Ribbon cell edges rounding classes */
+    .first-col-cell {
+      border-top-left-radius: 8px !important;
+      border-bottom-left-radius: 8px !important;
+    }
+    .last-col-cell {
+      border-top-right-radius: 8px !important;
+      border-bottom-right-radius: 8px !important;
+    }
+
+    /* Soft Blue selection ribbon style */
+    .selected-ribbon {
+      background-color: rgba(59, 130, 246, 0.15) !important;
+      border-top: 1px solid rgba(59, 130, 246, 0.4) !important;
+      border-bottom: 1px solid rgba(59, 130, 246, 0.4) !important;
+    }
+    .selected-ribbon.first-col-cell {
+      border-left: 1px solid rgba(59, 130, 246, 0.4) !important;
+    }
+    .selected-ribbon.last-col-cell {
+      border-right: 1px solid rgba(59, 130, 246, 0.4) !important;
+    }
+
+    /* Dynamic Grid Density adjustments (gaps and heights) */
+    #results-canvas.pad-compact { row-gap: 4px; }
     #results-canvas.pad-compact .grid-cell { min-height: 2.5rem; padding: 2px 4px; }
+    #results-canvas.pad-standard { row-gap: 8px; }
     #results-canvas.pad-standard .grid-cell { min-height: 3.5rem; padding: 4px 8px; }
+    #results-canvas.pad-relaxed { row-gap: 12px; }
     #results-canvas.pad-relaxed .grid-cell { min-height: 4.5rem; padding: 8px 12px; }
   </style>
 </head>
@@ -592,7 +618,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v04.02</span>
+          <span class="text-[8px] font-normal text-blue-400">v04.03</span>
         </span>
       </button>
 
@@ -1143,16 +1169,17 @@
       };
 
       // 2. Font Sizes (Live Updates)
-      const rawHeaderFont = computedStyle.getPropertyValue(`--header-font-${colKey}`).trim() || "10px";
-      headerFontSlider.value = parseFloat(rawHeaderFont) || 10;
+      const rawHeaderFont = computedStyle.getPropertyValue(`--header-font-${colKey}`).trim() || "16px";
+      headerFontSlider.value = parseFloat(rawHeaderFont) || 16;
       headerFontValText.textContent = headerFontSlider.value + 'px';
       headerFontSlider.oninput = function() {
         headerFontValText.textContent = this.value + 'px';
         document.documentElement.style.setProperty(`--header-font-${colKey}`, this.value + 'px');
       };
 
-      const rawDataFont = computedStyle.getPropertyValue(`--data-font-${colKey}`).trim() || "11px";
-      dataFontSlider.value = parseFloat(rawDataFont) || 11;
+      const defaultDataFontVal = colKey === 'price' ? "30px" : "16px";
+      const rawDataFont = computedStyle.getPropertyValue(`--data-font-${colKey}`).trim() || defaultDataFontVal;
+      dataFontSlider.value = parseFloat(rawDataFont) || (colKey === 'price' ? 30 : 16);
       dataFontValText.textContent = dataFontSlider.value + 'px';
       dataFontSlider.oninput = function() {
         dataFontValText.textContent = this.value + 'px';
@@ -1160,7 +1187,7 @@
       };
 
       // 3. Alignments
-      const rawAlignHoriz = computedStyle.getPropertyValue(`--align-horiz-${colKey}`).trim() || "start";
+      const rawAlignHoriz = computedStyle.getPropertyValue(`--align-horiz-${colKey}`).trim() || "center";
       alignHorizSelect.value = rawAlignHoriz;
 
       const rawAlignVert = computedStyle.getPropertyValue(`--align-vert-${colKey}`).trim() || "center";
@@ -1239,6 +1266,18 @@
         document.documentElement.style.setProperty(`--bg-color-${colKey}`, bgColorVal);
         document.documentElement.style.setProperty(`--align-text-${colKey}`, textAlignVal);
 
+        // Update columnStyles registry and persist it
+        columnStyles[colKey] = {
+          width: widthVal,
+          headerFont: headerFontVal,
+          dataFont: dataFontVal,
+          alignHoriz: alignHorizVal,
+          alignVert: alignVertVal,
+          bgColor: bgColorVal,
+          textAlign: textAlignVal
+        };
+        localStorage.setItem('changeout_styles_v1', JSON.stringify(columnStyles));
+
         // Apply visual updates to canvas track layout immediately
         applyColumnVisibility();
       }
@@ -1270,24 +1309,48 @@
         localStorage.setItem('changeout_columns_v1', JSON.stringify(columnVisibility));
     }
 
+    let columnStyles = {};
+
+    function loadColumnStyles() {
+      const saved = localStorage.getItem('changeout_styles_v1');
+      if (saved) {
+        try {
+          columnStyles = JSON.parse(saved);
+          Object.keys(columnStyles).forEach(colKey => {
+            const styles = columnStyles[colKey];
+            if (styles.width) document.documentElement.style.setProperty(`--col-width-${colKey}`, styles.width);
+            if (styles.headerFont) document.documentElement.style.setProperty(`--header-font-${colKey}`, styles.headerFont);
+            if (styles.dataFont) document.documentElement.style.setProperty(`--data-font-${colKey}`, styles.dataFont);
+            if (styles.alignHoriz) document.documentElement.style.setProperty(`--align-horiz-${colKey}`, styles.alignHoriz);
+            if (styles.alignVert) document.documentElement.style.setProperty(`--align-vert-${colKey}`, styles.alignVert);
+            if (styles.bgColor) document.documentElement.style.setProperty(`--bg-color-${colKey}`, styles.bgColor);
+            if (styles.textAlign) document.documentElement.style.setProperty(`--align-text-${colKey}`, styles.textAlign);
+          });
+        } catch (e) {
+          console.error("Error loading column styles:", e);
+        }
+      }
+    }
+
     function initDynamicColumnStyles() {
       const styleEl = document.createElement('style');
       let cssRules = '';
       filterConfigs.forEach(cfg => {
+        const defaultDataFont = cfg.key === 'price' ? '30px' : '16px';
         cssRules += `
           .col-${cfg.key}.grid-header {
-            font-size: var(--header-font-${cfg.key}, 10px) !important;
-            align-items: var(--align-horiz-${cfg.key}, start) !important;
+            font-size: var(--header-font-${cfg.key}, 16px) !important;
+            align-items: var(--align-horiz-${cfg.key}, center) !important;
             justify-content: var(--align-vert-${cfg.key}, center) !important;
             background-color: var(--bg-color-${cfg.key}, #0f172a) !important;
-            text-align: var(--align-text-${cfg.key}, left) !important;
+            text-align: var(--align-text-${cfg.key}, center) !important;
           }
           .col-${cfg.key}.grid-cell {
-            font-size: var(--data-font-${cfg.key}, 11px) !important;
-            align-items: var(--align-horiz-${cfg.key}, start) !important;
+            font-size: var(--data-font-${cfg.key}, ${defaultDataFont}) !important;
+            align-items: var(--align-horiz-${cfg.key}, center) !important;
             justify-content: var(--align-vert-${cfg.key}, center) !important;
             background-color: var(--bg-color-${cfg.key}, #1e293b) !important;
-            text-align: var(--align-text-${cfg.key}, left) !important;
+            text-align: var(--align-text-${cfg.key}, center) !important;
           }
         `;
       });
@@ -1296,6 +1359,7 @@
     }
 
     function loadColumnSettings() {
+        loadColumnStyles();
         initDynamicColumnStyles();
         const saved = localStorage.getItem('changeout_columns_v1');
         if (saved) {
@@ -1413,10 +1477,13 @@
       const activeCols = getActiveColumns();
 
       // Render Headers
-      activeCols.forEach(cfg => {
+      activeCols.forEach((cfg, colIdx) => {
         const header = document.createElement('div');
         header.id = `header-${cfg.key}-group`;
-        header.className = `grid-header col-${cfg.key}`;
+        let headerClass = `grid-header col-${cfg.key}`;
+        if (colIdx === 0) headerClass += ' first-col-cell';
+        if (colIdx === activeCols.length - 1) headerClass += ' last-col-cell';
+        header.className = headerClass;
         header.onclick = () => openCategoryModal(cfg.key, cfg.name);
         header.innerHTML = `<span data-col-key="${cfg.key}">${cfg.name}</span>`;
         canvas.appendChild(header);
@@ -1428,12 +1495,15 @@
 
         // Cell Class based on cart status
         const baseCellClass = isInCart
-          ? "grid-cell border border-blue-500/50 bg-blue-950/20 text-white cursor-pointer"
-          : "grid-cell border border-slate-750 bg-slate-850 text-slate-300 hover:bg-slate-800 hover:border-slate-700 cursor-pointer";
+          ? "grid-cell cursor-pointer selected-ribbon text-white"
+          : "grid-cell cursor-pointer bg-slate-850 text-slate-300 hover:bg-slate-800 transition-colors";
 
-        activeCols.forEach(cfg => {
+        activeCols.forEach((cfg, colIdx) => {
           const cell = document.createElement('div');
-          cell.className = `${baseCellClass} col-${cfg.key}`;
+          let cellClass = `${baseCellClass} col-${cfg.key}`;
+          if (colIdx === 0) cellClass += ' first-col-cell';
+          if (colIdx === activeCols.length - 1) cellClass += ' last-col-cell';
+          cell.className = cellClass;
           cell.setAttribute('data-row-index', rowIndex);
 
           // Get the raw value for this cell
