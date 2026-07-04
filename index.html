@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v01.22 | Table Font Scaler & Platts Logo Lock -->
+<!-- Changeout Lookup v01.23 | Layout Cleanup, Text Wrap & Logo Protection -->
 <!DOCTYPE html>
 <html lang="en" style="overscroll-behavior: none;">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Changeout Lookup v01.22</title>
+  <title>Changeout Lookup v01.23</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -90,15 +90,6 @@
   <!-- MAIN CONTAINER -->
   <main class="w-full px-2 md:px-4 py-6 flex-grow flex flex-col space-y-6">
 
-    <!-- Main Filter Hub Trigger (Mobile & Desktop) -->
-    <div class="block w-full">
-      <button onclick="openMobileFilterHubAll()" class="w-full bg-blue-600 hover:bg-blue-500 active:scale-98 transition text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center space-x-2 shadow-lg border border-blue-500/30">
-        <span>🔎</span>
-        <span>Filter Equipment Options</span>
-        <span id="mobile-filter-badge" class="bg-white text-blue-600 font-extrabold text-xs px-2 py-0.5 rounded-full shadow-inner hidden">0</span>
-      </button>
-    </div>
-
     <!-- THE LIVE RESULTS CANVAS -->
     <section class="bg-slate-800 border border-slate-700 rounded-2xl flex-grow overflow-hidden flex flex-col shadow-xl">
       <!-- Live Results Header -->
@@ -119,9 +110,9 @@
             <tr class="bg-slate-900 text-slate-400 text-[10px] uppercase font-bold tracking-wider border-b border-slate-700 select-none">
               <th id="th-add" class="py-3 px-4 text-center w-16 whitespace-nowrap">Add</th>
               <th id="th-source" onclick="openFilterFor('source')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Source Row</th>
-              <th id="th-capacity" onclick="openFilterFor('capacity')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Capacity</th>
+              <th id="th-capacity" onclick="openFilterFor('capacity')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[80px] max-w-[100px] leading-tight">Capacity</th>
               <th id="th-type" onclick="openFilterFor('type')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">System Type</th>
-              <th id="th-brand" onclick="openFilterFor('brand')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Brand</th>
+              <th id="th-brand" onclick="openFilterFor('brand')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap min-w-[130px]">Brand</th>
               <th id="th-series" onclick="openFilterFor('series')" class="py-3 px-4 cursor-pointer hover:bg-slate-805 transition whitespace-nowrap">Series / Tier</th>
               <th id="th-stage" onclick="openFilterFor('stage')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Mechanical Stage</th>
               <th id="th-style" onclick="openFilterFor('style')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Application / Style</th>
@@ -460,7 +451,7 @@
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
           <span>Lookup</span>
-          <span class="text-[8px] font-normal text-blue-400">v01.22</span>
+          <span class="text-[8px] font-normal text-blue-400">v01.23</span>
         </span>
       </button>
 
@@ -560,7 +551,7 @@
       price: [],
       tax: []
     };
- 
+
     // Settings State
     const settings = {};
 
@@ -945,7 +936,7 @@
         // Index 0: Source Row
         tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${row[0] || ""}</td>`);
         // Index 1: Capacity
-        tdCells.push(`<td class="py-3 px-4 font-medium text-slate-355 whitespace-nowrap">${row[1] || ""}</td>`);
+        tdCells.push(`<td class="py-3 px-4 whitespace-normal break-words min-w-[80px] max-w-[100px] leading-tight font-medium text-slate-355">${row[1] || ""}</td>`);
         // Index 2: System Type
         tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${row[2] || ""}</td>`);
         
@@ -959,7 +950,7 @@
         } else {
             brandHtml = `<span class="font-bold text-white">${row[3] || ""}</span>`;
         }
-        tdCells.push('<td class="py-3 px-4 font-semibold text-white whitespace-nowrap">' + brandHtml + '</td>');
+        tdCells.push('<td class="py-3 px-4 min-w-[130px] font-semibold text-white">' + brandHtml + '</td>');
         
         // Index 4: Series / Tier (Badge button markup)
         const series = String(row[4] || "").toUpperCase();
