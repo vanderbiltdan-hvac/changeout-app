@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v03.08 | Mobile Scroll Fix (minmax) | Lines: 2016 -->
+<!-- Changeout Lookup v04.00 | Flat Spreadsheet Architecture | Lines: 1932 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v03.08</title>
+  <title>Changeout Lookup v04.00</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -17,10 +17,23 @@
   <style>
     :root {
       --col-width-source: 0.5fr;
+      --col-width-capacity: 1.0fr;
+      --col-width-type: 1.2fr;
       --col-width-brand: 1.5fr;
-      --col-width-capacity: 1.5fr;
-      --col-width-efficiency: 2.2fr;
+      --col-width-series: 1.5fr;
+      --col-width-stage: 1.0fr;
+      --col-width-style: 1.0fr;
+      --col-width-seer2: 1.0fr;
+      --col-width-eer2: 1.0fr;
+      --col-width-hspf2: 1.0fr;
+      --col-width-ahri: 1.2fr;
+      --col-width-coolbtu: 1.2fr;
+      --col-width-heatbtu: 1.2fr;
+      --col-width-page: 0.8fr;
+      --col-width-width: 0.8fr;
+      --col-width-height: 0.8fr;
       --col-width-price: 1.5fr;
+      --col-width-tax: 1.2fr;
     }
     body {
       font-family: 'Inter', sans-serif;
@@ -46,7 +59,7 @@
       overflow-y: auto;
       overflow-x: auto;
       display: grid;
-      grid-template-columns: minmax(120px, var(--col-width-source)) minmax(120px, var(--col-width-brand)) minmax(120px, var(--col-width-capacity)) minmax(120px, var(--col-width-efficiency)) minmax(120px, var(--col-width-price));
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
       gap: 0.5rem 0.75rem; /* Row gap and column gap */
       padding: 1rem;
       align-items: stretch;
@@ -63,7 +76,7 @@
       padding: 0.5rem 0.75rem;
       background-color: #0f172a; /* Slate 900 */
       border: 1px solid #1e293b; /* Slate 800 */
-      border-radius: 0.75rem; /* rounded-xl */
+      border-radius: 0.5rem; /* rounded-lg */
       font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
@@ -80,12 +93,12 @@
     }
 
     .grid-cell {
-      min-height: 7rem; /* 112px */
+      min-height: 3.5rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 0.75rem;
-      border-radius: 0.75rem; /* rounded-xl */
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.375rem; /* rounded-md */
       transition: all 0.15s ease;
       overflow: hidden;
       user-select: none;
@@ -98,12 +111,12 @@
     }
 
     /* Dynamic Grid Density */
-    #results-canvas.pad-compact { gap: 0.35rem 0.5rem; }
-    #results-canvas.pad-compact .grid-cell { min-height: 6rem; padding: 0.5rem; }
+    #results-canvas.pad-compact { gap: 0.25rem 0.35rem; }
+    #results-canvas.pad-compact .grid-cell { min-height: 2.75rem; padding: 0.25rem 0.5rem; }
     #results-canvas.pad-standard { gap: 0.5rem 0.75rem; }
-    #results-canvas.pad-standard .grid-cell { min-height: 7rem; padding: 0.75rem; }
-    #results-canvas.pad-relaxed { gap: 0.75rem 1.25rem; }
-    #results-canvas.pad-relaxed .grid-cell { min-height: 8.5rem; padding: 1rem; }
+    #results-canvas.pad-standard .grid-cell { min-height: 3.5rem; padding: 0.5rem 0.75rem; }
+    #results-canvas.pad-relaxed { gap: 0.75rem 1.0rem; }
+    #results-canvas.pad-relaxed .grid-cell { min-height: 4.5rem; padding: 0.75rem 1.0rem; }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col no-scrollbar selection:bg-blue-500 selection:text-white pb-32">
@@ -526,7 +539,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v03.08</span>
+          <span class="text-[8px] font-normal text-blue-400">v04.00</span>
         </span>
       </button>
 
@@ -989,26 +1002,6 @@
 
     let currentConfigColKey = null;
 
-    const parentVarMapping = {
-      source: 'source',
-      brand: 'brand',
-      series: 'brand',
-      capacity: 'capacity',
-      type: 'capacity',
-      stage: 'capacity',
-      seer2: 'efficiency',
-      eer2: 'efficiency',
-      hspf2: 'efficiency',
-      ahri: 'efficiency',
-      coolbtu: 'efficiency',
-      heatbtu: 'efficiency',
-      width: 'efficiency',
-      height: 'efficiency',
-      page: 'efficiency',
-      price: 'price',
-      tax: 'price'
-    };
-
     const headerFilterMapping = {
       source: { defaultCategory: 'source', groupKey: null },
       brand: { defaultCategory: 'brand', groupKey: 'brand-tier' },
@@ -1043,14 +1036,14 @@
       
       title.textContent = `Configure Column: ${defaultTitle}`;
       
-      // Look up current text label
-      const labelSpan = document.querySelector(`#results-header [data-col-key="${colKey}"]`);
+      // Look up current text label inside results-canvas headers
+      const labelSpan = document.querySelector(`#results-canvas [data-col-key="${colKey}"]`);
       labelInput.value = labelSpan ? labelSpan.textContent.trim() : defaultTitle;
       
       // Look up current CSS variable value
-      const varKey = parentVarMapping[colKey] || colKey;
+      const varKey = colKey;
       const computedStyle = getComputedStyle(document.documentElement);
-      const varVal = computedStyle.getPropertyValue(`--col-width-${varKey}`).trim() || "1.0";
+      const varVal = computedStyle.getPropertyValue(`--col-width-${varKey}`).trim() || "1.0fr";
       slider.value = parseFloat(varVal);
       sliderValText.textContent = varVal;
       
@@ -1074,7 +1067,7 @@
       
       if (currentConfigColKey && labelVal) {
         // Update header label text
-        const labelSpans = document.querySelectorAll(`#results-header [data-col-key="${currentConfigColKey}"]`);
+        const labelSpans = document.querySelectorAll(`#results-canvas [data-col-key="${currentConfigColKey}"]`);
         labelSpans.forEach(span => {
           span.textContent = labelVal;
         });
@@ -1127,6 +1120,16 @@
         document.documentElement.style.setProperty('--' + prop, val == 0 ? 'auto' : val + 'px');
     }
 
+    function getActiveColumns() {
+      return filterConfigs.filter(cfg => {
+        let isVisible = columnVisibility[cfg.key];
+        if (useCompactLayout && (cfg.key === 'series' || cfg.key === 'type' || cfg.key === 'stage' || cfg.key === 'seer2')) {
+          isVisible = false;
+        }
+        return isVisible;
+      });
+    }
+
     function applyColumnVisibility() {
       // Loop over every key in the columnVisibility object
       Object.keys(columnVisibility).forEach(key => {
@@ -1137,43 +1140,7 @@
           isVisible = false;
         }
 
-        const elements = document.querySelectorAll(`#results-canvas [data-col-key="${key}"]`);
-        elements.forEach(el => {
-          if (isVisible) el.classList.remove('hidden');
-          else el.classList.add('hidden');
-        });
-      });
-
-      // Calculate which of the 5 Grid Columns should be visible
-      const col1Visible = columnVisibility['source'];
-      const col2Visible = columnVisibility['brand'] || columnVisibility['series'];
-      
-      let capacityVisible = columnVisibility['capacity'];
-      let typeVisible = columnVisibility['type'];
-      let stageVisible = columnVisibility['stage'];
-      if (useCompactLayout) {
-        typeVisible = false;
-        stageVisible = false;
-      }
-      const col3Visible = capacityVisible || typeVisible || stageVisible;
-
-      let seer2Visible = columnVisibility['seer2'];
-      if (useCompactLayout) seer2Visible = false;
-      const col4Visible = seer2Visible || columnVisibility['eer2'] || columnVisibility['hspf2'] || columnVisibility['ahri'] || columnVisibility['coolbtu'] || columnVisibility['heatbtu'] || columnVisibility['width'] || columnVisibility['page'];
-
-      const col5Visible = columnVisibility['price'] || columnVisibility['tax'];
-
-      const colVisibilityMap = {
-        'col-source': col1Visible,
-        'col-brand': col2Visible,
-        'col-capacity': col3Visible,
-        'col-efficiency': col4Visible,
-        'col-price': col5Visible
-      };
-
-      Object.keys(colVisibilityMap).forEach(colClass => {
-        const isVisible = colVisibilityMap[colClass];
-        const elements = document.querySelectorAll(`#results-canvas .${colClass}`);
+        const elements = document.querySelectorAll(`#results-canvas .col-${key}`);
         elements.forEach(el => {
           if (isVisible) el.classList.remove('hidden');
           else el.classList.add('hidden');
@@ -1183,44 +1150,31 @@
       // Update gridTemplateColumns on results-canvas
       const canvas = document.getElementById('results-canvas');
       if (canvas) {
-        const template = [
-          col1Visible ? 'minmax(120px, var(--col-width-source))' : '0px',
-          col2Visible ? 'minmax(120px, var(--col-width-brand))' : '0px',
-          col3Visible ? 'minmax(120px, var(--col-width-capacity))' : '0px',
-          col4Visible ? 'minmax(120px, var(--col-width-efficiency))' : '0px',
-          col5Visible ? 'minmax(120px, var(--col-width-price))' : '0px'
-        ].join(' ');
+        const activeCols = getActiveColumns();
+        const template = activeCols.map(cfg => `minmax(120px, var(--col-width-${cfg.key}))`).join(' ');
         canvas.style.gridTemplateColumns = template;
       }
     }
 
     // Smart Headers: Update header styles if filters are active (displays selected filters length)
     function updateHeaderIndicators() {
-      const groups = {
-        'header-brand-group': ['brand', 'series'],
-        'header-capacity-group': ['capacity', 'type', 'stage'],
-        'header-efficiency-group': ['seer2', 'eer2', 'hspf2', 'ahri', 'coolbtu', 'heatbtu', 'width', 'page'],
-        'header-price-group': ['price', 'tax']
-      };
-      
-      Object.keys(groups).forEach(groupId => {
-        const div = document.getElementById(groupId);
+      filterConfigs.forEach(cfg => {
+        const div = document.getElementById(`header-${cfg.key}-group`);
         if (!div) return;
         
-        const childKeys = groups[groupId];
-        const activeFilterCount = childKeys.reduce((acc, key) => acc + (mobileFilterState[key] ? mobileFilterState[key].length : 0), 0);
+        const activeFilterCount = mobileFilterState[cfg.key] ? mobileFilterState[cfg.key].length : 0;
         
         const mainTitle = div.querySelector('span:first-child');
         if (mainTitle) {
           if (activeFilterCount > 0) {
             mainTitle.classList.remove('text-slate-400');
             mainTitle.classList.add('text-blue-400');
-            const baseName = mainTitle.dataset.baseName || mainTitle.innerText.split(' ')[0];
+            const baseName = mainTitle.dataset.baseName || mainTitle.textContent.replace(/\s*\(\d+\)\s*$/, '').trim();
             mainTitle.dataset.baseName = baseName;
             mainTitle.innerHTML = `${baseName} <span class="text-[8px] font-bold">(${activeFilterCount})</span>`;
           } else {
             mainTitle.classList.remove('text-blue-400');
-            const baseName = mainTitle.dataset.baseName || mainTitle.innerText.split(' ')[0];
+            const baseName = mainTitle.dataset.baseName || mainTitle.textContent.replace(/\s*\(\d+\)\s*$/, '').trim();
             mainTitle.innerHTML = baseName;
           }
         }
@@ -1249,136 +1203,98 @@
       tax: 17
     };
 
-    // Render Table logic dynamically generating cards for all 18 database indexes
-    // Render Grid logic dynamically generating grid cells for all 18 database indexes
+    // Render Grid logic dynamically generating spreadsheet grid cells for all 18 database indexes
     function renderTable(dataToRender) {
       const canvas = document.getElementById('results-canvas');
       if (!canvas) return;
       canvas.innerHTML = '';
 
       if (dataToRender.length === 0) {
-        canvas.innerHTML = `<div class="col-span-5 py-12 text-center text-sm text-slate-500 font-semibold bg-slate-850 border border-slate-750/50 rounded-xl">No results match your criteria.</div>`;
+        canvas.innerHTML = `<div class="col-span-full py-12 text-center text-sm text-slate-500 font-semibold bg-slate-850 border border-slate-750/50 rounded-xl">No results match your criteria.</div>`;
         return;
       }
 
-      // Create the 5 Column Headers
-      const colSpecs = [
-        { key: 'source', id: 'header-source-group', title: 'Source Row', colClass: 'col-source' },
-        { key: 'brand', id: 'header-brand-group', title: 'Brand & Tier', colClass: 'col-brand' },
-        { key: 'capacity', id: 'header-capacity-group', title: 'Capacity & Stage', colClass: 'col-capacity' },
-        { key: 'efficiency', id: 'header-efficiency-group', title: 'Efficiency', colClass: 'col-efficiency' },
-        { key: 'price', id: 'header-price-group', title: 'Price', colClass: 'col-price' }
-      ];
+      const activeCols = getActiveColumns();
 
-      colSpecs.forEach(spec => {
+      // Render Headers
+      activeCols.forEach(cfg => {
         const header = document.createElement('div');
-        header.id = spec.id;
-        header.className = `grid-header ${spec.colClass}`;
-        header.onclick = () => openCategoryModal(spec.key, spec.title);
-        header.innerHTML = `<span data-col-key="${spec.key}">${spec.title}</span>`;
+        header.id = `header-${cfg.key}-group`;
+        header.className = `grid-header col-${cfg.key}`;
+        header.onclick = () => openCategoryModal(cfg.key, cfg.name);
+        header.innerHTML = `<span data-col-key="${cfg.key}">${cfg.name}</span>`;
         canvas.appendChild(header);
       });
 
-      // Populate cells
+      // Populate cells row by row
       dataToRender.forEach((row, rowIndex) => {
         const isInCart = cart.some(item => String(item[map.sourceRow] || "").trim() === String(row[map.sourceRow] || "").trim());
-        const rowStrEsc = JSON.stringify(row).replace(/'/g, "&apos;");
 
         // Cell Class based on cart status
         const baseCellClass = isInCart
           ? "grid-cell border border-blue-500/50 bg-blue-950/20 text-white cursor-pointer"
           : "grid-cell border border-slate-750 bg-slate-850 text-slate-300 hover:bg-slate-800 hover:border-slate-700 cursor-pointer";
 
-        // Generate data html for each silo
-        // Cell 1: Source Row
-        const sourceHtml = `<span class="text-[10px] text-slate-500 font-mono font-semibold">#${row[map.sourceRow] || ""}</span>`;
-
-        // Cell 2: Brand & Tier
-        let brandVal = String(row[map.brand] || "").trim().toUpperCase();
-        let brandHtml = row[map.brand] || "";
-        if (brandVal === "CARRIER") brandHtml = `<img src="./carrier.png" alt="Carrier" class="h-6 md:h-8 w-auto object-contain transition-transform" title="Toggle Selection">`;
-        else if (brandVal === "COMFORTMAKER") brandHtml = `<img src="./comfortmaker.png" alt="Comfortmaker" class="h-8 md:h-10 w-auto object-contain transition-transform" title="Toggle Selection">`;
-        else brandHtml = `<span class="font-bold text-white">${row[map.brand] || ""}</span>`;
-
-        const series = String(row[map.tier] || "").toUpperCase();
-        let badgeClass = "bg-slate-900/40 text-slate-355 border-slate-800/40";
-        if (series === "INFINITY" || series === "MAIN LINE") badgeClass = "bg-blue-900/40 text-blue-300 border-blue-800/40";
-        else if (series === "PERFORMANCE" || series === "PERFORMER") badgeClass = "bg-green-900/40 text-green-300 border-green-800/40";
-        else if (series === "COMFORT" || series === "BUILDER") badgeClass = "bg-amber-900/40 text-amber-300 border-amber-800/40";
-
-        const badgeHtml = `<button onclick='event.stopPropagation(); openSystemDetails(${JSON.stringify(row)})' class="px-2.5 py-0.5 mt-1 rounded text-[10px] font-semibold border ${badgeClass} hover:scale-105 transition-transform shadow-sm">${row[map.tier] || ""}</button>`;
-        const brandTierHtml = `
-          <div data-col-key="brand">${brandHtml}</div>
-          <div data-col-key="series">${badgeHtml}</div>
-        `;
-
-        // Cell 3: Capacity & Stage
-        let capText = String(row[map.capacity] || "").trim();
-        if (useAbbreviations) capText = capText.replace(/Ton/gi, "T");
-
-        let typeHtml = row[map.type] || "";
-        let mechStage = String(row[map.stage] || "").trim();
-        const capStageHtml = `
-          <span data-col-key="capacity" class="font-extrabold text-white text-[15px] md:text-[17px] leading-none">${capText}</span>
-          <span data-col-key="type" class="text-[12px] font-semibold text-slate-300 leading-tight">${typeHtml}</span>
-          <span data-col-key="stage" class="text-[11px] font-bold text-slate-500 uppercase leading-none">${mechStage}</span>
-        `;
-
-        // Cell 4: Efficiency & Specs (Combines both blocks for rich details)
-        let seer2Html = row[map.seer2] ? `<div data-col-key="seer2" class="flex items-center justify-start gap-2 text-[11px] font-mono text-blue-400 font-bold"><span>SEER2:</span><span>${row[map.seer2]}</span></div>` : '';
-        let eer2Html = row[map.eer2] ? `<div data-col-key="eer2" class="flex items-center justify-start gap-2 text-[11px] font-mono text-slate-355"><span>EER2:</span><span>${row[map.eer2]}</span></div>` : '';
-        let hspf2Html = (row[map.hspf2] && String(row[map.type]).toUpperCase() !== "STRAIGHT COOL" && String(row[map.type]).toUpperCase() !== "AC") 
-            ? `<div data-col-key="hspf2" class="flex items-center justify-start gap-2 text-[11px] font-mono text-slate-355"><span>HSPF2:</span><span>${row[map.hspf2]}</span></div>` 
-            : '';
-        let ahriHtml = row[map.ahri] ? `<div data-col-key="ahri" class="flex items-center justify-start gap-2 text-[10px] font-mono text-slate-500"><span>AHRI:</span><span>${row[map.ahri]}</span></div>` : '';
-
-        // Size & Page specs
-        let coolBtuHtml = row[map.coolbtu] ? `<div data-col-key="coolbtu" class="flex justify-start gap-2 text-[11px]"><span>Cool BTU:</span><span class="font-mono text-slate-300 font-medium">${row[map.coolbtu]}</span></div>` : '';
-        let heatBtuHtml = row[map.heatbtu] ? `<div data-col-key="heatbtu" class="flex justify-start gap-2 text-[11px]"><span>Heat BTU:</span><span class="font-mono text-slate-300 font-medium">${row[map.heatbtu]}</span></div>` : '';
-        
-        let dimsText = "";
-        if (row[map.width] && row[map.height]) dimsText = `${row[map.width]}" x ${row[map.height]}"`;
-        else if (row[map.width]) dimsText = `${row[map.width]}" W`;
-        else if (row[map.height]) dimsText = `${row[map.height]}" H`;
-        
-        let dimsHtml = dimsText ? `<div data-col-key="width" class="flex justify-start gap-2 text-[11px]"><span>Size:</span><span class="font-mono text-slate-400">${dimsText}</span></div>` : '';
-        let pageHtml = row[map.page] ? `<div data-col-key="page" class="flex justify-start gap-2 text-[10px] text-slate-500"><span>Page:</span><span class="font-mono">${row[map.page]}</span></div>` : '';
-
-        const efficiencyHtml = `
-          ${seer2Html}
-          ${eer2Html}
-          ${hspf2Html}
-          ${ahriHtml}
-          ${coolBtuHtml}
-          ${heatBtuHtml}
-          ${dimsHtml}
-          ${pageHtml}
-        `;
-
-        // Cell 5: Price
-        let priceVal = row[map.price] || "";
-        if (typeof priceVal === "number") priceVal = "$" + Math.round(priceVal).toLocaleString();
-        else if (priceVal !== "" && !isNaN(Number(priceVal))) priceVal = "$" + Math.round(Number(priceVal)).toLocaleString();
-        
-        let taxHtml = row[map.tax] ? `<span data-col-key="tax" class="px-2 py-0.5 mt-1 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-900/40 text-[9px] font-bold tracking-wide uppercase leading-none shadow-sm">${row[map.tax]}</span>` : '';
-        const priceHtml = `
-          <span data-col-key="price" class="font-extrabold text-emerald-450 font-mono text-[16px] md:text-[18px] tracking-tight">${priceVal || "N/A"}</span>
-          ${taxHtml}
-        `;
-
-        const columnContents = [
-          sourceHtml,
-          brandTierHtml,
-          capStageHtml,
-          efficiencyHtml,
-          priceHtml
-        ];
-
-        // Create cells in each column directly inside CSS Grid results-canvas
-        columnContents.forEach((htmlContent, colIdx) => {
+        activeCols.forEach(cfg => {
           const cell = document.createElement('div');
-          cell.className = `grid-cell col-${colSpecs[colIdx].key}`;
+          cell.className = `${baseCellClass} col-${cfg.key}`;
           cell.setAttribute('data-row-index', rowIndex);
+
+          // Get the raw value for this cell
+          let rawVal = row[cfg.index] || "";
+
+          // Render value with specific formatting if needed
+          let htmlContent = "";
+          if (cfg.key === 'source') {
+            htmlContent = `<span class="text-[10px] text-slate-500 font-mono font-semibold">#${rawVal}</span>`;
+          } else if (cfg.key === 'brand') {
+            let brandVal = String(rawVal).trim().toUpperCase();
+            if (brandVal === "CARRIER") {
+              htmlContent = `<img src="./carrier.png" alt="Carrier" class="h-6 md:h-8 w-auto object-contain transition-transform" title="Toggle Selection">`;
+            } else if (brandVal === "COMFORTMAKER") {
+              htmlContent = `<img src="./comfortmaker.png" alt="Comfortmaker" class="h-8 md:h-10 w-auto object-contain transition-transform" title="Toggle Selection">`;
+            } else {
+              htmlContent = `<span class="font-bold text-white">${rawVal}</span>`;
+            }
+          } else if (cfg.key === 'series') {
+            // Tier / Series badge
+            const seriesVal = String(rawVal).toUpperCase();
+            let badgeClass = "bg-slate-900/40 text-slate-355 border-slate-800/40";
+            if (seriesVal === "INFINITY" || seriesVal === "MAIN LINE") badgeClass = "bg-blue-900/40 text-blue-300 border-blue-800/40";
+            else if (seriesVal === "PERFORMANCE" || seriesVal === "PERFORMER") badgeClass = "bg-green-900/40 text-green-300 border-green-800/40";
+            else if (seriesVal === "COMFORT" || seriesVal === "BUILDER") badgeClass = "bg-amber-900/40 text-amber-300 border-amber-800/40";
+
+            htmlContent = `<button onclick='event.stopPropagation(); openSystemDetails(${JSON.stringify(row)})' class="px-2.5 py-0.5 rounded text-[10px] font-semibold border ${badgeClass} hover:scale-105 transition-transform shadow-sm">${rawVal}</button>`;
+          } else if (cfg.key === 'capacity') {
+            let capText = String(rawVal).trim();
+            if (useAbbreviations) capText = capText.replace(/Ton/gi, "T");
+            htmlContent = `<span class="font-extrabold text-white text-[14px] md:text-[16px] leading-none">${capText}</span>`;
+          } else if (cfg.key === 'price') {
+            let priceVal = rawVal;
+            if (typeof priceVal === "number") priceVal = "$" + Math.round(priceVal).toLocaleString();
+            else if (priceVal !== "" && !isNaN(Number(priceVal))) priceVal = "$" + Math.round(Number(priceVal)).toLocaleString();
+            htmlContent = `<span class="font-extrabold text-emerald-450 font-mono text-[14px] md:text-[16px] tracking-tight">${priceVal || "N/A"}</span>`;
+          } else if (cfg.key === 'tax') {
+            htmlContent = rawVal ? `<span class="px-2 py-0.5 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-900/40 text-[9px] font-bold tracking-wide uppercase leading-none shadow-sm">${rawVal}</span>` : '';
+          } else if (cfg.key === 'seer2') {
+            htmlContent = `<div class="flex items-center gap-1.5 text-[11px] font-mono text-blue-400 font-bold"><span>SEER2:</span><span>${rawVal}</span></div>`;
+          } else if (cfg.key === 'eer2') {
+            htmlContent = `<div class="flex items-center gap-1.5 text-[11px] font-mono text-slate-355"><span>EER2:</span><span>${rawVal}</span></div>`;
+          } else if (cfg.key === 'hspf2') {
+            const isSC = String(row[map.type]).toUpperCase() === "STRAIGHT COOL" || String(row[map.type]).toUpperCase() === "AC";
+            htmlContent = (!isSC && rawVal) ? `<div class="flex items-center gap-1.5 text-[11px] font-mono text-slate-355"><span>HSPF2:</span><span>${rawVal}</span></div>` : '';
+          } else if (cfg.key === 'ahri') {
+            htmlContent = rawVal ? `<div class="flex items-center gap-1.5 text-[10px] font-mono text-slate-500"><span>AHRI:</span><span>${rawVal}</span></div>` : '';
+          } else if (cfg.key === 'coolbtu') {
+            htmlContent = rawVal ? `<div class="flex gap-1.5 text-[11px] font-mono text-slate-300"><span>Cool BTU:</span><span>${rawVal}</span></div>` : '';
+          } else if (cfg.key === 'heatbtu') {
+            htmlContent = rawVal ? `<div class="flex gap-1.5 text-[11px] font-mono text-slate-300"><span>Heat BTU:</span><span>${rawVal}</span></div>` : '';
+          } else if (cfg.key === 'width' || cfg.key === 'height') {
+            htmlContent = `<div class="text-[11px] font-mono text-slate-400">${rawVal ? rawVal + '"' : ''}</div>`;
+          } else {
+            htmlContent = `<span class="text-[11px] text-slate-300 font-semibold">${rawVal}</span>`;
+          }
+
           cell.innerHTML = htmlContent;
 
           // Setup interactions
