@@ -1,14 +1,14 @@
-<!-- Changeout Lookup v04.05 | Details Card Expansion & Brand/Series Merge -->
+<!-- Changeout Lookup v04.04 | Visual Polish & Grid Limit Unlock -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v04.05</title>
+  <title>Changeout Lookup v04.04</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <!-- Tailwind CSS CDN -- 
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Inter & Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,6 +20,7 @@
       --col-width-capacity: 1.0fr;
       --col-width-type: 1.2fr;
       --col-width-brand: 1.5fr;
+      --col-width-series: 1.5fr;
       --col-width-stage: 1.0fr;
       --col-width-style: 1.0fr;
       --col-width-seer2: 1.0fr;
@@ -427,7 +428,7 @@
 
   <!-- FLOATING SYSTEM DETAILS CARD MODAL -->
   <div id="system-details-modal" class="hidden fixed inset-0 z-50 bg-slate-955/90 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-slate-800 border border-slate-700 w-full max-w-4xl rounded-2xl flex flex-col max-h-[90vh] shadow-2xl overflow-hidden">
+    <div class="bg-slate-800 border border-slate-700 w-full max-w-lg rounded-2xl flex flex-col max-h-[90vh] shadow-2xl overflow-hidden">
       <!-- Modal Header -->
       <div class="px-6 py-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/80">
         <div class="flex items-center space-x-2.5">
@@ -438,7 +439,7 @@
       </div>
       
       <!-- Modal Body (Grid of Specs) -->
-      <div id="system-details-content" class="flex-grow overflow-y-auto p-6 space-y-4 text-base">
+      <div id="system-details-content" class="flex-grow overflow-y-auto p-6 space-y-4 text-xs">
         <!-- Filled dynamically by JavaScript -->
       </div>
       
@@ -502,6 +503,10 @@
           <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
             <input type="checkbox" id="toggle-col-brand" checked onchange="toggleColumnVisibility('brand')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
             <span>Brand</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-series" checked onchange="toggleColumnVisibility('series')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>Series / Tier</span>
           </label>
           <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
             <input type="checkbox" id="toggle-col-stage" checked onchange="toggleColumnVisibility('stage')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
@@ -613,7 +618,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v04.05</span>
+          <span class="text-[8px] font-normal text-blue-400">v04.04</span>
         </span>
       </button>
 
@@ -726,6 +731,7 @@
       { key: 'capacity', name: 'Capacity', index: 1 },
       { key: 'type', name: 'System Type', index: 2 },
       { key: 'brand', name: 'Brand', index: 3 },
+      { key: 'series', name: 'Series / Tier', index: 4 },
       { key: 'stage', name: 'Mechanical Stage', index: 5 },
       { key: 'style', name: 'Application / Style', index: 6 },
       { key: 'seer2', name: 'SEER2', index: 7 },
@@ -741,12 +747,13 @@
       { key: 'tax', name: 'Tax Creditable', index: 17 }
     ];
 
-    // Column Visibility State (All 17 tracked)
+    // Column Visibility State (All 18 tracked)
     const columnVisibility = {
       source: true,
       capacity: true,
       type: true,
       brand: true,
+      series: true,
       stage: true,
       style: true,
       seer2: true,
@@ -762,12 +769,13 @@
       tax: true
     };
 
-    // Mobile Filters State (All 17 tracked as arrays for multi-select)
+    // Mobile Filters State (All 18 tracked as arrays for multi-select)
     const mobileFilterState = {
       source: [],
       capacity: [],
       type: [],
       brand: [],
+      series: [],
       stage: [],
       style: [],
       seer2: [],
@@ -1507,38 +1515,22 @@
             htmlContent = `<span class="text-slate-200 font-mono font-semibold">#${rawVal}</span>`;
           } else if (cfg.key === 'brand') {
             let brandVal = String(rawVal).trim().toUpperCase();
-            let seriesVal = row[map.tier] || "";
-            
-            let seriesHtml = "";
-            if (seriesVal) {
-              const seriesUpper = String(seriesVal).toUpperCase();
-              let badgeColorClass = "text-slate-400 border-slate-700/50 bg-slate-900/40";
-              if (seriesUpper === "INFINITY" || seriesUpper === "MAIN LINE") badgeColorClass = "text-blue-300 border-blue-800/40 bg-blue-900/30";
-              else if (seriesUpper === "PERFORMANCE" || seriesUpper === "PERFORMER") badgeColorClass = "text-green-300 border-green-800/40 bg-green-900/30";
-              else if (seriesUpper === "COMFORT" || seriesUpper === "BUILDER") badgeColorClass = "text-amber-300 border-amber-800/40 bg-amber-900/30";
-              
-              seriesHtml = `
-                <button onclick="event.stopPropagation(); openSystemDetails(${JSON.stringify(row)})" class="px-2 py-0.5 mt-1 text-[10px] font-bold tracking-wide uppercase border rounded ${badgeColorClass} hover:scale-105 transition-transform shadow-sm">
-                  ${seriesVal}
-                </button>
-              `;
-            }
-
-            let logoHtml = "";
             if (brandVal === "CARRIER") {
-              logoHtml = `<img src="./carrier.png" alt="Carrier" class="h-[2em] w-auto object-contain transition-transform" title="Toggle Selection">`;
+              htmlContent = `<img src="./carrier.png" alt="Carrier" class="h-[2em] w-auto object-contain transition-transform" title="Toggle Selection">`;
             } else if (brandVal === "COMFORTMAKER") {
-              logoHtml = `<img src="./comfortmaker.png" alt="Comfortmaker" class="h-[2.5em] w-auto object-contain transition-transform" title="Toggle Selection">`;
+              htmlContent = `<img src="./comfortmaker.png" alt="Comfortmaker" class="h-[2.5em] w-auto object-contain transition-transform" title="Toggle Selection">`;
             } else {
-              logoHtml = `<span class="font-extrabold text-white text-base">${rawVal}</span>`;
+              htmlContent = `<span class="font-bold text-white">${rawVal}</span>`;
             }
+          } else if (cfg.key === 'series') {
+            // Tier / Series badge
+            const seriesVal = String(rawVal).toUpperCase();
+            let badgeClass = "bg-slate-900/40 text-slate-355 border-slate-800/40";
+            if (seriesVal === "INFINITY" || seriesVal === "MAIN LINE") badgeClass = "bg-blue-900/40 text-blue-300 border-blue-800/40";
+            else if (seriesVal === "PERFORMANCE" || seriesVal === "PERFORMER") badgeClass = "bg-green-900/40 text-green-300 border-green-800/40";
+            else if (seriesVal === "COMFORT" || seriesVal === "BUILDER") badgeClass = "bg-amber-900/40 text-amber-300 border-amber-800/40";
 
-            htmlContent = `
-              <div class="flex flex-col items-center justify-center text-center py-1">
-                ${logoHtml}
-                ${seriesHtml}
-              </div>
-            `;
+            htmlContent = `<button onclick='event.stopPropagation(); openSystemDetails(${JSON.stringify(row)})' class="px-2.5 py-0.5 rounded font-semibold border ${badgeClass} hover:scale-105 transition-transform shadow-sm">${rawVal}</button>`;
           } else if (cfg.key === 'capacity') {
             let capText = String(rawVal).trim();
             if (useAbbreviations) capText = capText.replace(/Ton/gi, "T");
@@ -1787,81 +1779,81 @@
 
       // Render grid layout for 18 specs
       container.innerHTML = `
-        <div class="grid grid-cols-2 gap-4 border-b border-slate-750 pb-5 mb-5">
+        <div class="grid grid-cols-2 gap-4 border-b border-slate-750 pb-4 mb-4">
           <div>
-            <span class="text-slate-400 block mb-1 uppercase tracking-wider text-sm">Brand</span>
-            <span class="text-3xl font-black text-white">${rowObj[3] || "N/A"}</span>
+            <span class="text-slate-400 block mb-0.5 uppercase tracking-wider text-[10px]">Brand</span>
+            <span class="text-base font-bold text-white">${rowObj[3] || "N/A"}</span>
           </div>
           <div>
-            <span class="text-slate-400 block mb-1 uppercase tracking-wider text-sm">Series / Tier</span>
-            <span class="text-3xl font-black ${cardSeriesColor}">${rowObj[4] || "N/A"}</span>
+            <span class="text-slate-400 block mb-0.5 uppercase tracking-wider text-[10px]">Series / Tier</span>
+            <span class="text-base font-bold ${cardSeriesColor}">${rowObj[4] || "N/A"}</span>
           </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-y-6 gap-x-8">
+        <div class="grid grid-cols-2 gap-y-3 gap-x-6">
           <div>
-            <span class="text-slate-400 block uppercase tracking-wider text-xs font-bold mb-1">Source Row</span>
-            <span class="text-slate-200 font-bold text-lg">#${rowObj[0] || "N/A"}</span>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Source Row</span>
+            <span class="text-slate-200 font-semibold">${rowObj[0] || "N/A"}</span>
           </div>
           <div>
-            <span class="text-slate-400 block uppercase tracking-wider text-xs font-bold mb-1">Capacity</span>
-            <span class="text-slate-200 font-bold text-lg">${rowObj[1] || "N/A"}</span>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Capacity</span>
+            <span class="text-slate-200 font-semibold">${rowObj[1] || "N/A"}</span>
           </div>
           <div>
-            <span class="text-slate-400 block uppercase tracking-wider text-xs font-bold mb-1">System Type</span>
-            <span class="text-slate-200 font-bold text-lg">${rowObj[2] || "N/A"}</span>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">System Type</span>
+            <span class="text-slate-200 font-semibold">${rowObj[2] || "N/A"}</span>
           </div>
           <div>
-            <span class="text-slate-400 block uppercase tracking-wider text-xs font-bold mb-1">Mechanical Stage</span>
-            <span class="text-slate-200 font-bold text-lg">${rowObj[5] || "N/A"}</span>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Mechanical Stage</span>
+            <span class="text-slate-200 font-semibold">${rowObj[5] || "N/A"}</span>
           </div>
           <div>
-            <span class="text-slate-400 block uppercase tracking-wider text-xs font-bold mb-1">Application / Style</span>
-            <span class="text-slate-200 font-bold text-lg">${rowObj[6] || "N/A"}</span>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Application / Style</span>
+            <span class="text-slate-200 font-semibold">${rowObj[6] || "N/A"}</span>
           </div>
           <div>
-            <span class="text-slate-400 block uppercase tracking-wider text-xs font-bold mb-1">SEER2</span>
-            <span class="text-slate-200 font-bold text-lg font-mono">${rowObj[7] || "N/A"}</span>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">SEER2</span>
+            <span class="text-slate-200 font-semibold font-mono">${rowObj[7] || "N/A"}</span>
           </div>
           <div>
-            <span class="text-slate-400 block uppercase tracking-wider text-xs font-bold mb-1">EER2</span>
-            <span class="text-slate-200 font-bold text-lg font-mono">${rowObj[8] || "N/A"}</span>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">EER2</span>
+            <span class="text-slate-200 font-semibold font-mono">${rowObj[8] || "N/A"}</span>
           </div>
           <div>
-            <span class="text-slate-400 block uppercase tracking-wider text-xs font-bold mb-1">HSPF2</span>
-            <span class="text-slate-200 font-bold text-lg font-mono">${rowObj[9] || "N/A"}</span>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">HSPF2</span>
+            <span class="text-slate-200 font-semibold font-mono">${rowObj[9] || "N/A"}</span>
           </div>
           <div>
-            <span class="text-slate-400 block uppercase tracking-wider text-xs font-bold mb-1">AHRI #</span>
-            <span class="text-slate-200 font-bold text-lg font-mono">${rowObj[10] || "N/A"}</span>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">AHRI #</span>
+            <span class="text-slate-200 font-semibold font-mono">${rowObj[10] || "N/A"}</span>
           </div>
           <div>
-            <span class="text-slate-400 block uppercase tracking-wider text-xs font-bold mb-1">Cooling BTU</span>
-            <span class="text-slate-200 font-bold text-lg font-mono">${rowObj[11] || "N/A"}</span>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Cooling BTU</span>
+            <span class="text-slate-200 font-semibold font-mono">${rowObj[11] || "N/A"}</span>
           </div>
           <div>
-            <span class="text-slate-400 block uppercase tracking-wider text-xs font-bold mb-1">Heating BTU</span>
-            <span class="text-slate-200 font-bold text-lg font-mono">${rowObj[12] || "N/A"}</span>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Heating BTU</span>
+            <span class="text-slate-200 font-semibold font-mono">${rowObj[12] || "N/A"}</span>
           </div>
           <div>
-            <span class="text-slate-400 block uppercase tracking-wider text-xs font-bold mb-1">PAGE</span>
-            <span class="text-slate-200 font-bold text-lg font-mono">${rowObj[13] || "N/A"}</span>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">PAGE</span>
+            <span class="text-slate-200 font-semibold font-mono">${rowObj[13] || "N/A"}</span>
           </div>
           <div>
-            <span class="text-slate-400 block uppercase tracking-wider text-xs font-bold mb-1">Cabinet Width</span>
-            <span class="text-slate-200 font-bold text-lg font-mono">${widthVal}</span>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Cabinet Width</span>
+            <span class="text-slate-200 font-semibold font-mono">${widthVal}</span>
           </div>
           <div>
-            <span class="text-slate-400 block uppercase tracking-wider text-xs font-bold mb-1">Cabinet Height</span>
-            <span class="text-slate-200 font-bold text-lg font-mono">${heightVal}</span>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Cabinet Height</span>
+            <span class="text-slate-200 font-semibold font-mono">${heightVal}</span>
           </div>
           <div>
-            <span class="text-slate-400 block uppercase tracking-wider text-xs font-bold mb-1">Tax Creditable</span>
-            <span class="text-slate-200 font-bold text-lg">${rowObj[17] || "N/A"}</span>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Tax Creditable</span>
+            <span class="text-slate-200 font-semibold">${rowObj[17] || "N/A"}</span>
           </div>
-          <div class="col-span-full border-t border-slate-750 pt-5 mt-2">
-            <span class="text-slate-400 block uppercase tracking-wider text-sm font-bold mb-1">Investment Price</span>
-            <span class="text-emerald-400 font-black font-mono text-3xl">${priceVal || "N/A"}</span>
+          <div>
+            <span class="text-slate-400 block uppercase tracking-wider text-[9px]">Investment Price</span>
+            <span class="text-emerald-400 font-bold font-mono text-sm">${priceVal || "N/A"}</span>
           </div>
         </div>
       `;
