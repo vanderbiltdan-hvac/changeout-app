@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v02.06 | Cart Toggle & Highlight Hotfixes -->
+<!-- Changeout Lookup v02.07 | Source Row Relocation | Lines: 1724 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v02.06</title>
+  <title>Changeout Lookup v02.07</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -146,6 +146,7 @@
         <table id="results-table" class="w-full text-left border-collapse transition-all duration-200">
           <thead>
             <tr class="bg-slate-900 text-slate-400 text-[10px] uppercase font-bold tracking-wider border-b border-slate-700 select-none">
+              <th id="th-source" onclick="openFilterFor('source')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Source Row</th>
               <th id="th-brand" onclick="openFilterFor('brand')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap min-w-[160px] align-top">
                   <span class="head-desktop">Brand</span>
                   <div class="head-compact flex-col items-start gap-1 w-full">
@@ -163,7 +164,6 @@
                   </div>
               </th>
               <th id="th-type" onclick="openFilterFor('type')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[80px] leading-tight">System Type</th>
-              <th id="th-source" onclick="openFilterFor('source')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap">Source Row</th>
               <th id="th-stage" onclick="openFilterFor('stage')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-normal min-w-[85px] leading-tight">Mechanical Stage</th>
               <th id="th-style" onclick="openFilterFor('style')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition whitespace-nowrap min-w-[100px] max-w-[130px] leading-tight break-words align-top">
                   <span class="head-desktop">Style</span>
@@ -485,7 +485,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v02.06</span>
+          <span class="text-[8px] font-normal text-blue-400">v02.07</span>
         </span>
       </button>
 
@@ -909,11 +909,11 @@
       if (!table) return;
 
       const colMapping = {
+        source: 'th-source',
         brand: 'th-brand',
         series: 'th-series',
         capacity: 'th-capacity',
         type: 'th-type',
-        source: 'th-source',
         stage: 'th-stage',
         style: 'th-style',
         seer2: 'th-seer2',
@@ -1026,6 +1026,9 @@
 
         const tdCells = [];
         
+        // --- COL 5: SOURCE ROW ---
+        tdCells.push(`<td class="py-3 px-4 whitespace-nowrap text-slate-400 text-xs">${row[0] || ""}</td>`);
+
         // --- COL 1 & 2: BRAND & SERIES ---
         let brandVal = String(row[3] || "").trim().toUpperCase();
         let brandHtml = row[3] || "";
@@ -1090,17 +1093,10 @@
                 </div>
             </td>`);
             tdCells.push(`<td class="hidden"></td>`); // Type sync
+            tdCells.push(`<td class="hidden"></td>`); // Stage sync
         } else {
             tdCells.push(`<td class="py-3 px-4 font-semibold text-white whitespace-nowrap">${capText}</td>`);
             tdCells.push(`<td class="py-3 px-4 font-semibold text-slate-300 whitespace-nowrap">${typeHtml}</td>`);
-        }
-
-        // --- COL 5: SOURCE ROW ---
-        tdCells.push(`<td class="py-3 px-4 whitespace-nowrap text-slate-400 text-xs">${row[0] || ""}</td>`);
-
-        if (useCompactLayout) {
-            tdCells.push(`<td class="hidden"></td>`); // Stage sync (Source Row pushed earlier to match array order)
-        } else {
             tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${mechStage}</td>`);
         }
 
