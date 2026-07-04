@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v04.01 | Spreadsheet Polish & Ultimate Header Menu | Lines: 2090 -->
+<!-- Changeout Lookup v04.02 | Live Sliders & Split Font Controls | Lines: 2128 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v04.01</title>
+  <title>Changeout Lookup v04.02</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -269,13 +269,21 @@
           <input type="range" id="widget-width-slider" min="0.2" max="5.0" step="0.1" class="w-full accent-blue-500 h-1.5 bg-slate-850 rounded-lg appearance-none cursor-pointer">
         </div>
 
-        <!-- Font Size Scaler -->
+        <!-- Split Font Sliders -->
         <div class="flex flex-col gap-1.5">
           <div class="flex justify-between items-center">
-            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Font Size</label>
-            <span id="widget-font-value" class="text-xs font-mono font-bold text-blue-400">12px</span>
+            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Header Font Size</label>
+            <span id="widget-header-font-value" class="text-xs font-mono font-bold text-blue-400">12px</span>
           </div>
-          <input type="range" id="widget-font-slider" min="10" max="30" step="1" class="w-full accent-blue-500 h-1.5 bg-slate-850 rounded-lg appearance-none cursor-pointer">
+          <input type="range" id="widget-header-font-slider" min="10" max="30" step="1" class="w-full accent-blue-500 h-1.5 bg-slate-850 rounded-lg appearance-none cursor-pointer">
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Data Font Size</label>
+            <span id="widget-data-font-value" class="text-xs font-mono font-bold text-blue-400">12px</span>
+          </div>
+          <input type="range" id="widget-data-font-slider" min="10" max="30" step="1" class="w-full accent-blue-500 h-1.5 bg-slate-850 rounded-lg appearance-none cursor-pointer">
         </div>
 
         <!-- Alignment Matrix -->
@@ -584,7 +592,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v04.01</span>
+          <span class="text-[8px] font-normal text-blue-400">v04.02</span>
         </span>
       </button>
 
@@ -1077,8 +1085,10 @@
       const widthModeSelect = document.getElementById('widget-width-mode');
       const slider = document.getElementById('widget-width-slider');
       const sliderValText = document.getElementById('widget-slider-value');
-      const fontSlider = document.getElementById('widget-font-slider');
-      const fontValText = document.getElementById('widget-font-value');
+      const headerFontSlider = document.getElementById('widget-header-font-slider');
+      const headerFontValText = document.getElementById('widget-header-font-value');
+      const dataFontSlider = document.getElementById('widget-data-font-slider');
+      const dataFontValText = document.getElementById('widget-data-font-value');
       const alignHorizSelect = document.getElementById('widget-align-horiz');
       const alignVertSelect = document.getElementById('widget-align-vert');
       const bgColorInput = document.getElementById('widget-bg-color');
@@ -1100,10 +1110,10 @@
       const isPx = rawWidth.endsWith('px');
       widthModeSelect.value = isPx ? 'px' : 'fr';
       
-      // Setup dynamic slider properties based on width mode
+      // Setup dynamic slider properties based on width mode (20px floor floor)
       function updateSliderLimits() {
         if (widthModeSelect.value === 'px') {
-          slider.min = "50";
+          slider.min = "20";
           slider.max = "600";
           slider.step = "10";
           slider.value = isPx ? parseFloat(rawWidth) : 150;
@@ -1118,17 +1128,35 @@
       }
       updateSliderLimits();
       
-      widthModeSelect.onchange = updateSliderLimits;
-      slider.oninput = function() {
-        sliderValText.textContent = this.value + widthModeSelect.value;
+      widthModeSelect.onchange = function() {
+        updateSliderLimits();
+        document.documentElement.style.setProperty(`--col-width-${colKey}`, slider.value + this.value);
+        applyColumnVisibility();
       };
 
-      // 2. Font Size
-      const rawFontSize = computedStyle.getPropertyValue(`--font-size-${colKey}`).trim() || "11px";
-      fontSlider.value = parseFloat(rawFontSize);
-      fontValText.textContent = fontSlider.value + 'px';
-      fontSlider.oninput = function() {
-        fontValText.textContent = this.value + 'px';
+      slider.oninput = function() {
+        const val = this.value;
+        const unit = widthModeSelect.value;
+        sliderValText.textContent = val + unit;
+        document.documentElement.style.setProperty(`--col-width-${colKey}`, val + unit);
+        applyColumnVisibility();
+      };
+
+      // 2. Font Sizes (Live Updates)
+      const rawHeaderFont = computedStyle.getPropertyValue(`--header-font-${colKey}`).trim() || "10px";
+      headerFontSlider.value = parseFloat(rawHeaderFont) || 10;
+      headerFontValText.textContent = headerFontSlider.value + 'px';
+      headerFontSlider.oninput = function() {
+        headerFontValText.textContent = this.value + 'px';
+        document.documentElement.style.setProperty(`--header-font-${colKey}`, this.value + 'px');
+      };
+
+      const rawDataFont = computedStyle.getPropertyValue(`--data-font-${colKey}`).trim() || "11px";
+      dataFontSlider.value = parseFloat(rawDataFont) || 11;
+      dataFontValText.textContent = dataFontSlider.value + 'px';
+      dataFontSlider.oninput = function() {
+        dataFontValText.textContent = this.value + 'px';
+        document.documentElement.style.setProperty(`--data-font-${colKey}`, this.value + 'px');
       };
 
       // 3. Alignments
@@ -1167,7 +1195,8 @@
       
       const widthModeSelect = document.getElementById('widget-width-mode');
       const slider = document.getElementById('widget-width-slider');
-      const fontSlider = document.getElementById('widget-font-slider');
+      const headerFontSlider = document.getElementById('widget-header-font-slider');
+      const dataFontSlider = document.getElementById('widget-data-font-slider');
       const alignHorizSelect = document.getElementById('widget-align-horiz');
       const alignVertSelect = document.getElementById('widget-align-vert');
       const bgColorText = document.getElementById('widget-bg-text');
@@ -1191,7 +1220,8 @@
 
         // 2. Build and save CSS variables
         const widthVal = slider.value + widthModeSelect.value;
-        const fontSizeVal = fontSlider.value + 'px';
+        const headerFontVal = headerFontSlider.value + 'px';
+        const dataFontVal = dataFontSlider.value + 'px';
         const alignHorizVal = alignHorizSelect.value;
         const alignVertVal = alignVertSelect.value;
         const bgColorVal = bgColorText.value.trim() || "#1e293b";
@@ -1202,7 +1232,8 @@
         else if (alignHorizVal === "end") textAlignVal = "right";
 
         document.documentElement.style.setProperty(`--col-width-${colKey}`, widthVal);
-        document.documentElement.style.setProperty(`--font-size-${colKey}`, fontSizeVal);
+        document.documentElement.style.setProperty(`--header-font-${colKey}`, headerFontVal);
+        document.documentElement.style.setProperty(`--data-font-${colKey}`, dataFontVal);
         document.documentElement.style.setProperty(`--align-horiz-${colKey}`, alignHorizVal);
         document.documentElement.style.setProperty(`--align-vert-${colKey}`, alignVertVal);
         document.documentElement.style.setProperty(`--bg-color-${colKey}`, bgColorVal);
@@ -1244,12 +1275,19 @@
       let cssRules = '';
       filterConfigs.forEach(cfg => {
         cssRules += `
-          .col-${cfg.key} {
-            font-size: var(--font-size-${cfg.key}) !important;
-            align-items: var(--align-horiz-${cfg.key}) !important;
-            justify-content: var(--align-vert-${cfg.key}) !important;
-            background-color: var(--bg-color-${cfg.key}) !important;
-            text-align: var(--align-text-${cfg.key}) !important;
+          .col-${cfg.key}.grid-header {
+            font-size: var(--header-font-${cfg.key}, 10px) !important;
+            align-items: var(--align-horiz-${cfg.key}, start) !important;
+            justify-content: var(--align-vert-${cfg.key}, center) !important;
+            background-color: var(--bg-color-${cfg.key}, #0f172a) !important;
+            text-align: var(--align-text-${cfg.key}, left) !important;
+          }
+          .col-${cfg.key}.grid-cell {
+            font-size: var(--data-font-${cfg.key}, 11px) !important;
+            align-items: var(--align-horiz-${cfg.key}, start) !important;
+            justify-content: var(--align-vert-${cfg.key}, center) !important;
+            background-color: var(--bg-color-${cfg.key}, #1e293b) !important;
+            text-align: var(--align-text-${cfg.key}, left) !important;
           }
         `;
       });
@@ -1404,7 +1442,7 @@
           // Render value with specific formatting if needed
           let htmlContent = "";
           if (cfg.key === 'source') {
-            htmlContent = `<span class="text-[10px] text-slate-500 font-mono font-semibold">#${rawVal}</span>`;
+            htmlContent = `<span class="text-slate-500 font-mono font-semibold">#${rawVal}</span>`;
           } else if (cfg.key === 'brand') {
             let brandVal = String(rawVal).trim().toUpperCase();
             if (brandVal === "CARRIER") {
@@ -1422,35 +1460,35 @@
             else if (seriesVal === "PERFORMANCE" || seriesVal === "PERFORMER") badgeClass = "bg-green-900/40 text-green-300 border-green-800/40";
             else if (seriesVal === "COMFORT" || seriesVal === "BUILDER") badgeClass = "bg-amber-900/40 text-amber-300 border-amber-800/40";
 
-            htmlContent = `<button onclick='event.stopPropagation(); openSystemDetails(${JSON.stringify(row)})' class="px-2.5 py-0.5 rounded text-[10px] font-semibold border ${badgeClass} hover:scale-105 transition-transform shadow-sm">${rawVal}</button>`;
+            htmlContent = `<button onclick='event.stopPropagation(); openSystemDetails(${JSON.stringify(row)})' class="px-2.5 py-0.5 rounded font-semibold border ${badgeClass} hover:scale-105 transition-transform shadow-sm">${rawVal}</button>`;
           } else if (cfg.key === 'capacity') {
             let capText = String(rawVal).trim();
             if (useAbbreviations) capText = capText.replace(/Ton/gi, "T");
-            htmlContent = `<span class="font-extrabold text-white text-[14px] md:text-[16px] leading-none">${capText}</span>`;
+            htmlContent = `<span class="font-extrabold text-white leading-none">${capText}</span>`;
           } else if (cfg.key === 'price') {
             let priceVal = rawVal;
             if (typeof priceVal === "number") priceVal = "$" + Math.round(priceVal).toLocaleString();
             else if (priceVal !== "" && !isNaN(Number(priceVal))) priceVal = "$" + Math.round(Number(priceVal)).toLocaleString();
-            htmlContent = `<span class="font-extrabold text-emerald-450 font-mono text-[14px] md:text-[16px] tracking-tight">${priceVal || "N/A"}</span>`;
+            htmlContent = `<span class="font-extrabold text-emerald-450 font-mono tracking-tight">${priceVal || "N/A"}</span>`;
           } else if (cfg.key === 'tax') {
-            htmlContent = rawVal ? `<span class="px-2 py-0.5 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-900/40 text-[9px] font-bold tracking-wide uppercase leading-none shadow-sm">${rawVal}</span>` : '';
+            htmlContent = rawVal ? `<span class="px-2 py-0.5 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-900/40 font-bold tracking-wide uppercase leading-none shadow-sm">${rawVal}</span>` : '';
           } else if (cfg.key === 'seer2') {
-            htmlContent = `<div class="flex items-center gap-1.5 text-[11px] font-mono text-blue-400 font-bold"><span>SEER2:</span><span>${rawVal}</span></div>`;
+            htmlContent = `<div class="flex items-center gap-1.5 font-mono text-blue-400 font-bold"><span>SEER2:</span><span>${rawVal}</span></div>`;
           } else if (cfg.key === 'eer2') {
-            htmlContent = `<div class="flex items-center gap-1.5 text-[11px] font-mono text-slate-355"><span>EER2:</span><span>${rawVal}</span></div>`;
+            htmlContent = `<div class="flex items-center gap-1.5 font-mono text-slate-355"><span>EER2:</span><span>${rawVal}</span></div>`;
           } else if (cfg.key === 'hspf2') {
             const isSC = String(row[map.type]).toUpperCase() === "STRAIGHT COOL" || String(row[map.type]).toUpperCase() === "AC";
-            htmlContent = (!isSC && rawVal) ? `<div class="flex items-center gap-1.5 text-[11px] font-mono text-slate-355"><span>HSPF2:</span><span>${rawVal}</span></div>` : '';
+            htmlContent = (!isSC && rawVal) ? `<div class="flex items-center gap-1.5 font-mono text-slate-355"><span>HSPF2:</span><span>${rawVal}</span></div>` : '';
           } else if (cfg.key === 'ahri') {
-            htmlContent = rawVal ? `<div class="flex items-center gap-1.5 text-[10px] font-mono text-slate-500"><span>AHRI:</span><span>${rawVal}</span></div>` : '';
+            htmlContent = rawVal ? `<div class="flex items-center gap-1.5 font-mono text-slate-500"><span>AHRI:</span><span>${rawVal}</span></div>` : '';
           } else if (cfg.key === 'coolbtu') {
-            htmlContent = rawVal ? `<div class="flex gap-1.5 text-[11px] font-mono text-slate-300"><span>Cool BTU:</span><span>${rawVal}</span></div>` : '';
+            htmlContent = rawVal ? `<div class="flex gap-1.5 font-mono text-slate-300"><span>Cool BTU:</span><span>${rawVal}</span></div>` : '';
           } else if (cfg.key === 'heatbtu') {
-            htmlContent = rawVal ? `<div class="flex gap-1.5 text-[11px] font-mono text-slate-300"><span>Heat BTU:</span><span>${rawVal}</span></div>` : '';
+            htmlContent = rawVal ? `<div class="flex gap-1.5 font-mono text-slate-300"><span>Heat BTU:</span><span>${rawVal}</span></div>` : '';
           } else if (cfg.key === 'width' || cfg.key === 'height') {
-            htmlContent = `<div class="text-[11px] font-mono text-slate-400">${rawVal ? rawVal + '"' : ''}</div>`;
+            htmlContent = `<div class="font-mono text-slate-400">${rawVal ? rawVal + '"' : ''}</div>`;
           } else {
-            htmlContent = `<span class="text-[11px] text-slate-300 font-semibold">${rawVal}</span>`;
+            htmlContent = `<span class="text-slate-300 font-semibold">${rawVal}</span>`;
           }
 
           cell.innerHTML = htmlContent;
