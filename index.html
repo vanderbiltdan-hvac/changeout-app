@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v04.03 | Floating Ribbon, Full-Row Highlight & Memory Lock -->
+<!-- Changeout Lookup v04.04 | Visual Polish & Grid Limit Unlock -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v04.03</title>
+  <title>Changeout Lookup v04.04</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -64,7 +64,7 @@
       overflow-y: auto;
       overflow-x: auto;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
       row-gap: 8px; /* Horizontal gap between ribbons */
       column-gap: 0px; /* No gaps within columns of the ribbon */
       padding: 1rem;
@@ -123,7 +123,7 @@
 
     /* Soft Blue selection ribbon style */
     .selected-ribbon {
-      background-color: rgba(59, 130, 246, 0.15) !important;
+      background-color: rgba(59, 130, 246, 0.35) !important;
       border-top: 1px solid rgba(59, 130, 246, 0.4) !important;
       border-bottom: 1px solid rgba(59, 130, 246, 0.4) !important;
     }
@@ -618,7 +618,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v04.03</span>
+          <span class="text-[8px] font-normal text-blue-400">v04.04</span>
         </span>
       </button>
 
@@ -1411,7 +1411,7 @@
       const canvas = document.getElementById('results-canvas');
       if (canvas) {
         const activeCols = getActiveColumns();
-        const template = activeCols.map(cfg => `minmax(120px, var(--col-width-${cfg.key}))`).join(' ');
+        const template = activeCols.map(cfg => `minmax(60px, var(--col-width-${cfg.key}))`).join(' ');
         canvas.style.gridTemplateColumns = template;
       }
     }
@@ -1512,7 +1512,7 @@
           // Render value with specific formatting if needed
           let htmlContent = "";
           if (cfg.key === 'source') {
-            htmlContent = `<span class="text-slate-500 font-mono font-semibold">#${rawVal}</span>`;
+            htmlContent = `<span class="text-slate-200 font-mono font-semibold">#${rawVal}</span>`;
           } else if (cfg.key === 'brand') {
             let brandVal = String(rawVal).trim().toUpperCase();
             if (brandVal === "CARRIER") {
@@ -1550,13 +1550,13 @@
             const isSC = String(row[map.type]).toUpperCase() === "STRAIGHT COOL" || String(row[map.type]).toUpperCase() === "AC";
             htmlContent = (!isSC && rawVal) ? `<div class="flex items-center gap-1.5 font-mono text-slate-355"><span>HSPF2:</span><span>${rawVal}</span></div>` : '';
           } else if (cfg.key === 'ahri') {
-            htmlContent = rawVal ? `<div class="flex items-center gap-1.5 font-mono text-slate-500"><span>AHRI:</span><span>${rawVal}</span></div>` : '';
+            htmlContent = rawVal ? `<div class="flex items-center gap-1.5 font-mono text-slate-200"><span>AHRI:</span><span>${rawVal}</span></div>` : '';
           } else if (cfg.key === 'coolbtu') {
-            htmlContent = rawVal ? `<div class="flex gap-1.5 font-mono text-slate-300"><span>Cool BTU:</span><span>${rawVal}</span></div>` : '';
+            htmlContent = rawVal ? `<div class="flex flex-col items-center justify-center font-mono text-slate-300"><span>Cool BTU</span><span>${rawVal}</span></div>` : '';
           } else if (cfg.key === 'heatbtu') {
-            htmlContent = rawVal ? `<div class="flex gap-1.5 font-mono text-slate-300"><span>Heat BTU:</span><span>${rawVal}</span></div>` : '';
+            htmlContent = rawVal ? `<div class="flex flex-col items-center justify-center font-mono text-slate-300"><span>Heat BTU</span><span>${rawVal}</span></div>` : '';
           } else if (cfg.key === 'width' || cfg.key === 'height') {
-            htmlContent = `<div class="font-mono text-slate-400">${rawVal ? rawVal + '"' : ''}</div>`;
+            htmlContent = `<div class="font-mono text-slate-200">${rawVal ? rawVal + '"' : ''}</div>`;
           } else {
             htmlContent = `<span class="text-slate-300 font-semibold">${rawVal}</span>`;
           }
