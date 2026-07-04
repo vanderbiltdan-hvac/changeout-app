@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v04.00 | Flat Spreadsheet Architecture | Lines: 1932 -->
+<!-- Changeout Lookup v04.01 | Spreadsheet Polish & Ultimate Header Menu | Lines: 2090 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v04.00</title>
+  <title>Changeout Lookup v04.01</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -53,16 +53,18 @@
       display: none;
     }
 
-    /* Scrollable Results Canvas - Pure CSS Grid Layout */
+    /* Scrollable Results Canvas - Pure CSS Grid Layout (Spreadsheet Mode) */
     #results-canvas {
       max-height: 75vh;
       overflow-y: auto;
       overflow-x: auto;
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 0.5rem 0.75rem; /* Row gap and column gap */
+      gap: 0px; /* No gaps for traditional spreadsheet look */
       padding: 1rem;
       align-items: stretch;
+      border-left: 1px solid #334155;
+      border-top: 1px solid #334155;
     }
 
     .grid-header {
@@ -75,8 +77,8 @@
       justify-content: center;
       padding: 0.5rem 0.75rem;
       background-color: #0f172a; /* Slate 900 */
-      border: 1px solid #1e293b; /* Slate 800 */
-      border-radius: 0.5rem; /* rounded-lg */
+      border-right: 1px solid #334155;
+      border-bottom: 2px solid #475569;
       font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
@@ -88,7 +90,6 @@
     }
     .grid-header:hover {
       color: #ffffff;
-      border-color: #475569;
       background-color: #1e293b;
     }
 
@@ -97,8 +98,9 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 0.5rem 0.75rem;
-      border-radius: 0.375rem; /* rounded-md */
+      padding: 4px 8px; /* Strict tight spreadsheet padding */
+      border-right: 1px solid #334155;
+      border-bottom: 1px solid #334155;
       transition: all 0.15s ease;
       overflow: hidden;
       user-select: none;
@@ -107,16 +109,12 @@
     /* Row highlight styles */
     .grid-cell.row-hovered {
       background-color: #334155 !important; /* slate-700 hover state */
-      border-color: #475569 !important;
     }
 
-    /* Dynamic Grid Density */
-    #results-canvas.pad-compact { gap: 0.25rem 0.35rem; }
-    #results-canvas.pad-compact .grid-cell { min-height: 2.75rem; padding: 0.25rem 0.5rem; }
-    #results-canvas.pad-standard { gap: 0.5rem 0.75rem; }
-    #results-canvas.pad-standard .grid-cell { min-height: 3.5rem; padding: 0.5rem 0.75rem; }
-    #results-canvas.pad-relaxed { gap: 0.75rem 1.0rem; }
-    #results-canvas.pad-relaxed .grid-cell { min-height: 4.5rem; padding: 0.75rem 1.0rem; }
+    /* Dynamic Grid Density (Only adjusting min-height and padding inside the cells, no gaps) */
+    #results-canvas.pad-compact .grid-cell { min-height: 2.5rem; padding: 2px 4px; }
+    #results-canvas.pad-standard .grid-cell { min-height: 3.5rem; padding: 4px 8px; }
+    #results-canvas.pad-relaxed .grid-cell { min-height: 4.5rem; padding: 8px 12px; }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col no-scrollbar selection:bg-blue-500 selection:text-white pb-32">
@@ -246,20 +244,67 @@
       </div>
       
       <!-- Content Area -->
-      <div class="p-4 space-y-4">
+      <div class="p-4 space-y-4 max-h-[80vh] overflow-y-auto no-scrollbar">
         <!-- Assign label -->
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Custom Header Label</label>
           <input type="text" id="widget-column-label" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Enter custom label">
         </div>
         
+        <!-- Width Mode Toggle -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Width Mode</label>
+          <select id="widget-width-mode" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+            <option value="fr">Flexible (fr)</option>
+            <option value="px">Fixed Pixel (px)</option>
+          </select>
+        </div>
+
         <!-- Real-Time Width Slider -->
         <div class="flex flex-col gap-1.5">
           <div class="flex justify-between items-center">
-            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Column Width factor</label>
-            <span id="widget-slider-value" class="text-xs font-mono font-bold text-blue-400">1.5</span>
+            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Column Width</label>
+            <span id="widget-slider-value" class="text-xs font-mono font-bold text-blue-400">1.5fr</span>
           </div>
           <input type="range" id="widget-width-slider" min="0.2" max="5.0" step="0.1" class="w-full accent-blue-500 h-1.5 bg-slate-850 rounded-lg appearance-none cursor-pointer">
+        </div>
+
+        <!-- Font Size Scaler -->
+        <div class="flex flex-col gap-1.5">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Font Size</label>
+            <span id="widget-font-value" class="text-xs font-mono font-bold text-blue-400">12px</span>
+          </div>
+          <input type="range" id="widget-font-slider" min="10" max="30" step="1" class="w-full accent-blue-500 h-1.5 bg-slate-850 rounded-lg appearance-none cursor-pointer">
+        </div>
+
+        <!-- Alignment Matrix -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Horizontal</label>
+            <select id="widget-align-horiz" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+              <option value="start">Left</option>
+              <option value="center">Center</option>
+              <option value="end">Right</option>
+            </select>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Vertical</label>
+            <select id="widget-align-vert" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+              <option value="start">Top</option>
+              <option value="center">Middle</option>
+              <option value="end">Bottom</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Background Fill -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Background Fill</label>
+          <div class="flex items-center gap-2">
+            <input type="color" id="widget-bg-color" class="w-8 h-8 rounded border border-slate-700 bg-transparent cursor-pointer">
+            <input type="text" id="widget-bg-text" class="flex-grow bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="#1e293b">
+          </div>
         </div>
 
         <div class="flex flex-col gap-2 pt-2">
@@ -539,7 +584,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v04.00</span>
+          <span class="text-[8px] font-normal text-blue-400">v04.01</span>
         </span>
       </button>
 
@@ -1029,8 +1074,15 @@
       const modal = document.getElementById('widget-menu-modal');
       const title = document.getElementById('widget-modal-title');
       const labelInput = document.getElementById('widget-column-label');
+      const widthModeSelect = document.getElementById('widget-width-mode');
       const slider = document.getElementById('widget-width-slider');
       const sliderValText = document.getElementById('widget-slider-value');
+      const fontSlider = document.getElementById('widget-font-slider');
+      const fontValText = document.getElementById('widget-font-value');
+      const alignHorizSelect = document.getElementById('widget-align-horiz');
+      const alignVertSelect = document.getElementById('widget-align-vert');
+      const bgColorInput = document.getElementById('widget-bg-color');
+      const bgColorText = document.getElementById('widget-bg-text');
       
       if (!modal) return;
       
@@ -1038,21 +1090,69 @@
       
       // Look up current text label inside results-canvas headers
       const labelSpan = document.querySelector(`#results-canvas [data-col-key="${colKey}"]`);
-      labelInput.value = labelSpan ? labelSpan.textContent.trim() : defaultTitle;
+      labelInput.value = labelSpan ? labelSpan.textContent.replace(/\s*\(\d+\)\s*$/, '').trim() : defaultTitle;
       
-      // Look up current CSS variable value
-      const varKey = colKey;
+      // Read current computed settings for the selected column
       const computedStyle = getComputedStyle(document.documentElement);
-      const varVal = computedStyle.getPropertyValue(`--col-width-${varKey}`).trim() || "1.0fr";
-      slider.value = parseFloat(varVal);
-      sliderValText.textContent = varVal;
       
-      // Update slider value text in real-time on input
+      // 1. Width & Unit
+      const rawWidth = computedStyle.getPropertyValue(`--col-width-${colKey}`).trim() || "1.0fr";
+      const isPx = rawWidth.endsWith('px');
+      widthModeSelect.value = isPx ? 'px' : 'fr';
+      
+      // Setup dynamic slider properties based on width mode
+      function updateSliderLimits() {
+        if (widthModeSelect.value === 'px') {
+          slider.min = "50";
+          slider.max = "600";
+          slider.step = "10";
+          slider.value = isPx ? parseFloat(rawWidth) : 150;
+          sliderValText.textContent = slider.value + 'px';
+        } else {
+          slider.min = "0.2";
+          slider.max = "5.0";
+          slider.step = "0.1";
+          slider.value = !isPx ? parseFloat(rawWidth) : 1.0;
+          sliderValText.textContent = slider.value + 'fr';
+        }
+      }
+      updateSliderLimits();
+      
+      widthModeSelect.onchange = updateSliderLimits;
       slider.oninput = function() {
-        sliderValText.textContent = this.value + 'fr';
-        document.documentElement.style.setProperty(`--col-width-${varKey}`, this.value + 'fr');
+        sliderValText.textContent = this.value + widthModeSelect.value;
       };
+
+      // 2. Font Size
+      const rawFontSize = computedStyle.getPropertyValue(`--font-size-${colKey}`).trim() || "11px";
+      fontSlider.value = parseFloat(rawFontSize);
+      fontValText.textContent = fontSlider.value + 'px';
+      fontSlider.oninput = function() {
+        fontValText.textContent = this.value + 'px';
+      };
+
+      // 3. Alignments
+      const rawAlignHoriz = computedStyle.getPropertyValue(`--align-horiz-${colKey}`).trim() || "start";
+      alignHorizSelect.value = rawAlignHoriz;
+
+      const rawAlignVert = computedStyle.getPropertyValue(`--align-vert-${colKey}`).trim() || "center";
+      alignVertSelect.value = rawAlignVert;
+
+      // 4. Background Color
+      const rawBgColor = computedStyle.getPropertyValue(`--bg-color-${colKey}`).trim() || "#1e293b";
+      bgColorInput.value = rawBgColor.startsWith('#') ? rawBgColor : "#1e293b";
+      bgColorText.value = rawBgColor;
       
+      // Sync color picker and color text box
+      bgColorInput.oninput = function() {
+        bgColorText.value = this.value;
+      };
+      bgColorText.oninput = function() {
+        if (this.value.startsWith('#') && (this.value.length === 4 || this.value.length === 7)) {
+          bgColorInput.value = this.value;
+        }
+      };
+
       modal.classList.remove('hidden');
     }
 
@@ -1065,12 +1165,51 @@
       const labelInput = document.getElementById('widget-column-label');
       const labelVal = labelInput.value.trim();
       
-      if (currentConfigColKey && labelVal) {
-        // Update header label text
-        const labelSpans = document.querySelectorAll(`#results-canvas [data-col-key="${currentConfigColKey}"]`);
-        labelSpans.forEach(span => {
-          span.textContent = labelVal;
-        });
+      const widthModeSelect = document.getElementById('widget-width-mode');
+      const slider = document.getElementById('widget-width-slider');
+      const fontSlider = document.getElementById('widget-font-slider');
+      const alignHorizSelect = document.getElementById('widget-align-horiz');
+      const alignVertSelect = document.getElementById('widget-align-vert');
+      const bgColorText = document.getElementById('widget-bg-text');
+
+      if (currentConfigColKey) {
+        const colKey = currentConfigColKey;
+
+        // 1. Save Label (retaining filter badges if any exist)
+        if (labelVal) {
+          const labelSpan = document.querySelector(`#results-canvas [data-col-key="${colKey}"]`);
+          if (labelSpan) {
+            const activeFilterCount = mobileFilterState[colKey] ? mobileFilterState[colKey].length : 0;
+            if (activeFilterCount > 0) {
+              labelSpan.innerHTML = `${labelVal} <span class="text-[8px] font-bold">(${activeFilterCount})</span>`;
+            } else {
+              labelSpan.textContent = labelVal;
+            }
+            labelSpan.dataset.baseName = labelVal;
+          }
+        }
+
+        // 2. Build and save CSS variables
+        const widthVal = slider.value + widthModeSelect.value;
+        const fontSizeVal = fontSlider.value + 'px';
+        const alignHorizVal = alignHorizSelect.value;
+        const alignVertVal = alignVertSelect.value;
+        const bgColorVal = bgColorText.value.trim() || "#1e293b";
+
+        // Map horizontal alignment to text alignment key
+        let textAlignVal = "left";
+        if (alignHorizVal === "center") textAlignVal = "center";
+        else if (alignHorizVal === "end") textAlignVal = "right";
+
+        document.documentElement.style.setProperty(`--col-width-${colKey}`, widthVal);
+        document.documentElement.style.setProperty(`--font-size-${colKey}`, fontSizeVal);
+        document.documentElement.style.setProperty(`--align-horiz-${colKey}`, alignHorizVal);
+        document.documentElement.style.setProperty(`--align-vert-${colKey}`, alignVertVal);
+        document.documentElement.style.setProperty(`--bg-color-${colKey}`, bgColorVal);
+        document.documentElement.style.setProperty(`--align-text-${colKey}`, textAlignVal);
+
+        // Apply visual updates to canvas track layout immediately
+        applyColumnVisibility();
       }
       
       closeWidgetModal();
@@ -1100,7 +1239,26 @@
         localStorage.setItem('changeout_columns_v1', JSON.stringify(columnVisibility));
     }
 
+    function initDynamicColumnStyles() {
+      const styleEl = document.createElement('style');
+      let cssRules = '';
+      filterConfigs.forEach(cfg => {
+        cssRules += `
+          .col-${cfg.key} {
+            font-size: var(--font-size-${cfg.key}) !important;
+            align-items: var(--align-horiz-${cfg.key}) !important;
+            justify-content: var(--align-vert-${cfg.key}) !important;
+            background-color: var(--bg-color-${cfg.key}) !important;
+            text-align: var(--align-text-${cfg.key}) !important;
+          }
+        `;
+      });
+      styleEl.innerHTML = cssRules;
+      document.head.appendChild(styleEl);
+    }
+
     function loadColumnSettings() {
+        initDynamicColumnStyles();
         const saved = localStorage.getItem('changeout_columns_v1');
         if (saved) {
             try {
@@ -1250,9 +1408,9 @@
           } else if (cfg.key === 'brand') {
             let brandVal = String(rawVal).trim().toUpperCase();
             if (brandVal === "CARRIER") {
-              htmlContent = `<img src="./carrier.png" alt="Carrier" class="h-6 md:h-8 w-auto object-contain transition-transform" title="Toggle Selection">`;
+              htmlContent = `<img src="./carrier.png" alt="Carrier" class="h-[2em] w-auto object-contain transition-transform" title="Toggle Selection">`;
             } else if (brandVal === "COMFORTMAKER") {
-              htmlContent = `<img src="./comfortmaker.png" alt="Comfortmaker" class="h-8 md:h-10 w-auto object-contain transition-transform" title="Toggle Selection">`;
+              htmlContent = `<img src="./comfortmaker.png" alt="Comfortmaker" class="h-[2.5em] w-auto object-contain transition-transform" title="Toggle Selection">`;
             } else {
               htmlContent = `<span class="font-bold text-white">${rawVal}</span>`;
             }
