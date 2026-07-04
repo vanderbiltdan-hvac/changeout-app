@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v03.06 | CSS Grid Architecture | Lines: 2021 -->
+<!-- Changeout Lookup v03.07 | CSS Grid Syntax Fix | Lines: 2021 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"> 
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v03.06</title>
+  <title>Changeout Lookup v03.07</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -16,11 +16,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --col-width-source: 0.5;
-      --col-width-brand: 1.5;
-      --col-width-capacity: 1.5;
-      --col-width-efficiency: 2.2;
-      --col-width-price: 1.5;
+      --col-width-source: 0.5fr;
+      --col-width-brand: 1.5fr;
+      --col-width-capacity: 1.5fr;
+      --col-width-efficiency: 2.2fr;
+      --col-width-price: 1.5fr;
     }
     body {
       font-family: 'Inter', sans-serif;
@@ -47,11 +47,11 @@
       overflow-x: auto;
       display: grid;
       grid-template-columns: 
-        calc(var(--col-width-source) * 1fr)
-        calc(var(--col-width-brand) * 1fr)
-        calc(var(--col-width-capacity) * 1fr)
-        calc(var(--col-width-efficiency) * 1fr)
-        calc(var(--col-width-price) * 1fr);
+        var(--col-width-source)
+        var(--col-width-brand)
+        var(--col-width-capacity)
+        var(--col-width-efficiency)
+        var(--col-width-price);
       gap: 0.5rem 0.75rem; /* Row gap and column gap */
       padding: 1rem;
       align-items: stretch;
@@ -531,7 +531,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v03.06</span>
+          <span class="text-[8px] font-normal text-blue-400">v03.07</span>
         </span>
       </button>
 
@@ -1061,8 +1061,8 @@
       
       // Update slider value text in real-time on input
       slider.oninput = function() {
-        sliderValText.textContent = this.value;
-        document.documentElement.style.setProperty(`--col-width-${varKey}`, this.value);
+        sliderValText.textContent = this.value + 'fr';
+        document.documentElement.style.setProperty(`--col-width-${varKey}`, this.value + 'fr');
       };
       
       modal.classList.remove('hidden');
@@ -1189,11 +1189,11 @@
       const canvas = document.getElementById('results-canvas');
       if (canvas) {
         const template = [
-          col1Visible ? 'calc(var(--col-width-source) * 1fr)' : '0px',
-          col2Visible ? 'calc(var(--col-width-brand) * 1fr)' : '0px',
-          col3Visible ? 'calc(var(--col-width-capacity) * 1fr)' : '0px',
-          col4Visible ? 'calc(var(--col-width-efficiency) * 1fr)' : '0px',
-          col5Visible ? 'calc(var(--col-width-price) * 1fr)' : '0px'
+          col1Visible ? 'var(--col-width-source)' : '0px',
+          col2Visible ? 'var(--col-width-brand)' : '0px',
+          col3Visible ? 'var(--col-width-capacity)' : '0px',
+          col4Visible ? 'var(--col-width-efficiency)' : '0px',
+          col5Visible ? 'var(--col-width-price)' : '0px'
         ].join(' ');
         canvas.style.gridTemplateColumns = template;
       }
