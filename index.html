@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v03.03 | Data Spacing Fix | Lines: 1974 -->
+<!-- Changeout Lookup v03.05 | Vertical Silo Architecture | Lines: 2007 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v03.03</title>
+  <title>Changeout Lookup v03.05</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -19,8 +19,7 @@
       --col-width-source: 0.5;
       --col-width-brand: 1.5;
       --col-width-capacity: 1.5;
-      --col-width-efficiency: 2;
-      --col-width-specs: 2;
+      --col-width-efficiency: 2.2;
       --col-width-price: 1.5;
     }
     body {
@@ -41,24 +40,74 @@
       display: none;
     }
 
-    /* Scrollable Results Grid & Sticky Header Map */
-    #results-canvas { max-height: 75vh; overflow-y: auto; overflow-x: auto; display: flex; flex-direction: column; }
-    
-    /* Horizontal Compare Mode Pivot for Cards */
-    #results-canvas.compare-mode #results-header { display: none !important; }
-    #results-canvas.compare-mode #results-grid { display: flex; flex-direction: row; overflow-x: auto; overflow-y: visible; align-items: stretch; max-height: none; p-4 }
-    #results-canvas.compare-mode #results-grid > div { flex-direction: column !important; min-width: 220px; flex-shrink: 0; align-items: stretch; }
-    #results-canvas.compare-mode #results-grid > div > div { flex: 1 !important; border-right: none !important; border-bottom: 1px solid #1e293b; padding-bottom: 0.5rem; padding-top: 0.5rem; width: 100%; }
-    #results-canvas.compare-mode #results-grid > div > div:last-child { border-bottom: none !important; }
+    /* Scrollable Results Canvas with strictly vertical silos */
+    #results-canvas {
+      max-height: 75vh;
+      overflow-y: auto;
+      overflow-x: auto;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      gap: 0.75rem;
+      padding: 1rem;
+    }
 
-    /* Dynamic Grid Density */
-    #results-grid { transition: gap 0.2s ease; }
-    #results-grid.pad-compact { gap: 0.35rem; }
-    #results-grid.pad-compact > div { padding: 0.5rem !important; }
-    #results-grid.pad-standard { gap: 0.5rem; }
-    #results-grid.pad-standard > div { padding: 0.85rem !important; }
-    #results-grid.pad-relaxed { gap: 0.85rem; }
-    #results-grid.pad-relaxed > div { padding: 1.25rem !important; }
+    .silo-column {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      min-width: 120px;
+      transition: flex-basis 0.2s ease;
+    }
+
+    .silo-header {
+      height: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0.5rem 0.75rem;
+      background-color: #0f172a; /* Slate 900 */
+      border: 1px solid #1e293b; /* Slate 800 */
+      border-radius: 0.75rem; /* rounded-xl */
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8; /* Slate 400 */
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+    .silo-header:hover {
+      color: #ffffff;
+      border-color: #475569;
+    }
+
+    .silo-cell {
+      height: 7rem; /* 112px */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0.75rem;
+      border-radius: 0.75rem; /* rounded-xl */
+      transition: all 0.15s ease;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Row highlight styles */
+    .silo-cell.row-hovered {
+      background-color: #334155 !important; /* slate-700 hover state */
+      border-color: #475569 !important;
+    }
+
+    /* Dynamic Silo Density */
+    #results-canvas.pad-compact { gap: 0.35rem; }
+    #results-canvas.pad-compact .silo-cell { height: 6rem; padding: 0.5rem; }
+    #results-canvas.pad-standard { gap: 0.75rem; }
+    #results-canvas.pad-standard .silo-cell { height: 7rem; padding: 0.75rem; }
+    #results-canvas.pad-relaxed { gap: 1.25rem; }
+    #results-canvas.pad-relaxed .silo-cell { height: 8.5rem; padding: 1rem; }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col no-scrollbar selection:bg-blue-500 selection:text-white pb-32">
@@ -144,56 +193,9 @@
 
       <!-- Scrollable Canvas -->
       <div id="results-canvas" class="overflow-y-auto no-scrollbar">
-        <!-- Dynamic Resizing Header Map -->
-        <div id="results-header" class="sticky top-0 z-20 bg-slate-900 border-b border-slate-700 px-4 py-2.5 hidden md:flex items-center gap-4 text-[10px] uppercase font-bold text-slate-400 tracking-wider shadow shrink-0 select-none">
-          <!-- Column 1: Source Row -->
-          <div data-col-key="source" onclick="openCategoryModal('source', 'Source Row')" style="flex: var(--col-width-source);" class="cursor-pointer hover:text-white transition flex flex-col justify-center">
-              <span>Source</span>
-          </div>
-          <!-- Column 2: Brand / Tier -->
-          <div id="header-brand-group" onclick="openCategoryModal('brand', 'Brand / Tier')" class="cursor-pointer hover:text-white transition flex flex-col justify-start" style="flex: var(--col-width-brand);">
-              <span data-col-key="brand">Brand</span>
-              <span data-col-key="series" class="text-[8px] text-slate-500">Tier</span>
-          </div>
-          <!-- Column 3: Capacity / Type / Stage -->
-          <div id="header-capacity-group" onclick="openCategoryModal('capacity', 'Capacity / Type / Stage')" class="cursor-pointer hover:text-white transition flex flex-col justify-center gap-0.5" style="flex: var(--col-width-capacity);">
-              <span data-col-key="capacity" class="leading-none">Capacity</span>
-              <span data-col-key="type" class="text-[8px] text-slate-500 leading-none">Type</span>
-              <span data-col-key="stage" class="text-[8px] text-slate-500 leading-none">Stage</span>
-          </div>
-          <!-- Column 4: Efficiency -->
-          <div id="header-efficiency-group" onclick="openCategoryModal('seer2', 'Efficiency')" class="cursor-pointer hover:text-white transition flex flex-col justify-start" style="flex: var(--col-width-efficiency);">
-              <span>Efficiency</span>
-              <span class="text-[8px] text-slate-500 flex flex-wrap gap-1">
-                <span data-col-key="seer2">SEER2</span>
-                <span data-col-key="eer2">/ EER2</span>
-                <span data-col-key="hspf2">/ HSPF2</span>
-                <span data-col-key="ahri">/ AHRI</span>
-              </span>
-          </div>
-          <!-- Column 5: Specs -->
-          <div id="header-dimensions-group" onclick="openCategoryModal('width', 'Specs')" class="cursor-pointer hover:text-white transition flex flex-col justify-start" style="flex: var(--col-width-specs);">
-              <span>Specs</span>
-              <span class="text-[8px] text-slate-500 flex flex-wrap gap-1">
-                <span data-col-key="coolbtu">Cool BTU</span>
-                <span data-col-key="heatbtu">/ Heat BTU</span>
-                <span data-col-key="width">/ Dims</span>
-                <span data-col-key="page">/ Page</span>
-              </span>
-          </div>
-          <!-- Column 6: Price -->
-          <div id="header-price-group" onclick="openCategoryModal('price', 'Price')" class="cursor-pointer hover:text-white transition flex flex-col justify-start text-right" style="flex: var(--col-width-price);">
-              <span data-col-key="price">Price</span>
-              <span data-col-key="tax" class="text-[8px] text-slate-500">Tax Incentive</span>
-          </div>
-        </div>
-
-        <!-- Dynamic Results Grid Container -->
-        <div id="results-grid" class="flex flex-col gap-2 w-full p-4">
-          <!-- Loading Indicator -->
-          <div id="loading-row" class="py-12 text-center text-xs text-slate-500 font-medium bg-slate-850 border border-slate-750/50 rounded-xl">
-            <span class="inline-block animate-spin mr-2">⏳</span> Loading catalog from Google Sheets...
-          </div>
+        <!-- Loading Indicator -->
+        <div id="loading-row" class="w-full py-12 text-center text-xs text-slate-500 font-medium bg-slate-850 border border-slate-750/50 rounded-xl">
+          <span class="inline-block animate-spin mr-2">⏳</span> Loading catalog from Google Sheets...
         </div>
       </div>
     </section>
@@ -528,7 +530,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v03.03</span>
+          <span class="text-[8px] font-normal text-blue-400">v03.05</span>
         </span>
       </button>
 
@@ -573,12 +575,12 @@
     }
 
     function applyDisplaySettings() {
-        const grid = document.getElementById('results-grid');
-        if (!grid) return;
+        const canvas = document.getElementById('results-canvas');
+        if (!canvas) return;
         
         // Apply Padding Class
-        grid.classList.remove('pad-compact', 'pad-standard', 'pad-relaxed');
-        grid.classList.add('pad-' + currentPadding);
+        canvas.classList.remove('pad-compact', 'pad-standard', 'pad-relaxed');
+        canvas.classList.add('pad-' + currentPadding);
         
         // Update Button UI (Padding)
         ['compact', 'standard', 'relaxed'].forEach(p => {
@@ -1002,11 +1004,11 @@
       eer2: 'efficiency',
       hspf2: 'efficiency',
       ahri: 'efficiency',
-      coolbtu: 'specs',
-      heatbtu: 'specs',
-      width: 'specs',
-      height: 'specs',
-      page: 'specs',
+      coolbtu: 'efficiency',
+      heatbtu: 'efficiency',
+      width: 'efficiency',
+      height: 'efficiency',
+      page: 'efficiency',
       price: 'price',
       tax: 'price'
     };
@@ -1229,69 +1231,86 @@
 
     // Render Table logic dynamically generating cards for all 18 database indexes
     function renderTable(dataToRender) {
-      const grid = document.getElementById('results-grid');
-      if (!grid) return;
-      grid.innerHTML = '';
+      const canvas = document.getElementById('results-canvas');
+      if (!canvas) return;
+      canvas.innerHTML = '';
 
       if (dataToRender.length === 0) {
-        grid.innerHTML = `<div class="py-12 text-center text-sm text-slate-500 font-semibold bg-slate-850 border border-slate-750/50 rounded-xl">No results match your criteria.</div>`;
+        canvas.innerHTML = `<div class="w-full py-12 text-center text-sm text-slate-500 font-semibold bg-slate-850 border border-slate-750/50 rounded-xl">No results match your criteria.</div>`;
         return;
       }
 
-      dataToRender.forEach(row => {
-        const isInCart = cart.some(item => String(item[map.sourceRow] || "").trim() === String(row[map.sourceRow] || "").trim());
-        
-        const card = document.createElement('div');
-        card.className = isInCart 
-          ? "flex flex-col md:flex-row items-stretch bg-blue-950/20 hover:bg-blue-900/10 transition border border-blue-500/50 rounded-xl p-3 md:p-4 gap-3 md:gap-4 select-none" 
-          : "flex flex-col md:flex-row items-stretch bg-slate-850 hover:bg-slate-800 transition border border-slate-750/50 rounded-xl p-3 md:p-4 gap-3 md:gap-4 select-none";
+      // Create the 5 Column Silos
+      const colSpecs = [
+        { key: 'source', title: 'Source Row', flexVar: '--col-width-source' },
+        { key: 'brand', title: 'Brand & Tier', flexVar: '--col-width-brand' },
+        { key: 'capacity', title: 'Capacity & Stage', flexVar: '--col-width-capacity' },
+        { key: 'efficiency', title: 'Efficiency', flexVar: '--col-width-efficiency' },
+        { key: 'price', title: 'Price', flexVar: '--col-width-price' }
+      ];
 
-        // --- BRAND LOGO & SERIES TIER ---
+      const columns = colSpecs.map(spec => {
+        const colDiv = document.createElement('div');
+        colDiv.className = 'silo-column';
+        colDiv.style.flex = `var(${spec.flexVar})`;
+        colDiv.setAttribute('data-col-key', spec.key);
+
+        // Header Block
+        const header = document.createElement('div');
+        header.className = 'silo-header';
+        header.onclick = () => openCategoryModal(spec.key, spec.title);
+        header.innerHTML = `<span data-col-key="${spec.key}">${spec.title}</span>`;
+        colDiv.appendChild(header);
+
+        return { spec, colDiv };
+      });
+
+      // Populate cells
+      dataToRender.forEach((row, rowIndex) => {
+        const isInCart = cart.some(item => String(item[map.sourceRow] || "").trim() === String(row[map.sourceRow] || "").trim());
+        const rowStrEsc = JSON.stringify(row).replace(/'/g, "&apos;");
+
+        // Cell Class based on cart status
+        const baseCellClass = isInCart
+          ? "silo-cell border-blue-500/50 bg-blue-950/20 text-white cursor-pointer"
+          : "silo-cell border-slate-750 bg-slate-850 text-slate-300 hover:bg-slate-800 hover:border-slate-700 cursor-pointer";
+
+        // Generate data html for each silo
+        // Silo 1: Source Row
+        const sourceHtml = `<span class="text-[10px] text-slate-500 font-mono font-semibold">#${row[map.sourceRow] || ""}</span>`;
+
+        // Silo 2: Brand & Tier
         let brandVal = String(row[map.brand] || "").trim().toUpperCase();
         let brandHtml = row[map.brand] || "";
-        const rowStrEsc = JSON.stringify(row).replace(/'/g, "&apos;");
-        if (brandVal === "CARRIER") brandHtml = `<img onclick='event.stopPropagation(); toggleCartItem(${rowStrEsc})' src="./carrier.png" alt="Carrier" class="h-6 md:h-8 w-auto object-contain cursor-pointer hover:scale-105 transition-transform" title="Toggle Selection">`;
-        else if (brandVal === "COMFORTMAKER") brandHtml = `<img onclick='event.stopPropagation(); toggleCartItem(${rowStrEsc})' src="./comfortmaker.png" alt="Comfortmaker" class="h-8 md:h-10 w-auto object-contain cursor-pointer hover:scale-105 transition-transform" title="Toggle Selection">`;
-        else brandHtml = `<span onclick='event.stopPropagation(); toggleCartItem(${rowStrEsc})' class="font-bold text-white cursor-pointer hover:underline" title="Toggle Selection">${row[map.brand] || ""}</span>`;
+        if (brandVal === "CARRIER") brandHtml = `<img src="./carrier.png" alt="Carrier" class="h-6 md:h-8 w-auto object-contain transition-transform" title="Toggle Selection">`;
+        else if (brandVal === "COMFORTMAKER") brandHtml = `<img src="./comfortmaker.png" alt="Comfortmaker" class="h-8 md:h-10 w-auto object-contain transition-transform" title="Toggle Selection">`;
+        else brandHtml = `<span class="font-bold text-white">${row[map.brand] || ""}</span>`;
 
         const series = String(row[map.tier] || "").toUpperCase();
         let badgeClass = "bg-slate-900/40 text-slate-355 border-slate-800/40";
         if (series === "INFINITY" || series === "MAIN LINE") badgeClass = "bg-blue-900/40 text-blue-300 border-blue-800/40";
         else if (series === "PERFORMANCE" || series === "PERFORMER") badgeClass = "bg-green-900/40 text-green-300 border-green-800/40";
         else if (series === "COMFORT" || series === "BUILDER") badgeClass = "bg-amber-900/40 text-amber-300 border-amber-800/40";
-        
-        const badgeHtml = `<button onclick='event.stopPropagation(); openSystemDetails(${JSON.stringify(row)})' class="px-2.5 py-0.5 mt-1 rounded text-[10px] font-semibold border ${badgeClass} hover:scale-105 transition-transform shadow-sm">${row[map.tier] || ""}</button>`;
 
-        // Capacity, Type & Stage specs
+        const badgeHtml = `<button onclick='event.stopPropagation(); openSystemDetails(${JSON.stringify(row)})' class="px-2.5 py-0.5 mt-1 rounded text-[10px] font-semibold border ${badgeClass} hover:scale-105 transition-transform shadow-sm">${row[map.tier] || ""}</button>`;
+        const brandTierHtml = `
+          <div data-col-key="brand">${brandHtml}</div>
+          <div data-col-key="series">${badgeHtml}</div>
+        `;
+
+        // Silo 3: Capacity & Stage
         let capText = String(row[map.capacity] || "").trim();
         if (useAbbreviations) capText = capText.replace(/Ton/gi, "T");
 
-        let rawSysType = String(row[map.type] || "").toUpperCase();
-        let mainType = row[map.type] || "";
-        let subType = "";
-        if (rawSysType.includes("STRAIGHT COOL") || rawSysType === "AC") { mainType = "AC"; subType = "(Straight Cool)"; } 
-        else if (rawSysType.includes("HEAT PUMP") || rawSysType === "HP") { mainType = "HP"; subType = "(Heat Pump)"; } 
-        else if (rawSysType.includes("GAS FURNACE") || rawSysType.includes("FURNACE")) { mainType = "FURN"; subType = "(Gas Furnace)"; }
-        let typeHtml = useAbbreviations ? mainType : `<span class="block">${mainType}</span><span class="text-[10px] text-slate-500 font-normal">${subType}</span>`;
+        let typeHtml = row[map.type] || "";
+        let mechStage = String(row[map.stage] || "").trim();
+        const capStageHtml = `
+          <span data-col-key="capacity" class="font-extrabold text-white text-[15px] md:text-[17px] leading-none">${capText}</span>
+          <span data-col-key="type" class="text-[12px] font-semibold text-slate-300 leading-tight">${typeHtml}</span>
+          <span data-col-key="stage" class="text-[11px] font-bold text-slate-500 uppercase leading-none">${mechStage}</span>
+        `;
 
-        let mechStage = row[map.stage] || "";
-        let upperStage = String(mechStage).toUpperCase();
-        if (upperStage.includes("SINGLE STAGE") || upperStage === "1 STAGE") mechStage = useAbbreviations ? "1 STG" : "1 Stage";
-        else if (upperStage.includes("2 STAGE") || upperStage.includes("TWO STAGE")) mechStage = useAbbreviations ? "2 STG" : "2 Stage";
-        else if (upperStage.includes("VARIABLE SPEED") || upperStage.includes("VAR")) mechStage = useAbbreviations ? "VAR" : "Variable Speed";
-
-        // Application Style details
-        let styleText = row[map.style] || "";
-        if (useAbbreviations) {
-            let upperStyle = String(styleText).toUpperCase();
-            if (upperStyle.includes("APARTMENT COASTAL")) styleText = "APT CSTL";
-            else if (upperStyle.includes("APARTMENT")) styleText = "APT";
-            else if (upperStyle.includes("COASTAL")) styleText = "CSTL";
-            else if (upperStyle.includes("CROSSOVER")) styleText = "CROSS";
-            else if (upperStyle.includes("STANDARD")) styleText = "STD";
-        }
-
-        // --- SUB-BLOCK CONDITIONAL SPECS ---
+        // Silo 4: Efficiency & Specs (Combines both blocks for rich details)
         let seer2Html = row[map.seer2] ? `<div data-col-key="seer2" class="flex items-center justify-start gap-2 text-[11px] font-mono text-blue-400 font-bold"><span>SEER2:</span><span>${row[map.seer2]}</span></div>` : '';
         let eer2Html = row[map.eer2] ? `<div data-col-key="eer2" class="flex items-center justify-start gap-2 text-[11px] font-mono text-slate-355"><span>EER2:</span><span>${row[map.eer2]}</span></div>` : '';
         let hspf2Html = (row[map.hspf2] && String(row[map.type]).toUpperCase() !== "STRAIGHT COOL" && String(row[map.type]).toUpperCase() !== "AC") 
@@ -1311,60 +1330,74 @@
         let dimsHtml = dimsText ? `<div data-col-key="width" class="flex justify-start gap-2 text-[11px]"><span>Size:</span><span class="font-mono text-slate-400">${dimsText}</span></div>` : '';
         let pageHtml = row[map.page] ? `<div data-col-key="page" class="flex justify-start gap-2 text-[10px] text-slate-500"><span>Page:</span><span class="font-mono">${row[map.page]}</span></div>` : '';
 
+        const efficiencyHtml = `
+          ${seer2Html}
+          ${eer2Html}
+          ${hspf2Html}
+          ${ahriHtml}
+          ${coolBtuHtml}
+          ${heatBtuHtml}
+          ${dimsHtml}
+          ${pageHtml}
+        `;
+
+        // Silo 5: Price
         let priceVal = row[map.price] || "";
         if (typeof priceVal === "number") priceVal = "$" + Math.round(priceVal).toLocaleString();
         else if (priceVal !== "" && !isNaN(Number(priceVal))) priceVal = "$" + Math.round(Number(priceVal)).toLocaleString();
         
         let taxHtml = row[map.tax] ? `<span data-col-key="tax" class="px-2 py-0.5 mt-1 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-900/40 text-[9px] font-bold tracking-wide uppercase leading-none shadow-sm">${row[map.tax]}</span>` : '';
-
-        // Card HTML Template Construction
-        card.innerHTML = `
-          <!-- SECTION 0: SOURCE ROW -->
-          <div data-col-key="source" style="flex: var(--col-width-source);" class="flex flex-col justify-center border-b md:border-b-0 md:border-r border-slate-800 pb-2 md:pb-0">
-            <span class="text-[10px] text-slate-500 font-mono font-semibold">#${row[map.sourceRow] || ""}</span>
-          </div>
-
-          <!-- SECTION 1: HERO BRAND & SERIES -->
-          <div onclick="event.stopPropagation(); toggleCartItem(${rowStrEsc})" style="flex: var(--col-width-brand);" class="flex flex-row md:flex-col justify-between items-start gap-2 border-b md:border-b-0 md:border-r border-slate-800 pb-2 md:pb-0 cursor-pointer">
-            <div data-col-key="brand">${brandHtml}</div>
-            <div data-col-key="series">${badgeHtml}</div>
-          </div>
-
-          <!-- SECTION 2: CAPACITY & SYSTEM TYPE -->
-          <div style="flex: var(--col-width-capacity);" class="flex flex-col justify-center items-start gap-1 border-b md:border-b-0 md:border-r border-slate-800 pb-2 md:pb-0">
-            <span data-col-key="capacity" class="font-extrabold text-white text-[15px] md:text-[17px] leading-none">${capText}</span>
-            <span data-col-key="type" class="text-[12px] font-semibold text-slate-300 leading-tight">${typeHtml}</span>
-            <span data-col-key="stage" class="text-[11px] font-bold text-slate-500 uppercase leading-none">${mechStage}</span>
-          </div>
-
-          <!-- SECTION 3: EFFICIENCY BLOCK -->
-          <div style="flex: var(--col-width-efficiency);" class="flex flex-col justify-center gap-1 border-b md:border-b-0 md:border-r border-slate-800 pb-2 md:pb-0 pr-2">
-            ${seer2Html}
-            ${eer2Html}
-            ${hspf2Html}
-            ${ahriHtml}
-          </div>
-
-          <!-- SECTION 4: SPEC DETAILS -->
-          <div style="flex: var(--col-width-specs);" class="flex flex-col justify-center gap-1 border-b md:border-b-0 md:border-r border-slate-800 pb-2 md:pb-0 pr-2">
-            ${coolBtuHtml}
-            ${heatBtuHtml}
-            ${dimsHtml}
-            ${pageHtml}
-          </div>
-
-          <!-- SECTION 5: PRICING -->
-          <div style="flex: var(--col-width-price);" class="flex flex-row md:flex-col justify-between md:justify-center items-center md:items-end gap-1">
-            <span data-col-key="price" class="font-extrabold text-emerald-450 font-mono text-[16px] md:text-[18px] tracking-tight">${priceVal || "N/A"}</span>
-            ${taxHtml}
-          </div>
+        const priceHtml = `
+          <span data-col-key="price" class="font-extrabold text-emerald-450 font-mono text-[16px] md:text-[18px] tracking-tight">${priceVal || "N/A"}</span>
+          ${taxHtml}
         `;
 
-        grid.appendChild(card);
+        const columnContents = [
+          sourceHtml,
+          brandTierHtml,
+          capStageHtml,
+          efficiencyHtml,
+          priceHtml
+        ];
+
+        // Create cells in each column
+        columns.forEach((col, colIdx) => {
+          const cell = document.createElement('div');
+          cell.className = baseCellClass;
+          cell.setAttribute('data-row-index', rowIndex);
+          cell.innerHTML = columnContents[colIdx];
+
+          // Setup interactions
+          cell.onmouseenter = () => highlightRow(rowIndex, true);
+          cell.onmouseleave = () => highlightRow(rowIndex, false);
+          cell.onclick = (e) => {
+            e.stopPropagation();
+            toggleCartItem(row);
+          };
+
+          col.colDiv.appendChild(cell);
+        });
+      });
+
+      // Append columns to canvas
+      columns.forEach(col => {
+        canvas.appendChild(col.colDiv);
       });
 
       // Apply visibility filters to card sub-elements
       applyColumnVisibility();
+    }
+
+    // Row Hover Highlight Synchronizer
+    function highlightRow(rowIndex, isHovered) {
+      const cells = document.querySelectorAll(`#results-canvas [data-row-index="${rowIndex}"]`);
+      cells.forEach(cell => {
+        if (isHovered) {
+          cell.classList.add('row-hovered');
+        } else {
+          cell.classList.remove('row-hovered');
+        }
+      });
     }
 
 
