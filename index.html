@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v02.07 | Source Row Relocation | Lines: 1724 -->
+<!-- Changeout Lookup v02.08 | Cart Crash Hotfixes | Lines: 1722 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v02.07</title>
+  <title>Changeout Lookup v02.08</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -485,7 +485,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v02.07</span>
+          <span class="text-[8px] font-normal text-blue-400">v02.08</span>
         </span>
       </button>
 
@@ -579,7 +579,7 @@
     }
 
     function toggleCartItem(rowStr) {
-        const rowObj = JSON.parse(rowStr);
+        const rowObj = typeof rowStr === 'string' ? JSON.parse(rowStr) : rowStr;
         const isInCart = cart.some(item => String(item[0] || "").trim() === String(rowObj[0] || "").trim());
         if (isInCart) removeFromCartBySource(rowObj);
         else addToCart(rowObj);
@@ -1483,12 +1483,10 @@
       if (collapsedBadge) collapsedBadge.textContent = cart.length;
       
       const cartItemsDiv = document.getElementById('cart-items');
-      const emptyState = document.getElementById('cart-empty-state');
-      
       cartItemsDiv.innerHTML = '';
       
       if (cart.length === 0) {
-        cartItemsDiv.appendChild(emptyState);
+        cartItemsDiv.innerHTML = `<div id="empty-cart-msg" class="p-8 text-center text-slate-500 text-xs">No equipment selected. Add items from the lookup canvas.</div>`;
       } else {
         const wrapContainer = document.createElement('div');
         wrapContainer.className = "flex flex-col gap-2.5 w-full";
