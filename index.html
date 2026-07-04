@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v03.02 | Widget Menu Polish | Lines: 1974 -->
+<!-- Changeout Lookup v03.03 | Data Spacing Fix | Lines: 1974 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v03.02</title>
+  <title>Changeout Lookup v03.03</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -528,7 +528,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v03.02</span>
+          <span class="text-[8px] font-normal text-blue-400">v03.03</span>
         </span>
       </button>
 
@@ -1292,24 +1292,24 @@
         }
 
         // --- SUB-BLOCK CONDITIONAL SPECS ---
-        let seer2Html = row[map.seer2] ? `<div data-col-key="seer2" class="flex items-center justify-between w-full text-[11px] font-mono text-blue-400 font-bold"><span>SEER2</span><span>${row[map.seer2]}</span></div>` : '';
-        let eer2Html = row[map.eer2] ? `<div data-col-key="eer2" class="flex items-center justify-between w-full text-[11px] font-mono text-slate-350"><span>EER2</span><span>${row[map.eer2]}</span></div>` : '';
+        let seer2Html = row[map.seer2] ? `<div data-col-key="seer2" class="flex items-center justify-start gap-2 text-[11px] font-mono text-blue-400 font-bold"><span>SEER2:</span><span>${row[map.seer2]}</span></div>` : '';
+        let eer2Html = row[map.eer2] ? `<div data-col-key="eer2" class="flex items-center justify-start gap-2 text-[11px] font-mono text-slate-355"><span>EER2:</span><span>${row[map.eer2]}</span></div>` : '';
         let hspf2Html = (row[map.hspf2] && String(row[map.type]).toUpperCase() !== "STRAIGHT COOL" && String(row[map.type]).toUpperCase() !== "AC") 
-            ? `<div data-col-key="hspf2" class="flex items-center justify-between w-full text-[11px] font-mono text-slate-355"><span>HSPF2</span><span>${row[map.hspf2]}</span></div>` 
+            ? `<div data-col-key="hspf2" class="flex items-center justify-start gap-2 text-[11px] font-mono text-slate-355"><span>HSPF2:</span><span>${row[map.hspf2]}</span></div>` 
             : '';
-        let ahriHtml = row[map.ahri] ? `<div data-col-key="ahri" class="flex items-center justify-between w-full text-[10px] font-mono text-slate-500"><span>AHRI</span><span>${row[map.ahri]}</span></div>` : '';
+        let ahriHtml = row[map.ahri] ? `<div data-col-key="ahri" class="flex items-center justify-start gap-2 text-[10px] font-mono text-slate-500"><span>AHRI:</span><span>${row[map.ahri]}</span></div>` : '';
 
         // Size & Page specs
-        let coolBtuHtml = row[map.coolbtu] ? `<div data-col-key="coolbtu" class="flex justify-between w-full text-[11px]"><span>Cool BTU</span><span class="font-mono text-slate-300 font-medium">${row[map.coolbtu]}</span></div>` : '';
-        let heatBtuHtml = row[map.heatbtu] ? `<div data-col-key="heatbtu" class="flex justify-between w-full text-[11px]"><span>Heat BTU</span><span class="font-mono text-slate-300 font-medium">${row[map.heatbtu]}</span></div>` : '';
+        let coolBtuHtml = row[map.coolbtu] ? `<div data-col-key="coolbtu" class="flex justify-start gap-2 text-[11px]"><span>Cool BTU:</span><span class="font-mono text-slate-300 font-medium">${row[map.coolbtu]}</span></div>` : '';
+        let heatBtuHtml = row[map.heatbtu] ? `<div data-col-key="heatbtu" class="flex justify-start gap-2 text-[11px]"><span>Heat BTU:</span><span class="font-mono text-slate-300 font-medium">${row[map.heatbtu]}</span></div>` : '';
         
         let dimsText = "";
         if (row[map.width] && row[map.height]) dimsText = `${row[map.width]}" x ${row[map.height]}"`;
         else if (row[map.width]) dimsText = `${row[map.width]}" W`;
         else if (row[map.height]) dimsText = `${row[map.height]}" H`;
         
-        let dimsHtml = dimsText ? `<div data-col-key="width" class="flex justify-between w-full text-[11px]"><span>Size</span><span class="font-mono text-slate-400">${dimsText}</span></div>` : '';
-        let pageHtml = row[map.page] ? `<div data-col-key="page" class="flex justify-between w-full text-[10px] text-slate-500"><span>Page</span><span class="font-mono">${row[map.page]}</span></div>` : '';
+        let dimsHtml = dimsText ? `<div data-col-key="width" class="flex justify-start gap-2 text-[11px]"><span>Size:</span><span class="font-mono text-slate-400">${dimsText}</span></div>` : '';
+        let pageHtml = row[map.page] ? `<div data-col-key="page" class="flex justify-start gap-2 text-[10px] text-slate-500"><span>Page:</span><span class="font-mono">${row[map.page]}</span></div>` : '';
 
         let priceVal = row[map.price] || "";
         if (typeof priceVal === "number") priceVal = "$" + Math.round(priceVal).toLocaleString();
