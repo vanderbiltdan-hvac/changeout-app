@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v02.04 | Header Stacking Fix & Font Size Bump -->
+<!-- Changeout Lookup v01.21 | UI Cleanup & Core Mechanics (Session 1) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v02.04</title>
+  <title>Changeout Lookup v01.21</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -94,13 +94,12 @@
     </div>
 
     <!-- Smart Status Bar -->
-    <div class="w-full bg-slate-850 border-t border-slate-700 flex justify-between items-center px-2 md:px-4 shadow-inner h-[30px] md:h-[40px]">
-        <!-- Left: Job Ticket -->
-        <div class="flex items-center space-x-2 bg-slate-900 border border-slate-700 rounded-full px-2 md:px-3 py-1 shadow-sm shrink-0 cursor-pointer">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
-            <span class="text-[10px] font-semibold tracking-wider text-slate-300 hidden sm:block">JOB #24908: SMITH</span>
-            <span class="text-[10px] font-semibold tracking-wider text-slate-300 sm:hidden">#24908</span>
-        </div>
+    <div class="w-full bg-slate-850 border-t border-slate-700 flex justify-end items-center px-2 md:px-4 shadow-inner h-[30px] md:h-[40px] gap-2">
+        <!-- Global Reset Filters Button -->
+        <button onclick="resetMobileFilters()" class="flex items-center justify-center h-6 md:h-8 px-2.5 md:px-4 bg-slate-800 hover:bg-slate-700 transition border border-slate-600 rounded-full shadow-sm text-[10px] md:text-xs font-bold text-slate-300 tracking-wider space-x-1.5" title="Reset All Filters">
+            <span>🔄</span>
+            <span class="hidden sm:inline">RESET FILTERS</span>
+        </button>
         <!-- Right: Blue Pill Cart -->
         <button onclick="openCartModal()" class="flex items-center justify-between h-6 md:h-8 px-2.5 md:px-4 bg-blue-600 hover:bg-blue-500 transition border border-blue-400 rounded-full shadow-sm shrink-0 space-x-1.5 md:space-x-2" title="View Cart">
           <span class="text-[11px] md:text-sm">🛒</span>
@@ -217,10 +216,7 @@
     </div>
   </div>
 
-  <!-- FLOATING LEFT CONTROLS -->
-  <button onclick="resetMobileFilters()" class="fixed bottom-36 left-4 z-50 bg-slate-700 hover:bg-slate-600 transition-all text-white p-4 rounded-full shadow-2xl flex items-center justify-center border border-slate-500/30" title="Reset All Filters">
-      <span class="text-xl">🔄</span>
-  </button>
+
 
 
 
@@ -489,7 +485,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v02.04</span>
+          <span class="text-[8px] font-normal text-blue-400">v01.21</span>
         </span>
       </button>
 
@@ -557,6 +553,17 @@
     function toggleCompactMode() {
         const checkbox = document.getElementById('toggle-compact-layout');
         useCompactLayout = checkbox ? checkbox.checked : false;
+        
+        // Auto-Hide / Show Source Row in Compact Mode
+        const sourceCheckbox = document.getElementById('toggle-col-source');
+        if (useCompactLayout) {
+            columnVisibility.source = false;
+            if (sourceCheckbox) sourceCheckbox.checked = false;
+        } else {
+            columnVisibility.source = true;
+            if (sourceCheckbox) sourceCheckbox.checked = true;
+        }
+        
         const table = document.getElementById('results-table');
         if (table) {
             if (useCompactLayout) table.classList.add('layout-compact');
@@ -1022,9 +1029,10 @@
         // --- COL 1 & 2: BRAND & SERIES ---
         let brandVal = String(row[3] || "").trim().toUpperCase();
         let brandHtml = row[3] || "";
-        if (brandVal === "CARRIER") brandHtml = `<img src="./carrier.png" alt="Carrier" class="h-6 md:h-8 w-auto object-contain">`;
-        else if (brandVal === "COMFORTMAKER") brandHtml = `<img src="./comfortmaker.png" alt="Comfortmaker" class="h-8 md:h-10 w-auto object-contain">`;
-        else brandHtml = `<span class="font-bold text-white">${row[3] || ""}</span>`;
+        const rowStrEsc = JSON.stringify(row).replace(/'/g, "&apos;");
+        if (brandVal === "CARRIER") brandHtml = `<img onclick='event.stopPropagation(); addToCart(${rowStrEsc})' src="./carrier.png" alt="Carrier" class="h-6 md:h-8 w-auto object-contain cursor-pointer hover:scale-105 transition-transform" title="Add to Cart">`;
+        else if (brandVal === "COMFORTMAKER") brandHtml = `<img onclick='event.stopPropagation(); addToCart(${rowStrEsc})' src="./comfortmaker.png" alt="Comfortmaker" class="h-8 md:h-10 w-auto object-contain cursor-pointer hover:scale-105 transition-transform" title="Add to Cart">`;
+        else brandHtml = `<span onclick='event.stopPropagation(); addToCart(${rowStrEsc})' class="font-bold text-white cursor-pointer hover:underline" title="Add to Cart">${row[3] || ""}</span>`;
 
         const series = String(row[4] || "").toUpperCase();
         let badgeClass = "bg-slate-900/40 text-slate-355 border-slate-800/40";
