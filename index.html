@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v02.09 | Universal Mini-Modal & Map Selector | Lines: 1811 -->
+<!-- Changeout Lookup v02.10 | Data Decoupling & Voice Engine | Lines: 1860 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v02.09</title>
+  <title>Changeout Lookup v02.10</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -84,7 +84,7 @@
         <button onclick="toggleCompareMode()" class="flex items-center space-x-1 bg-blue-600 hover:bg-blue-500 transition border border-blue-500 rounded py-1 px-2 text-[10px] font-medium text-white shadow-sm">
           <span>⇄</span><span class="hidden sm:inline">Compare</span>
         </button>
-        <button onclick="activateVoiceCommand()" id="top-mic-btn" class="flex items-center justify-center bg-red-600 hover:bg-red-500 transition border border-red-500 rounded-full w-7 h-7 text-xs text-white shadow-sm" title="Voice Search">
+        <button onclick="activateVoiceCommand()" id="top-mic-btn" class="flex items-center justify-center bg-slate-700 hover:bg-slate-600 transition border border-slate-500 rounded-full w-7 h-7 text-xs text-white shadow-sm" title="Voice Search">
           🎙️
         </button>
         <button onclick="openSettingsModal()" class="flex items-center justify-center bg-slate-700 hover:bg-slate-600 transition border border-slate-500 rounded-full w-7 h-7 text-xs text-white shadow-sm" title="Settings">
@@ -493,7 +493,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v02.09</span>
+          <span class="text-[8px] font-normal text-blue-400">v02.10</span>
         </span>
       </button>
 
@@ -1095,6 +1095,28 @@
       });
     }
 
+    // Master translation dictionary mapping column names to 0-indexed database positions
+    const map = {
+      sourceRow: 0,
+      capacity: 1,
+      type: 2,
+      brand: 3,
+      tier: 4,
+      stage: 5,
+      style: 6,
+      seer2: 7,
+      eer2: 8,
+      hspf2: 9,
+      ahri: 10,
+      coolbtu: 11,
+      heatbtu: 12,
+      page: 13,
+      width: 14,
+      height: 15,
+      price: 16,
+      tax: 17
+    };
+
     // Render Table logic dynamically generating cells for all 18 database indexes
     function renderTable(dataToRender) {
       const tbody = document.querySelector('#results-table tbody');
@@ -1102,12 +1124,10 @@
       tbody.innerHTML = '';
 
       if (dataToRender.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="18" class="py-12 text-center text-xs text-slate-500 font-medium whitespace-nowrap">No matches found matching the filter criteria.</td></tr>`;
-        return;
+        tbody.innerHTML = `<tr><td colspan="18" class="py-12 text-center text-xs text-slate-500 font-semibold">No results match your criteria.</td></tr>`;
       }
-
       dataToRender.forEach(row => {
-        const isInCart = cart.some(item => String(item[0] || "").trim() === String(row[0] || "").trim());
+        const isInCart = cart.some(item => String(item[map.sourceRow] || "").trim() === String(row[map.sourceRow] || "").trim());
         const tr = document.createElement('tr');
         tr.className = isInCart 
           ? "bg-blue-900/30 hover:bg-blue-850/50 transition border-b border-blue-500/30 leading-tight" 
@@ -1116,23 +1136,23 @@
         const tdCells = [];
         
         // --- COL 5: SOURCE ROW ---
-        tdCells.push(`<td class="py-3 px-4 whitespace-nowrap text-slate-400 text-xs">${row[0] || ""}</td>`);
+        tdCells.push(`<td class="py-3 px-4 whitespace-nowrap text-slate-400 text-xs">${row[map.sourceRow] || ""}</td>`);
 
         // --- COL 1 & 2: BRAND & SERIES ---
-        let brandVal = String(row[3] || "").trim().toUpperCase();
-        let brandHtml = row[3] || "";
+        let brandVal = String(row[map.brand] || "").trim().toUpperCase();
+        let brandHtml = row[map.brand] || "";
         const rowStrEsc = JSON.stringify(row).replace(/'/g, "&apos;");
         if (brandVal === "CARRIER") brandHtml = `<img onclick='event.stopPropagation(); toggleCartItem(${rowStrEsc})' src="./carrier.png" alt="Carrier" class="h-6 md:h-8 w-auto object-contain cursor-pointer hover:scale-105 transition-transform" title="Add to Cart">`;
         else if (brandVal === "COMFORTMAKER") brandHtml = `<img onclick='event.stopPropagation(); toggleCartItem(${rowStrEsc})' src="./comfortmaker.png" alt="Comfortmaker" class="h-8 md:h-10 w-auto object-contain cursor-pointer hover:scale-105 transition-transform" title="Add to Cart">`;
-        else brandHtml = `<span onclick='event.stopPropagation(); toggleCartItem(${rowStrEsc})' class="font-bold text-white cursor-pointer hover:underline" title="Add to Cart">${row[3] || ""}</span>`;
+        else brandHtml = `<span onclick='event.stopPropagation(); toggleCartItem(${rowStrEsc})' class="font-bold text-white cursor-pointer hover:underline" title="Add to Cart">${row[map.brand] || ""}</span>`;
 
-        const series = String(row[4] || "").toUpperCase();
+        const series = String(row[map.tier] || "").toUpperCase();
         let badgeClass = "bg-slate-900/40 text-slate-355 border-slate-800/40";
         if (series === "INFINITY" || series === "MAIN LINE") badgeClass = "bg-blue-900/40 text-blue-300 border-blue-800/40";
         else if (series === "PERFORMANCE" || series === "PERFORMER") badgeClass = "bg-green-900/40 text-green-300 border-green-800/40";
         else if (series === "COMFORT" || series === "BUILDER") badgeClass = "bg-amber-900/40 text-amber-300 border-amber-800/40";
         
-        const badgeHtml = `<button onclick='event.stopPropagation(); openSystemDetails(${JSON.stringify(row)})' class="px-2.5 py-0.5 mt-1 rounded text-[10px] font-semibold border ${badgeClass} hover:scale-105 transition-transform shadow-sm">${row[4] || ""}</button>`;
+        const badgeHtml = `<button onclick='event.stopPropagation(); openSystemDetails(${JSON.stringify(row)})' class="px-2.5 py-0.5 mt-1 rounded text-[10px] font-semibold border ${badgeClass} hover:scale-105 transition-transform shadow-sm">${row[map.tier] || ""}</button>`;
 
         let freezeClass = useFreezeColumn ? "freeze-col" : "";
         if (useCompactLayout) {
@@ -1156,18 +1176,18 @@
         }
 
         // --- COL 3, 4, 6: CAPACITY, TYPE, STAGE ---
-        let capText = String(row[1] || "").trim();
+        let capText = String(row[map.capacity] || "").trim();
         if (useAbbreviations) capText = capText.replace(/Ton/gi, "T");
 
-        let rawSysType = String(row[2] || "").toUpperCase();
-        let mainType = row[2] || "";
+        let rawSysType = String(row[map.type] || "").toUpperCase();
+        let mainType = row[map.type] || "";
         let subType = "";
         if (rawSysType.includes("STRAIGHT COOL") || rawSysType === "AC") { mainType = "AC"; subType = "(Straight Cool)"; } 
         else if (rawSysType.includes("HEAT PUMP") || rawSysType === "HP") { mainType = "HP"; subType = "(Heat Pump)"; } 
         else if (rawSysType.includes("GAS FURNACE") || rawSysType.includes("FURNACE")) { mainType = "FURN"; subType = "(Gas Furnace)"; }
         let typeHtml = useAbbreviations ? mainType : `<span class="block">${mainType}</span><span class="text-[10px] text-slate-500 font-normal">${subType}</span>`;
 
-        let mechStage = row[5] || "";
+        let mechStage = row[map.stage] || "";
         let upperStage = String(mechStage).toUpperCase();
         if (upperStage.includes("SINGLE STAGE") || upperStage === "1 STAGE") mechStage = useAbbreviations ? "1 STG" : "1 Stage";
         else if (upperStage.includes("2 STAGE") || upperStage.includes("TWO STAGE")) mechStage = useAbbreviations ? "2 STG" : "2 Stage";
@@ -1190,7 +1210,7 @@
         }
 
         // --- COL 7 & 8: STYLE & SEER2 ---
-        let styleText = row[6] || "";
+        let styleText = row[map.style] || "";
         if (useAbbreviations) {
             let upperStyle = String(styleText).toUpperCase();
             if (upperStyle.includes("APARTMENT COASTAL")) styleText = "APT CSTL";
@@ -1204,30 +1224,29 @@
             tdCells.push(`<td class="py-2 px-4 whitespace-nowrap align-top border-r border-slate-700/50 bg-slate-800/20">
                 <div class="flex flex-col items-start gap-1.5">
                     <span class="font-bold text-white text-[14px] md:text-[16px] leading-none">${styleText || "STD"}</span>
-                    <span class="text-[13px] md:text-[14px] font-mono font-bold text-blue-400 leading-none">${row[7] || ""} <span class="text-[10px] text-slate-500 font-sans">SEER2</span></span>
+                    <span class="text-[13px] md:text-[14px] font-mono font-bold text-blue-400 leading-none">${row[map.seer2] || ""} <span class="text-[10px] text-slate-500 font-sans">SEER2</span></span>
                 </div>
             </td>`);
             tdCells.push(`<td class="hidden"></td>`); // SEER2 sync
         } else {
             tdCells.push(`<td class="py-3 px-4 whitespace-normal break-words min-w-[100px] max-w-[130px] text-slate-300">${styleText}</td>`);
-            tdCells.push(`<td class="py-3 px-4 font-mono font-medium whitespace-nowrap">${row[7] || ""}</td>`);
+            tdCells.push(`<td class="py-3 px-4 font-mono font-medium whitespace-nowrap">${row[map.seer2] || ""}</td>`);
         }
-        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[8] || ""}</td>`); // EER2
-        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[9] || ""}</td>`); // HSPF2
-        tdCells.push(`<td class="py-3 px-4 font-mono text-xs text-slate-400 whitespace-nowrap">${row[10] || "N/A"}</td>`); // AHRI
-        tdCells.push(`<td class="py-3 px-4 font-mono whitespace-nowrap">${row[11] || ""}</td>`); // Cool BTU
-        tdCells.push(`<td class="py-3 px-4 font-mono whitespace-nowrap">${row[12] || ""}</td>`); // Heat BTU
-        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-400 whitespace-nowrap">${row[13] || ""}</td>`); // PAGE
-        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[14] ? row[14] + '"' : ""}</td>`); // W
-        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[15] ? row[15] + '"' : ""}</td>`); // H
-
-        let priceVal = row[16] || "";
+        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[map.eer2] || ""}</td>`); // EER2
+        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[map.hspf2] || ""}</td>`); // HSPF2
+        tdCells.push(`<td class="py-3 px-4 font-mono text-xs text-slate-400 whitespace-nowrap">${row[map.ahri] || "N/A"}</td>`); // AHRI
+        tdCells.push(`<td class="py-3 px-4 font-mono whitespace-nowrap">${row[map.coolbtu] || ""}</td>`); // Cool BTU
+        tdCells.push(`<td class="py-3 px-4 font-mono whitespace-nowrap">${row[map.heatbtu] || ""}</td>`); // Heat BTU
+        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-400 whitespace-nowrap">${row[map.page] || ""}</td>`); // PAGE
+        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[map.width] ? row[map.width] + '"' : ""}</td>`); // W
+        tdCells.push(`<td class="py-3 px-4 font-mono text-slate-355 whitespace-nowrap">${row[map.height] ? row[map.height] + '"' : ""}</td>`); // H
+        
+        let priceVal = row[map.price] || "";
         if (typeof priceVal === "number") priceVal = "$" + Math.round(priceVal).toLocaleString();
         else if (priceVal !== "" && !isNaN(Number(priceVal))) priceVal = "$" + Math.round(Number(priceVal)).toLocaleString();
         tdCells.push(`<td class="py-3 px-4 text-right font-bold text-emerald-455 font-mono whitespace-nowrap text-[16px] md:text-[18px]">${priceVal || "N/A"}</td>`); // PRICE
 
-        tdCells.push(`<td class="py-3 px-4 font-semibold text-slate-300 whitespace-nowrap">${row[17] || ""}</td>`); // TAX
-
+        tdCells.push(`<td class="py-3 px-4 font-semibold text-slate-300 whitespace-nowrap">${row[map.tax] || ""}</td>`); // TAX
         tr.innerHTML = tdCells.join('');
         tbody.appendChild(tr);
       });
@@ -1683,16 +1702,37 @@
         const floatVoiceBtn = document.getElementById('top-mic-btn');
 
         if (voiceBtn) voiceBtn.classList.add('bg-red-600', 'animate-pulse');
-        if (floatVoiceBtn) floatVoiceBtn.classList.add('bg-red-600', 'animate-pulse');
+        if (floatVoiceBtn) {
+            floatVoiceBtn.classList.add('bg-red-600', 'animate-pulse');
+            floatVoiceBtn.classList.remove('bg-slate-700', 'hover:bg-slate-600');
+        }
 
         recognition.start();
 
         recognition.onresult = function(event) {
             const speechResult = event.results[0][0].transcript.toUpperCase();
             if (voiceBtn) voiceBtn.classList.remove('bg-red-600', 'animate-pulse');
-            if (floatVoiceBtn) floatVoiceBtn.classList.remove('bg-red-600', 'animate-pulse');
+            if (floatVoiceBtn) {
+                floatVoiceBtn.classList.remove('bg-red-600', 'animate-pulse');
+                floatVoiceBtn.classList.add('bg-slate-700', 'hover:bg-slate-600');
+            }
             
             // Parsing Engine
+            // Brands
+            if (speechResult.includes("CARRIER")) selectMobilePill('brand', 'Carrier', 3);
+            else if (speechResult.includes("COMFORTMAKER") || speechResult.includes("C-MAKER") || speechResult.includes("C MAKER")) selectMobilePill('brand', 'Comfortmaker', 3);
+            else if (speechResult.includes("RUUD")) selectMobilePill('brand', 'Ruud', 3);
+
+            // Tiers / Series
+            if (speechResult.includes("INFINITY")) selectMobilePill('series', 'Infinity', 4);
+            else if (speechResult.includes("PERFORMANCE")) selectMobilePill('series', 'Performance', 4);
+            else if (speechResult.includes("COMFORT") && !speechResult.includes("COMFORTMAKER")) selectMobilePill('series', 'Comfort', 4);
+            else if (speechResult.includes("MAIN LINE") || speechResult.includes("MAINLINE")) selectMobilePill('series', 'Main Line', 4);
+            else if (speechResult.includes("PERFORMER")) selectMobilePill('series', 'Performer', 4);
+            else if (speechResult.includes("BUILDER")) selectMobilePill('series', 'Builder', 4);
+            else if (speechResult.includes("ACHIEVER")) selectMobilePill('series', 'Achiever', 4);
+
+            // Capacities
             if (speechResult.includes("1.5 TON") || speechResult.includes("ONE AND A HALF TON")) selectMobilePill('capacity', '1.5 Ton', 1);
             else if (speechResult.includes("2.5 TON") || speechResult.includes("TWO AND A HALF TON")) selectMobilePill('capacity', '2.5 Ton', 1);
             else if (speechResult.includes("3.5 TON") || speechResult.includes("THREE AND A HALF TON")) selectMobilePill('capacity', '3.5 Ton', 1);
@@ -1702,14 +1742,17 @@
             else if (speechResult.includes("4 TON") || speechResult.includes("FOUR TON")) selectMobilePill('capacity', '4 Ton', 1);
             else if (speechResult.includes("5 TON") || speechResult.includes("FIVE TON")) selectMobilePill('capacity', '5 Ton', 1);
 
+            // System Types
             if (speechResult.includes("STRAIGHT COOL") || speechResult.includes("AC") || speechResult.includes("A/C")) selectMobilePill('type', 'STRAIGHT COOL', 2);
             if (speechResult.includes("HEAT PUMP")) selectMobilePill('type', 'HEAT PUMP', 2);
             if (speechResult.includes("FURNACE") || speechResult.includes("GAS")) selectMobilePill('type', 'Gas Furnace', 2);
 
+            // Mechanical Stages
             if (speechResult.includes("SINGLE STAGE") || speechResult.includes("ONE STAGE") || speechResult.includes("1 STAGE")) selectMobilePill('stage', 'SINGLE STAGE', 5);
             if (speechResult.includes("TWO STAGE") || speechResult.includes("2 STAGE")) selectMobilePill('stage', '2 STAGE', 5);
             if (speechResult.includes("VARIABLE")) selectMobilePill('stage', 'VARIABLE SPEED', 5);
 
+            // Application Styles
             if (speechResult.includes("STANDARD")) selectMobilePill('style', 'STANDARD', 6);
             if (speechResult.includes("COASTAL")) selectMobilePill('style', 'COASTAL', 6);
             if (speechResult.includes("APARTMENT")) selectMobilePill('style', 'APARTMENT', 6);
@@ -1721,13 +1764,19 @@
 
         recognition.onerror = function(event) {
             if (voiceBtn) voiceBtn.classList.remove('bg-red-600', 'animate-pulse');
-            if (floatVoiceBtn) floatVoiceBtn.classList.remove('bg-red-600', 'animate-pulse');
+            if (floatVoiceBtn) {
+                floatVoiceBtn.classList.remove('bg-red-600', 'animate-pulse');
+                floatVoiceBtn.classList.add('bg-slate-700', 'hover:bg-slate-600');
+            }
             console.error("Speech recognition error", event.error);
         };
         
         recognition.onend = function() {
             if (voiceBtn) voiceBtn.classList.remove('bg-red-600', 'animate-pulse');
-            if (floatVoiceBtn) floatVoiceBtn.classList.remove('bg-red-600', 'animate-pulse');
+            if (floatVoiceBtn) {
+                floatVoiceBtn.classList.remove('bg-red-600', 'animate-pulse');
+                floatVoiceBtn.classList.add('bg-slate-700', 'hover:bg-slate-600');
+            }
         };
     }
 
