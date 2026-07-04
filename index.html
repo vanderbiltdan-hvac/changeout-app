@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v01.26 | Zoom Unlock, Sticky Headers, Compare Vis Fix & Rounding -->
+<!-- Changeout Lookup v01.27 | Hardcoded Logos, Horizontal Scroll, Toast Alerts & Tweaks -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v01.26</title>
+  <title>Changeout Lookup v01.27</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -50,6 +50,9 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col no-scrollbar selection:bg-blue-500 selection:text-white pb-32">
 
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[9999] flex flex-col gap-2 pointer-events-none"></div>
+
   <!-- TOP STATUS BAR & DRAWER (STICKY) -->
   <header class="sticky top-0 z-50 bg-slate-900 border-b border-slate-800 shadow-md">
     <div class="w-full px-2 md:px-4 py-2 md:py-3 flex items-center justify-between">
@@ -62,7 +65,7 @@
 
       <!-- Platt's Logo (Top Center) -->
       <div class="flex-1 flex justify-center px-2 shrink">
-        <img src="./platts.png" alt="Platt's Air and Heat" class="transition-all" style="height: var(--platt-h, 40px); max-height: 8vh; width: var(--platt-w, auto); object-fit: contain;">
+        <img src="./platts.png" alt="Platt's Air and Heat" class="transition-all h-[50px] md:h-[80px] w-auto object-contain">
       </div>
 
       <!-- Compare Mode Toggle -->
@@ -106,7 +109,7 @@
           <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">🔍</span>
           <span class="text-[10px] font-medium text-slate-400">Filters</span>
         </button>
-        <button onclick="clearAllSelections()" class="flex flex-col items-center justify-center p-3 rounded-xl bg-red-955/20 hover:bg-red-955/40 border border-red-900/30 hover:border-red-700/55 transition group col-span-4 md:col-span-1">
+        <button onclick="clearAllSelections()" class="flex flex-col items-center justify-center p-3 rounded-xl bg-red-955/20 hover:bg-red-955/40 border border-red-900/30 hover:border-red-700/55 transition group">
           <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">🧹</span>
           <span class="text-[10px] font-medium text-red-400">Clear All</span>
         </button>
@@ -395,36 +398,7 @@
         </div>
       </div>
 
-      <!-- Logo Scalers -->
-      <div class="space-y-4 border-t border-slate-700 pt-4 mt-4">
-          <h4 class="text-xs font-bold text-white tracking-wide">Brand Logo Sizing</h4>
-          <div class="grid grid-cols-2 gap-4">
-              <div>
-                  <div class="flex justify-between"><label class="text-[10px] text-slate-400">Carrier Height</label><span id="val-car-h" class="text-[10px] text-blue-400">34px</span></div>
-                  <input type="range" min="10" max="60" value="34" oninput="updateLogoSize('car-h', this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500">
-              </div>
-              <div>
-                  <div class="flex justify-between"><label class="text-[10px] text-slate-400">Carrier Width</label><span id="val-car-w" class="text-[10px] text-blue-400">97px</span></div>
-                  <input type="range" min="0" max="150" value="97" oninput="updateLogoSize('car-w', this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500">
-              </div>
-              <div>
-                  <div class="flex justify-between"><label class="text-[10px] text-slate-400">C-Maker Height</label><span id="val-cm-h" class="text-[10px] text-blue-400">26px</span></div>
-                  <input type="range" min="10" max="60" value="26" oninput="updateLogoSize('cm-h', this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500">
-              </div>
-              <div>
-                  <div class="flex justify-between"><label class="text-[10px] text-slate-400">C-Maker Width</label><span id="val-cm-w" class="text-[10px] text-blue-400">auto</span></div>
-                  <input type="range" min="0" max="150" value="0" oninput="updateLogoSize('cm-w', this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500">
-              </div>
-              <div>
-                  <div class="flex justify-between"><label class="text-[10px] text-slate-400">Platt's Height</label><span id="val-platt-h" class="text-[10px] text-blue-400">50px</span></div>
-                  <input type="range" min="10" max="80" value="50" oninput="updateLogoSize('platt-h', this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500">
-              </div>
-              <div>
-                  <div class="flex justify-between"><label class="text-[10px] text-slate-400">Platt's Width</label><span id="val-platt-w" class="text-[10px] text-blue-400">auto</span></div>
-                  <input type="range" min="0" max="250" value="0" oninput="updateLogoSize('platt-w', this.value)" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500">
-              </div>
-          </div>
-      </div>
+
 
       <!-- Table Font Scaler -->
       <div class="space-y-2 border-t border-slate-700 pt-4 mt-4">
@@ -480,7 +454,7 @@
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
           <span>Lookup</span>
-          <span class="text-[8px] font-normal text-blue-400">v01.26</span>
+          <span class="text-[8px] font-normal text-blue-400">v01.27</span>
         </span>
       </button>
 
@@ -987,9 +961,9 @@
         const brandVal = String(row[3] || "").trim().toUpperCase();
         let brandHtml = row[3] || "";
         if (brandVal === "CARRIER") {
-            brandHtml = `<img src="./carrier.png" alt="Carrier" style="height: var(--car-h, 34px); width: var(--car-w, 97px); object-fit: contain;">`;
+            brandHtml = `<img src="./carrier.png" alt="Carrier" class="h-[35px] md:h-[40px] w-auto object-contain">`;
         } else if (brandVal === "COMFORTMAKER") {
-            brandHtml = `<img src="./comfortmaker.png" alt="Comfortmaker" style="height: var(--cm-h, 26px); width: var(--cm-w, auto); object-fit: contain;">`;
+            brandHtml = `<img src="./comfortmaker.png" alt="Comfortmaker" class="h-[40px] md:h-[45px] w-auto object-contain">`;
         } else {
             brandHtml = `<span class="font-bold text-white">${row[3] || ""}</span>`;
         }
@@ -1011,8 +985,13 @@
         
         // Index 5: Mechanical Stage
         tdCells.push(`<td class="py-3 px-4 whitespace-nowrap">${row[5] || ""}</td>`);
+
         // Index 6: Application / Style
-        tdCells.push(`<td class="py-3 px-4 whitespace-normal break-words min-w-[100px] max-w-[130px] leading-tight text-slate-300">${row[6] || ""}</td>`);
+        let styleText = row[6] || "";
+        if (useAbbreviations && String(styleText).toUpperCase().includes("STANDARD")) {
+            styleText = "STND";
+        }
+        tdCells.push(`<td class="py-3 px-4 whitespace-normal break-words min-w-[100px] max-w-[130px] leading-tight text-slate-300">${styleText}</td>`);
         // Index 7: SEER2
         tdCells.push(`<td class="py-3 px-4 font-mono font-medium whitespace-nowrap">${row[7] || ""}</td>`);
         // Index 8: EER2
@@ -1526,7 +1505,7 @@
             if (speechResult.includes("CROSSOVER")) selectMobilePill('style', 'CROSSOVER', 6);
 
             filterData();
-            alert('Heard: "' + speechResult + '"\nFilters applied!');
+            showToast('🎙️ Heard: ' + speechResult);
         };
 
         recognition.onerror = function(event) {
@@ -1586,6 +1565,35 @@
                 document.exitFullscreen();
             }
         }
+    }
+
+    // Custom Toast Notification
+    function showToast(message) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = 'bg-slate-800 text-slate-200 text-xs font-bold px-4 py-3 rounded-xl shadow-2xl border border-slate-700 transition-all duration-500 transform -translate-y-full opacity-0';
+        toast.innerText = message;
+        container.appendChild(toast);
+        setTimeout(() => { toast.classList.remove('-translate-y-full', 'opacity-0'); }, 10);
+        setTimeout(() => {
+            toast.classList.add('-translate-y-full', 'opacity-0');
+            setTimeout(() => toast.remove(), 500);
+        }, 3000);
+    }
+
+    // Horizontal Mouse Scroll for Compare Mode
+    const resultsCanvas = document.getElementById('results-canvas');
+    if (resultsCanvas) {
+        resultsCanvas.addEventListener('wheel', function(e) {
+            const table = document.getElementById('results-table');
+            if (table && table.classList.contains('compare-mode')) {
+                if (e.deltaY !== 0) {
+                    e.preventDefault();
+                    this.scrollLeft += e.deltaY;
+                }
+            }
+        }, { passive: false });
     }
   </script>
 </body>
