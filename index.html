@@ -1,10 +1,10 @@
-<!-- Changeout Lookup v04.04 | Visual Polish & Grid Limit Unlock -->
+<!-- Changeout Lookup v04.05 | In-Grid Button Mockup Column -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Changeout Lookup v04.04</title>
+  <title>Changeout Lookup v04.05</title>
   <!-- Apple standalone web-app tags to hide address bar on iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -20,6 +20,7 @@
       --col-width-capacity: 1.0fr;
       --col-width-type: 1.2fr;
       --col-width-brand: 1.5fr;
+      --col-width-mockup: 120px;
       --col-width-series: 1.5fr;
       --col-width-stage: 1.0fr;
       --col-width-style: 1.0fr;
@@ -505,6 +506,10 @@
             <span>Brand</span>
           </label>
           <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="toggle-col-mockup" checked onchange="toggleColumnVisibility('mockup')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+            <span>Mockup</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer text-slate-300 hover:text-white">
             <input type="checkbox" id="toggle-col-series" checked onchange="toggleColumnVisibility('series')" class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
             <span>Series / Tier</span>
           </label>
@@ -618,7 +623,7 @@
       <button class="flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 border border-blue-500 rounded-xl text-white shadow-lg min-w-[70px] relative">
         <span class="text-base select-none">🔍</span>
         <span class="text-[10px] font-bold tracking-wide mt-0.5 flex flex-col items-center">
-          <span class="text-[8px] font-normal text-blue-400">v04.04</span>
+          <span class="text-[8px] font-normal text-blue-400">v04.05</span>
         </span>
       </button>
 
@@ -731,6 +736,7 @@
       { key: 'capacity', name: 'Capacity', index: 1 },
       { key: 'type', name: 'System Type', index: 2 },
       { key: 'brand', name: 'Brand', index: 3 },
+      { key: 'mockup', name: 'Mockup', index: -1 },
       { key: 'series', name: 'Series / Tier', index: 4 },
       { key: 'stage', name: 'Mechanical Stage', index: 5 },
       { key: 'style', name: 'Application / Style', index: 6 },
@@ -747,12 +753,13 @@
       { key: 'tax', name: 'Tax Creditable', index: 17 }
     ];
 
-    // Column Visibility State (All 18 tracked)
+    // Column Visibility State (All 19 tracked)
     const columnVisibility = {
       source: true,
       capacity: true,
       type: true,
       brand: true,
+      mockup: true,
       series: true,
       stage: true,
       style: true,
@@ -769,12 +776,13 @@
       tax: true
     };
 
-    // Mobile Filters State (All 18 tracked as arrays for multi-select)
+    // Mobile Filters State (All 19 tracked as arrays for multi-select)
     const mobileFilterState = {
       source: [],
       capacity: [],
       type: [],
       brand: [],
+      mockup: [],
       series: [],
       stage: [],
       style: [],
@@ -1484,8 +1492,23 @@
         if (colIdx === 0) headerClass += ' first-col-cell';
         if (colIdx === activeCols.length - 1) headerClass += ' last-col-cell';
         header.className = headerClass;
-        header.onclick = () => openCategoryModal(cfg.key, cfg.name);
-        header.innerHTML = `<span data-col-key="${cfg.key}">${cfg.name}</span>`;
+        
+        if (cfg.key === 'mockup') {
+          header.onclick = (e) => e.stopPropagation();
+          header.innerHTML = `
+            <div class="flex flex-col items-center justify-center bg-slate-900 border border-slate-700 rounded-lg overflow-hidden w-full shadow-sm">
+              <button class="w-full h-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 transition-colors p-1 border-b border-slate-700" title="Add to Proposal">
+                <img src="./carrier.png" alt="Carrier" class="h-6 w-auto object-contain pointer-events-none">
+              </button>
+              <button class="w-full py-1 flex items-center justify-center bg-slate-900 hover:bg-slate-800 transition-colors" title="View System Details">
+                <span class="px-2 text-[9px] font-bold tracking-wide uppercase border rounded text-green-400 border-green-800/40 bg-green-900/30">Performance</span>
+              </button>
+            </div>
+          `;
+        } else {
+          header.onclick = () => openCategoryModal(cfg.key, cfg.name);
+          header.innerHTML = `<span data-col-key="${cfg.key}">${cfg.name}</span>`;
+        }
         canvas.appendChild(header);
       });
 
@@ -1513,6 +1536,8 @@
           let htmlContent = "";
           if (cfg.key === 'source') {
             htmlContent = `<span class="text-slate-200 font-mono font-semibold">#${rawVal}</span>`;
+          } else if (cfg.key === 'mockup') {
+            htmlContent = `<span class="text-slate-600 font-semibold">---</span>`;
           } else if (cfg.key === 'brand') {
             let brandVal = String(rawVal).trim().toUpperCase();
             if (brandVal === "CARRIER") {
